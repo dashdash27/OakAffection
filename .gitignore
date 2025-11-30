@@ -4,5 +4,8 @@ __pycache__/
 *.log
 instance/
 app/static/img/uploads/*
+!app/static/img/uploads/.gitkeep
 app/static/videos/uploads/*
+!app/static/videos/uploads/.gitkeep
 app/static/img/colors/*
+!app/static/img/colors/.gitkeep
