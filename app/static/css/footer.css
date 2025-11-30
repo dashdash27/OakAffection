@@ -1,0 +1,51 @@
+footer {
+    background-color: rgb(15, 136, 15);
+    color: white;
+    padding: 40px 0;
+}
+.dark-theme footer {
+    background-color: rgb(8, 81, 8)
+}
+.footer__inner {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+.footer__item {
+    width: max-content;
+}
+.footer__item-title {
+    font-weight: 600;
+    font-size: 22px;
+    color: white;
+}
+.footer__item-inner {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px
+}
+.footer__link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.footer__link .link-text {
+    color: white;
+}
+.footer__link svg {
+    width: 35px;
+    height: 35px;
+}
+.freepik {
+    font-size: 13px;
+    color: rgb(226, 226, 226);
+    margin-top: 30px;
+}
+
+@media (min-width: 768px) {
+    .footer__inner {
+        gap: 120px;
+    }
+}

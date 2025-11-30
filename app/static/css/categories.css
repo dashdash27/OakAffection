@@ -1,0 +1,199 @@
+.wood-oils {
+    padding: 70px 0;
+}
+.indoor, .outdoor, .other {
+    margin-top: 40px;
+}
+
+/* Category title */
+.category__title {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.category__title-text {
+    font-size: 27px;
+    line-height: 40px;
+    font-weight: 600;
+}
+.category__title-text-h3 {
+    font-size: 17px;
+    line-height: 25px;
+    text-transform: uppercase;
+}
+.category__title-arrow {
+    opacity: 0;
+    display: flex;
+    align-items: center;
+}
+.category__title-arrow svg {
+    width: 35px;
+    height: 35px;
+}
+.category__title-arrow svg path {
+    fill: var(--text-color)
+}
+.category__title:hover .category__title-arrow {
+    opacity: 1;
+    transition: 0.3s;
+}
+
+/* Category items */
+.category__inner {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 20px;
+}
+.category__item {
+    width: 48%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Разная ширина category-item */
+.outdoor .category__item, 
+.other .category__item {
+    width: 100%;
+}
+
+.category__item img {
+    width: 100%;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+.category__item-title {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-weight: 600;
+    background-color: var(--bg-color);
+    border-radius: 30px;
+    padding: 6px 15px 6px 15px;
+    border: 1px solid transparent;
+    transition: 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.category__item-title h4 {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: -1000;
+}
+.category__item-title-text {
+    font-size: 12px;
+    font-weight: 600;
+}
+.category__item-title-arrow {
+    opacity: 0;
+}
+.category__item-title-arrow path {
+    fill: var(--text-color);
+}
+
+/* -- Dark mode -- */
+.dark-theme .wood-oils img {
+    filter: brightness(0.85);
+}
+
+/* Category Imen Hover */
+.category__item:hover .category__item-title {
+    width: 100%;
+    transition: 0.2s;
+    bottom: 0;left: 0;
+    border-radius:0;
+    padding: 12px 15px;
+    border: 1px solid var(--bg-sub-color);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.category__item:hover .category__item-title-arrow {
+    opacity: 1;
+    transition: 0.3s;
+}
+.dark-theme .category__item:hover img{
+    filter: brightness(1);
+    transition: 0.2s;
+}
+.category__item:hover img {
+    filter: brightness(0.85);
+    transition: 0.2s;
+}
+
+@media (min-width: 600px) {
+    .category__item-title {
+        bottom: 10px;
+        left: 10px;
+        padding: 7px 20px 7px 20px;
+    }
+    .category__item-title-text {
+        font-size: 14px;
+    }
+}
+
+@media (min-width: 768px) {
+    .category__title-text {
+        font-size: 35px;
+    }
+    .outdoor, .indoor, .other {
+        margin-top: 50px;
+    }
+    .category__title-text-h3 {
+        font-size: 23px;
+    }
+    .category__inner {
+        margin-top: 25px;
+    }
+    .category__item-title {
+        bottom: 15px;
+        left: 15px;
+        padding: 10px 20px 10px 20px;
+    }
+    .category__item-title-text {
+        font-size: 17px;
+    }
+    .category__item:hover .category__item-title {
+        border-radius:0;
+        padding: 20px 20px;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .indoor .category__item {
+        width: 24%;
+    }
+    .outdoor .category__item {
+        width: 32%;
+    }
+    .other .category__item {
+        width: 48%;
+    }
+    .indoor, .outdoor, .other {
+        margin-top: 80px;
+    }
+    .category__inner {
+        margin-top: 30px;
+    }
+    .category__item-title {
+        bottom: 12px;
+        left: 12px;
+        padding: 10px 20px 10px 20px;
+    }
+    .category__item-title-text {
+        font-size: 14px;
+    }
+    .category__item:hover .category__item-title {
+        border-radius:0;
+        padding: 20px 20px;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+}

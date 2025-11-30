@@ -1,0 +1,150 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    {{page_title}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/form.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-title">
+                {{page_title}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-text">Название цвета <span>*</span> </div>
+                {{ form.name(class="form-input input-name")}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Категория цвета <span>*</span>
+                </div>
+                {{ form.category_id(class="form-control color-category-select") }}
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Иконка цвета</div>
+                <div class="form-comment">
+                    Лучше добавить иконку, чтобы на сайте цвет выглядел наглядно.
+                </div>
+                <div class="icon-entry media-entry">
+                    <input 
+                        type="file" 
+                        name="{{ form.icon.name }}" 
+                        id="{{ form.icon.id }}" 
+                        class="icon-input media-input" 
+                        accept="image/*"
+                    />
+                    <label for="{{ form.icon.id }}" class="custom-icon-input custom-media-input">Выбрать фото</label>
+                    <div class="custom-icon-name custom-media-name">
+                        {% if color and color.icon_url %}
+                            {{ color.icon_url.split('/')[-1] }}
+                        {% endif %}
+                    </div>
+                    {% if color and color.icon_url %}
+                        <img src="{{ url_for('static', filename=color.icon_url) }}" class="preview-icon preview-media"/>
+                    {% else %}
+                        <img src="" class="preview-icon preview-media" style="display:none;" />
+                    {% endif %}
+                    <div class="icon-error media-error error-message"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Товары с этим цветом</div>
+                <div class="form-comment">
+                    Прикрепить цвет к товару можно на странице редактирования товара.
+                </div>
+                <div class="products">
+                    {% if color %}
+                        {% for product in color.products %}
+                            {% if product.delete_mark %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}">
+                                {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}">
+                                {% endif %}
+                                    {{product.name}}
+                                <span style="color: rgb(224, 66, 103)">(на удаление)</span>
+                                </a>    
+                            {% else %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}"> {{product.name}}
+                                        <span style="color: rgb(25, 48, 181)">(редактируется)</span></a>
+                                    {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}"> {{product.name}}
+                                        <span style="color: rgb(15, 173, 15)">(опубликован)</span></a>
+                                    {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for draft in color.product_drafts %}
+                            {% if not draft.product %}
+                                <a href="{{ url_for('admin.edit_product_orphan_draft', draft_id=draft.id) }}" > {{draft.name}}
+                                    <span style="color: rgb(6, 140, 177)">(новый, редактируется)</span>
+                                </a>
+                            {% else %}
+                                {% if draft.product not in color.products %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=draft.id) }}" > {{draft.name}}
+                                        <span style="color: rgb(25, 48, 181)">(редактируется)</span>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="btns">
+                <a class="btn close-btn" href="{{ url_for('admin.index') }}">Отменить</a>
+                <input class="btn submit-btn" id="submit" name="submit" type="submit" value="{{button_name}}">
+            </div>
+            
+
+        </form>
+        
+    </div>
+
+
+    <script src="{{ url_for('static', filename='js/admin/base.js') }}"></script>
+
+    <script>
+        const iconEntry = document.querySelector(".icon-entry");
+        const iconInput = iconEntry.querySelector(".icon-input");
+        const errorMessage = iconEntry.querySelector(".error-message");
+
+        iconInput.addEventListener('change', function(event) {
+            let input = event.target;
+            let preview = iconEntry.querySelector('.preview-icon');
+
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result; // Устанавливаем data URL загруженного файла
+                    preview.style.display = 'block'; // Показываем изображение
+                }
+                reader.readAsDataURL(input.files[0]);
+                
+                if (isLatinFileName(input.files[0].name)) {
+                    errorMessage.innerHTML = "";
+                }
+                else {
+                    errorMessage.innerHTML = "Название файла может содержать только английские буквы, цифры и дефис";
+                }
+                iconInput.parentElement.querySelector('.custom-icon-name').innerHTML = input.files[0].name;
+            } else {
+                preview.src = '';
+                preview.style.display = 'none'; // Если файл не выбран, скрываем превью
+                errorMessage.innerHTML = "Не загружено фото";
+                iconInput.parentElement.querySelector('.custom-icon-name').innerHTML = "-";
+            }
+        });
+    </script>
+{% endblock %}

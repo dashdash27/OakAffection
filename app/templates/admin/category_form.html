@@ -1,0 +1,123 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    {{page_title}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/form.css') }}">
+{% endblock %}
+    
+{% block content %}
+    <div class="container">
+
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-title">
+                {{page_title}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-text">Название категории <span>*</span></div>
+                {{ form.name(class="form-input input-name")}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-text">Мини-описание категории (100-150 слов) <span>*</span></div>
+                {{ form.description_tag(class="form-input input-description-tag")}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Родительская категория
+                </div>
+                {{ form.parent_id(class="form-control parent-select") }}
+
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Категории-потомки</div>
+                <div class="form-item children">
+                    <div class="form-text">Выбранные категории</div>
+                    <div class="children-error error-message"></div>
+                    {{ form.children(class="form-control children-select", multiple=True, required=false) }}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Товары из категории</div>
+                <div class="form-comment">
+                    Прикрепить товар к определенной категории можно на странице редактирования товара.
+                </div>
+                <div class="products">
+                    {% if category %}
+                        {% for product in category.products %}
+                            {% if product.delete_mark %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}">
+                                {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}">
+                                {% endif %}
+                                    {{product.name}}
+                                <span style="color: rgb(224, 66, 103)">(на удаление)</span>
+                                </a>    
+                            {% else %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}"> {{product.name}}
+                                        <span style="color: rgb(25, 48, 181)">(редактируется)</span></a>
+                                    {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}"> {{product.name}}
+                                        <span style="color: rgb(15, 173, 15)">(опубликован)</span></a>
+                                    {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for draft in category.product_drafts %}
+                            {% if not draft.product %}
+                                <a href="{{ url_for('admin.edit_product_orphan_draft', draft_id=draft.id) }}" > {{draft.name}}
+                                    <span style="color: rgb(6, 140, 177)">(новый, редактируется)</span>
+                                </a>
+                            {% else %}
+                                {% if draft.product not in category.products %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=draft.id) }}" > {{draft.name}}
+                                        <span style="color: rgb(25, 48, 181)">(редактируется)</span>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="btns">
+                <a class="btn close-btn" href="#" onclick="history.back(); return false;">Отменить</a>
+                <input class="btn submit-btn" id="submit" name="submit" type="submit" value="{{button_name}}">
+            </div>
+
+        </form>
+        
+    </div>
+
+    <!-- For select -->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        // for children
+        const multipleCancelButton2 = new Choices('.children-select', {
+            searchEnabled: false,
+            removeItemButton: true,
+            removeItemIconText: '×',
+            maxItemCount: -1
+        });
+
+        // Найти контейнер выбранных элементов
+        const selectedItems2 = document.querySelector('.children').querySelector('.choices__list--multiple');
+
+        // Создать и вставить кастомный разделитель
+        const separator2 = document.createElement('div');
+        separator2.textContent = 'Потомки (нажмите, чтобы выбрать)';
+        separator2.classList.add("form-text");
+
+        selectedItems2.parentNode.insertBefore(separator2, selectedItems2.nextSibling);
+    </script>
+
+{% endblock %}

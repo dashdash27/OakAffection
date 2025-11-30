@@ -1,0 +1,1 @@
+from .sitemap_generator import generate_sitemap

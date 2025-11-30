@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Oak Affection{% endblock %}
+{% block description %}Масла для обработки дерева наружные и внутренные работы{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/new.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}">
+{% endblock %}
+
+{% block content %}
+    <section class="hero">
+        <div class="container">
+            
+            <div class="hero__title">
+                С Заботой О <br>Дереве
+            </div>
+
+            <h1 class="main-h1">
+                Масла для обработки деревянных изделий
+            </h1>
+
+            <p class="hero__describe">
+                Все для ухода за деревянными изделиями и не только
+            </p>
+
+            <a href="#wood-oils" class="hero__button" aria-label="Перейти к продукции">
+                <div class="hero__button-text">
+                    Продукция
+                </div>
+                <img src="{{ url_for('static', filename='img/icons/arrow-right.svg') }}" alt="" class="hero__button-icon" aria-hidden="true">
+            </a>
+
+            <img class="hero__image" src="{{ url_for('static', filename='img/tree.png') }}" alt="Большое зеленое дерево">
+            <div id="wood-oils"></div>
+        </div>
+    </section>
+    <section class="wood-oils" id="wood-oils">
+        <div class="container">
+
+            <a href="{{ url_for('main.show_oils', category_key='oils') }}" class="category__title category__title-h2">
+                <h2 class="category__title-text category__title-text-h2">Масла Для Обработки Дерева</h2>
+                <div class="category__title-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                </div>
+            </a>
+            
+
+            <section class="indoor">
+                
+                <a href="{{ url_for('main.show_oils', category_key='indoor_oils') }}" class="category__title category__title-h3">
+                    <h3 class="category__title-text category__title-text-h3">Масла для внутренних работ</h3>
+                    <div class="category__title-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                    </div>
+                </a>
+
+                <div class="category__inner">
+
+                    <a href="{{ url_for('main.show_oils', category_key='kitchen_oils') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/wooden-ceramic-dishes.jpg') }}" alt="Предметы кухонной утвари">
+                        <div class="category__item-title">
+                            <h4>Масла для кухонной утвари</h4>
+                            <div class="category__item-title-text">
+                                Для кухни
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('main.show_oils', category_key='furniture_oils') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/wooden-furniture.jpg') }}"" alt="Деревянная мебель в комнате" class="indoor__item-img">
+                        <div class="category__item-title">
+                            <h4>Масла для обработки деревянной мебели</h4>
+                            <div class="category__item-title-text">
+                                Для мебели
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('main.show_oils', category_key='bath_oils') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/bathhouse.jpg') }}"" alt="Баня и сауна">
+                        <div class="category__item-title">
+                            <h4>Масла для обработки бань и саун</h4>
+                            <div class="category__item-title-text">
+                                Для мебели
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('main.show_oils', category_key='toy_oils') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/wooden-toys.jpg') }}"" alt="Деревянная игрушка">
+                        <div class="category__item-title">
+                            <h4>Масла для бработки деверянных игрушек</h4>
+                            <div class="category__item-title-text">
+                                Для игрушек
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <section class="outdoor">
+                <a href="{{ url_for('main.show_oils', category_key='outdoor_oils') }}" class="category__title category__title-h3">
+                    <h3 class="category__title-text category__title-text-h3">Масла для наружных работ</h3>
+                    <div class="category__title-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                    </div>
+                </a>
+
+                <div class="category__inner">
+                    <a href="{{ url_for('main.show_oils', category_key='terrace_oils') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/wooden-terrace.jpg') }}"" alt="Терраса в частном доме с деревянным покрытием">
+                        <div class="category__item-title">
+                            <h4>Масла для обработки деревянных террас</h4>
+                            <div class="category__item-title-text">
+                                Для террас
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('main.show_oils', category_key='facade_oils') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/wooden-house.jpg') }}"" alt="Деревянный дом в лесу">
+                        <div class="category__item-title">
+                            <h4>Масла для обработки деревянных фасадов</h4>
+                            <div class="category__item-title-text">
+                                Для фасадов
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('main.show_oils', category_key='garden_furniture_oils') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/garden-furniture.jpg') }}"" alt="Садовая мебель: деревянные столы и стулья на фоне природы">
+                        <div class="category__item-title">
+                            <h4>Масла для обработки деревянной садовой мебели</h4>
+                            <div class="category__item-title-text">
+                                Для садовой мебели
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+            <section class="other">
+                <a href="{{ url_for('main.show_oils', category_key='other_oils') }}" class="category__title">
+                    <h3 class="category__title-text category__title-text-h3">Другое</h3>
+                    <div class="category__title-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                    </div>
+                </a>
+                <div class="category__inner">
+                    <a href="{{ url_for('main.show_oils', category_key='tinted_oils') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/tinted-oils.jpg') }}"" alt="Банки с колерованными маслами">
+                        <div class="category__item-title">
+                            <h4>Колерованные масла (масла с пигментом)</h4>
+                            <div class="category__item-title-text">
+                                Колерованные масла (с пигментом)
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('main.show_oils', category_key='liquids') }}" class="category__item">
+                        <img src="{{ url_for('static', filename='img/categories/primer.jpg') }}"" alt="Покрытие деревянной поверхности грунтовкой">
+                        <div class="category__item-title">
+                            <h4>Грунтовочные масла и растворители</h4>
+                            <div class="category__item-title-text">
+                                Грунтовочные масла и растворители
+                            </div>
+                            <div class="category__item-title-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
+                            </div>
+                        </div>
+                    </a>
+                    
+                </div>
+                <div id="about"></div>
+            </section>
+        </div>
+    </section>
+    <section class="about">
+        <div class="container">
+            <div class="about__title">
+                Почему Выбирают Нас?
+            </div>
+            <div class="about__inner">
+                <div class="about__one about__item">
+                    <div class="about__item-number">
+                        1
+                    </div>
+                    <div class="about__item-text">
+                        Наша продукция - идеальное сочетание <span>натуральности</span> и высокой <span>эффективности</span>
+                    </div>
+                </div>
+                <div class="about__two about__item">
+                    <div class="about__item-number">
+                        2
+                    </div>
+                    <div class="about__item-text">
+                        Мы используем только <span>экологически чистые</span> материалы без химических добавок
+                    </div>
+                </div>
+                <div class="about__two about__item">
+                    <div class="about__item-number">
+                        3
+                    </div>
+                    <div class="about__item-text">
+                        Наши продукты <span>удобны</span> в использовании как для профессионалов, так и для любителей
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="new"></div>
+    </section>
+    {% if new_products %}
+        <section class="new">
+            <div class="container">
+                <div class="new__title">
+                    Новинки
+                </div>
+                {% if new_products|length < 5 %}
+                    <div class="new__inner new__inner-mini">
+                {% else %}
+                    <div class="new__inner">
+                {% endif %}
+                
+                    <!-- Тут расположены новинки, подгружаем из Flask-->
+                    <div class="swiper newSwiper">
+                        <div class="swiper-wrapper">
+                            <!-- Повторяющиеся карточки товаров -->
+                            {% for product in new_products %}
+                                <div class="card swiper-slide">
+                                    <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__media-wrapper">
+                                        {% if product.photos %}
+                                            <img class="card__media" src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">
+                                        {% else %}
+                                            <img class="card__media-no-photo" src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
+                                        {% endif %}
+                                    </a>
+                                    <div class="card__name">
+                                        {{product.name}}
+                                    </div>
+                                    <div class="card__addition">
+                                        <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__button">
+                                            Посмотреть
+                                        </a>
+                                        <div class="card__isnew">
+                                            {% if product.is_new %}
+                                                Новинка
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                    </div>
+                    <!-- Кнопки навигации -->
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    
+    <script src="{{ url_for('static', filename='js/swiper/swiper-bundle.min.js') }}"></script>
+
+    <script>
+
+    var swiper = new Swiper(".newSwiper", {
+        slidesPerView: 'auto',       // показываем 4 карточки в ряду
+        spaceBetween: 30,       // расстояние между слайдами
+        slidesPerGroup: 1,
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+        loop: false,            // зацикливание отключено, можно включить по желанию
+        breakpoints: {          // адаптивность для мобильных устройств
+        320: {
+            slidesPerView: 1,
+            spaceBetween: 20,
+        },
+        500: {
+            slidesPerView: 2,
+            spaceBetween: 25,
+        },
+        800: {
+            slidesPerView: 3,
+            spaceBetween: 25,
+        },
+        1024: {
+            slidesPerView: 4,
+            spaceBetween: 20,
+        },
+    }
+});
+
+    </script>
+
+{% endblock %}

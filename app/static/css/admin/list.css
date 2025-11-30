@@ -1,0 +1,266 @@
+
+.title-wrapper {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+h1 {
+    font-size: 25px;
+}
+.filters {
+    margin: 20px 0;
+    display: flex;
+    gap: 20px;
+}
+.filter {
+    color: rgb(88, 85, 85);
+    font-size: 18px;
+}
+.filter-active {
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: underline;
+}
+.table {
+    display: inline-block;
+    max-width: 100%;
+    font-size: 16px;
+    background-color: #fff;
+    border-radius: 10px;
+    border: 1px solid rgb(218, 218, 219);
+    overflow: scroll;
+    max-height: 500px;
+}
+.table-header {
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.table-header .table-cell {
+    background-color: rgb(221, 220, 228);
+    color: black;
+}
+.table > div:nth-child(even) .table-cell {
+    background-color: #f6f6f6;
+}
+.table-row {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+}
+.table-row-subtitle {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+}
+.table-cell {
+    border: 1px solid rgb(209, 209, 209);
+    padding: 15px 15px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+.table-btns {
+    width: 300px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.btn {
+    display: inline-block;
+    border: 1px solid rgb(206, 206, 206);
+    background-color: #fff;
+    padding: 7px 10px;
+    color: var(--accent-color);
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.btn:hover {
+    transition: 0.4s;
+}
+.delete-btn:hover {
+    background-color: rgb(255, 203, 214);
+}
+.edit-btn:hover {
+    background-color: rgb(166, 211, 94);
+}
+.duplicate-btn:hover {
+    background-color: rgb(198, 216, 251);
+}
+.create-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    border-radius: 5px;
+    color: white;
+}
+.create-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* Product */
+.table-cell-index {
+    width: 45px;
+    color: rgb(123, 123, 129);
+    font-weight: 600;
+}
+.product-name {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: start;
+    justify-content: center;
+}
+.product-name .link {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: var(--accent-color);
+}
+.product-name .link:hover {
+    text-decoration: underline;
+}
+.product-price {
+    width: 80px;
+    color: var(--accent-color);
+    font-weight: 600;
+}
+.product-main-photo {
+    width: 100px;
+}
+.product-main-photo img {
+    width: 50px;
+}
+.product-media {
+    width: 100px;
+}
+.product-new {
+    width: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.product-status {
+    width: 210px;
+}
+.product-btns {
+    width: 350px;
+}
+.status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgb(206, 206, 206);
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 7px 15px;
+}
+.status-text {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Target */
+.target-index {
+    width: 50px;
+}
+.target-name {
+    width: 250px;
+}
+.target-products-num {
+    width: 250px;
+}
+
+/* Category */
+.category-index {
+    width: 50px;
+}
+.category-name {
+    width: 300px;
+}
+
+/* Char */
+.char-index {
+    width: 50px;
+}
+.char-name {
+    width: 250px;
+}
+
+/* Product Group */
+.group-index {
+    width: 50px;
+}
+.group-name {
+    width: 250px;
+}
+.group-char {
+    width: 160px;
+}
+.group-products, 
+.category-products {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 10px;
+}
+.group-products a,
+.category-products a {
+    display: block;
+    color: black;
+}
+.group-products a:hover {
+    text-decoration: underline;
+}
+
+/* Color */
+.color-name {
+    width: 150px;
+}
+.color-icon {
+    width: 90px;
+}
+.color-icon img {
+    width: 60px;
+}
+.color-category {
+    width: 200px;
+}
+.color-products {
+    width: 300px;
+}
+
+/* Color Category */
+.color-category-name {
+    width: 250px;
+}
+.color-category-colors {
+    width: 300px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.color-category-btns {
+    width: 300px;
+}
+.category-color-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+    border: 1px solid rgb(182, 199, 214);
+    background-color: #fff;
+    border-radius: 30px;
+}
+.category-color-wrapper img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}

@@ -1,0 +1,111 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка - Товары
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <div class="title-wrapper">
+                <h1>Товары</h1>
+                <a href="{{ url_for('.create_product_draft') }}" class="create-btn">Добавить новый товар + </a>
+            </div>
+            <div class="filters">
+                <a href="{{ url_for('.product_list') }}" class="filter">Список всех товаров </a>
+                <a href="{{ url_for('.edited_product_list') }}" class="filter">Редактированные товары </a>
+                <a href="{{ url_for('.delete_marked_product_list') }}" class="filter">Отмеченные на удаление</a>
+                <a href="{{ url_for('.added_product_list') }}" class="filter filter-active">Добавленные товары</a>
+            </div>
+            <div class="products table">
+                <div class="table-header table-row">
+                    <div class="table-cell table-cell-index product-index">
+                        №
+                    </div>
+                    <div class="table-cell product-name">
+                        Название товара
+                    </div>
+                    <div class="table-cell product-price">
+                        Цена ₽
+                    </div>
+                    <div class="table-cell product-new">
+                        Новинка
+                    </div>
+                    <div class="table-cell product-status">
+                        Статус
+                    </div>
+                    <div class="table-cell product-main-photo">
+                        Основное фото
+                    </div>
+                    <div class="table-cell product-media">
+                        Фото и видео
+                    </div>
+                    <div class="table-cell product-btns table-btns">
+                        Действия
+                    </div>
+                </div>
+                
+                {% for product in orphan_drafts %}
+                    <div class="product table-row">
+                        <div class="product-index table-cell table-cell-index">
+                            {{loop.index}}
+                        </div>
+                        <div class="product-name table-cell">
+                            {{product.name}}
+                        </div>
+                        <div class="product-price table-cell">
+                            {% if product.price %}
+                                {{product.price}}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="product-new table-cell">
+                            {% if product.is_new %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="#58ac2a" fill-rule="evenodd" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1.177-7.86l-2.765-2.767L7 12.431l3.119 3.121a1 1 0 0 0 1.414 0l5.952-5.95l-1.062-1.062z"/></svg>
+                            {% endif %}
+                        </div>
+                        <div class="product-status table-cell">
+                            <div class="status" style="background: rgb(234, 234, 255)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 1024 1024"><title>Edit-filled SVG Icon</title><path fill="rgb(75, 58, 171)" d="M880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32m-622.3-84c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9"/></svg>
+                                <div class="status-text" style="color: rgb(75, 58, 171)">
+                                    Новый, редактируется
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-main-photo table-cell">
+                            {% if product.photos %}
+                                <img src="{{ url_for('static', filename=product.photos[0].photo_url) }}"/>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="product-media table-cell">
+                            <div class="wrapper">
+                                {% if product.photos | length == 0 %}
+                                    <span style="background-color: rgb(249, 221, 64);">{{product.photos | length }} фото,</span> <br>
+                                {% else %}
+                                    {{product.photos | length }} фото <br>
+                                {% endif %}
+                                {{product.videos | length }} видео
+                            </div>
+                        </div>
+                        
+                        <div class="table-cell table-btns product-btns">
+                            <a href="{{ url_for('admin.edit_product_orphan_draft', draft_id=product.id) }}" class="edit-btn btn">Редактировать</a>
+                            <form method="POST" action="{{ url_for('admin.delete_product_draft') }}" 
+                                onsubmit="return confirm('Вы уверены, что хотите удалить черновик продукта {{product.name}}?');">
+                                <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                                <input type="hidden" name="draft_id" value="{{product.id}}">
+                                <button type="submit" class="delete-btn btn">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+    </div>
+{% endblock %}

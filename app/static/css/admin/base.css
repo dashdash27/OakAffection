@@ -1,0 +1,75 @@
+body {
+    background-color: #f7f7f8;
+    --accent-color: #3f50b1;
+    --error-color: rgb(234, 68, 104);
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 80px 0 100px 0;
+}
+* {
+    box-sizing: border-box;
+}
+.menu {
+    background-color: var(--accent-color);
+    width: 100%;
+    height: 60px;
+    position: fixed;
+    top:0;
+    z-index: 10;
+}
+.menu .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    height: 100%;
+}
+.menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+.menu a:hover {
+    text-decoration: underline;
+}
+.menu a:visited, .menu a:active {
+    color: white;
+}
+.container {
+    max-width: 1300px;
+    width: 100%;
+    margin: 0 auto; 
+    padding: 0 30px;
+}
+a {
+    text-decoration: none;
+}
+
+/* Flash */
+.flash {
+    position: relative;
+    margin-top: 20px;
+    background-color: #bae6a1;
+    border-radius: 5px;
+    border: 1px solid rgb(205, 205, 205);
+    padding: 20px 100px 20px 30px;
+    line-height: 25px;
+}
+.flash-warning {
+    background-color: #fffddc;
+    color: #d4ac0b;
+}
+.flash-info {
+    background-color: #e7ecff;
+    color: #3e3eae;
+}
+.flash-success {
+    background-color: #ddffc3;
+    color: #10870e;
+}
+.flash .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}

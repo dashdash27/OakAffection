@@ -1,0 +1,33 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    {{page_title}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/form.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-title">
+                {{page_title}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-text">Название характеристики <span>*</span></div>
+                {{ form.name(class="form-input input-name")}}
+            </div>
+
+            <div class="btns">
+                <a class="btn close-btn" href="#" onclick="history.back(); return false;">Отменить</a>
+                <input class="btn submit-btn" id="submit" name="submit" type="submit" value="{{button_name}}">
+            </div>
+
+        </form>
+        
+    </div>
+{% endblock %}

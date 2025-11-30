@@ -1,0 +1,116 @@
+.home-title {
+    font-size: 35px;
+    font-weight: 600;
+    margin-top: 30px
+}
+.cards-wrapper {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.card {
+    background-color: #fff;
+    border-radius: 7px;
+    width: max-content;
+    padding: 30px 35px;
+    -webkit-box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
+}
+.changes-card {
+    width: 450px;
+    flex-shrink: 0;
+}
+.card:hover {
+    -webkit-box-shadow: 0px 0px 8px -1px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 0px 0px 8px -1px rgba(34, 60, 80, 0.2);
+    box-shadow: 0px 0px 8px -1px rgba(34, 60, 80, 0.2);
+}
+.card-title {
+    font-size: 22px;
+    font-weight: 600;
+}
+.changes-comment {
+    margin-top: 20px;
+    line-height: 25px;
+}
+.boxes {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.updated-box, .deleted-box, .added-box {
+    display: flex;
+    align-items: center;
+}
+.boxes .text {
+    width: 130px;
+    font-size: 18px;
+}
+.boxes .number {
+    font-size: 25px;
+    font-weight: 600;
+}
+.updated-box .number {
+    color: rgb(48, 68, 179);
+}
+.added-box .number {
+    color: rgb(36, 178, 23);
+}
+.deleted-box .number {
+    color: rgb(222, 82, 87);
+}
+.publish-changes {
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 7px;
+    color: white;
+    margin-top: 20px;
+    cursor: pointer;
+    font-size: 18px;
+}
+.publish-changes:hover {
+    filter: brightness(1.1);
+}
+
+.items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 700px;
+}
+.item {
+    background-color: #fff;
+    border-radius: 10px;
+    width: 300px;
+    padding: 30px 40px;
+}
+.item .card-title {
+    font-size: 17px;
+}
+.item .number {
+    margin-top: 20px;
+    font-size: 16px;
+}
+.item .number span {
+    font-weight: 600;
+    font-size: 20px;
+    margin-right: 10px;
+}
+.item-btns {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+.item-btns a {
+    padding: 7px 15px;
+    border-radius:5px;
+    border: 1px solid rgb(224, 229, 239);
+    font-size: 15px;
+}
+.item-btns a:hover {
+    background-color: #f4f5f7;
+}

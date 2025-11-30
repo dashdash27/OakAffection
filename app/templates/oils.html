@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{category.name}}{% endblock %}
+{% block description %}{{category.description_tag}}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+{% endblock %}
+
+{% block content %}
+    <section class="products">
+        <div class="container">
+            <div class="path">
+                <a href="{{ url_for('main.index') }}#wood-oils" class="path__item-catalog">
+                    Каталог
+                </a>
+                <div class="path__div">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 6l6 6l-6 6"/></svg>
+                </div>
+                <h1 class="path__item-name">
+                    {{category.name}}
+                </h1>
+            </div>
+            <div class="products__inner">
+                {% for product in products %}
+                    <div class="card">
+                        <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__media-wrapper">
+                            {% if product.photos %}
+                                <img class="card__media" src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">
+                            {% else %}
+                                <img class="card__media-no-photo" src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
+                            {% endif %}
+                        </a>
+                        <div class="card__name">
+                                {{product.name}}
+                            </div>
+                       <div class="card__addition">
+                            <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__button">
+                                Посмотреть
+                            </a>
+                            <div class="card__isnew">
+                                {% if product.is_new %}
+                                    Новинка
+                                {% endif %}
+                            </div>
+                       </div>
+                        
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

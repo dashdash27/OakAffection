@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}Админка OAKAFFECTION{% endblock %}</title>
+
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicons/admin-favicon.png') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/base.css') }}">
+    {% block css %}
+    {% endblock %}
+</head>
+<body>
+    <header class="menu">
+        <div class="container">
+            <a href="{{ url_for('admin.index') }}">Главная</a>
+            <a href="{{ url_for('admin.product_list') }}">Товары</a>
+            <a href="{{ url_for('admin.product_group_list') }}">Группы товаров</a>
+            <a href="{{ url_for('admin.category_list') }}">Категории товаров</a>
+            <a href="{{ url_for('admin.characteristic_list') }}">Характеристики</a>
+            <a href="{{ url_for('admin.target_list') }}">Предметы обработки</a>
+            <a href="{{ url_for('admin.color_list') }}">Цвета</a>
+        </div>
+    </header>
+    <div class="container">
+        <div class="flashes">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">
+                            <div class="message">
+                                {{ message }}
+                            </div>
+                            <div class="close-btn" onclick="this.parentElement.style.display='none';">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 1024 1024"><title>Close-outlined SVG Icon</title><path fill="#5a646c" fill-rule="evenodd" d="M799.855 166.312c.023.007.043.018.084.059l57.69 57.69c.041.041.052.06.059.084a.118.118 0 0 1 0 .069c-.007.023-.018.042-.059.083L569.926 512l287.703 287.703c.041.04.052.06.059.083a.118.118 0 0 1 0 .07c-.007.022-.018.042-.059.083l-57.69 57.69c-.041.041-.06.052-.084.059a.118.118 0 0 1-.069 0c-.023-.007-.042-.018-.083-.059L512 569.926L224.297 857.629c-.04.041-.06.052-.083.059a.118.118 0 0 1-.07 0c-.022-.007-.042-.018-.083-.059l-57.69-57.69c-.041-.041-.052-.06-.059-.084a.118.118 0 0 1 0-.069c.007-.023.018-.042.059-.083L454.073 512L166.371 224.297c-.041-.04-.052-.06-.059-.083a.118.118 0 0 1 0-.07c.007-.022.018-.042.059-.083l57.69-57.69c.041-.041.06-.052.084-.059a.118.118 0 0 1 .069 0c.023.007.042.018.083.059L512 454.073l287.703-287.702c.04-.041.06-.052.083-.059a.118.118 0 0 1 .07 0Z"/></svg>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

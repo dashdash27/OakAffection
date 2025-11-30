@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}{{product.name}}{% endblock %}
+{% block description %}{{product.description_tag}}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/product_detail.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabs.css') }}">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/slider.css') }}">
+{% endblock %}
+
+{% block js %}
+    <script defer src="{{ url_for('static', filename='js/swiper/swiper-bundle.min.js') }}"></script>
+    <!-- Swiper is in video -->
+    <script defer src="{{ url_for('static', filename='js/video.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <section class="product">
+        <div class="container">
+            <div class="product__inner">
+
+                <div class="column-1">
+                    <div class="product__media">
+                        <div class="swiper">
+                            <div class="swiper-wrapper">
+                                {% if not product.photos and not product.videos %}
+                                    <div class="swiper-slide">
+                                        <img class="swiper-slide-no-photo" src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
+                                    </div>
+                                {% endif %}
+
+                                {% if product.photos %}
+                                    {% for photo in product.photos %}
+                                        <div class="swiper-slide">
+                                            <img src="{{ url_for('static', filename=photo.photo_url) }}" loading="lazy" alt="{{photo.alt}}" />
+                                            <div class="swiper-lazy-preloader"></div>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if product.videos %}
+                                    {% for video in product.videos %}
+                                        <div class="swiper-slide">
+                                            <video autoplay muted loop class="video" autoplay loading="lazy" src="{{ url_for('static', filename=video.video_url) }}">
+                                                <source src="{{ url_for('static', filename=video.video_url) }}" type="video/mp4">
+                                            </video>
+                                            <div class="controls">
+                                                <button class="play-pause-btn">
+                                                    <img src="{{ url_for('static', filename='img/icons/pause.svg') }}" alt="">
+                                                </button>
+                                                <button class="mute-btn">
+                                                    <img src="{{ url_for('static', filename='img/icons/mute.svg') }}" alt="">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-pagination" style="bottom: -40px; position: absolute;"></div>
+                    </div>
+
+                    <div class="desktop-block">
+                        <div class="tabs">
+                            <input type="radio" id="tab1" name="tab" checked>
+                            <label for="tab1">Описание</label>
+
+                            <input type="radio" id="tab2" name="tab">
+                            <label for="tab2">Способ применения</label>
+
+                            <input type="radio" id="tab3" name="tab">
+                            <label for="tab3">Что обрабатывать</label>
+
+                            <div class="tab-content">
+                                <div id="content1" style="white-space: pre-line;">{{product.description}}</div>
+                                <div id="content2" style="white-space: pre-line;">{{product.application}}</div>
+                                <div id="content3">
+                                    <ul class="targets-list">
+                                        {% for item in product.targets %}
+                                        <li class="target-item">
+                                            <div class="target-icon">
+                                                <svg width="10px" height="10px" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="8" cy="8" r="8" fill="#fff"></circle> </g></svg>  
+                                            </div>
+                                            <div class="target-name">
+                                                {{item.name}} 
+                                            </div>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="column-2">
+                    <div class="product__info">
+                        <h1 class="product__name">
+                            {{product.name}}
+                        </h1>
+                        {% if product.subname %}
+                            <div class="product__subname">
+                                {{product.subname}}
+                            </div>
+                        {% endif %}
+
+                        <!--- Группа товаров (пока только объем)-->
+                        {% if product.group %}
+                            <div class="product__variants">
+                                <div class="variants__title">{{ product.group.characteristic.name }}</div>
+                                <div class="variants">
+                                    {% for p in sorted_group_products %}
+                                        {% for pchar in p.characteristics %}
+                                            {% if pchar.characteristic.id == product.group.characteristic.id %}
+                                                {% if pchar.value == product_group_characteristic_value %}
+                                                    <a href="{{ url_for('main.product_detail', slug=p.slug) }}" class="variant variant-active">
+                                                        {{pchar.value}} 
+                                                    </a>
+                                                {% else %}
+                                                    <a href="{{ url_for('main.product_detail', slug=p.slug) }}" class="variant">
+                                                        {{pchar.value}} 
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Colors -->
+                         {% if product.color %}
+                            <div class="product__colors">
+                                <div class="colors__title">
+                                    Цвет
+                                </div>
+                                <div class="color-dropdown">
+                                    {% for color in product.color.category.colors %}
+                                        {% if color.products %}
+                                            {% if color.name == product.color.name %}
+                                                <a href="#" class="color color-active">
+                                                    {% if color.icon_url %}
+                                                        <img src="{{ url_for('static', filename=color.icon_url) }}" class="color-icon" alt="">
+                                                    {% endif %}
+                                                    <div class="color-name">
+                                                        {{color.name}}
+                                                    </div>
+                                                    <div class="color-chevron">
+                                                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 9L12 15L18 9" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                                                    </div>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <div class="color-list">
+                                        {% for color in product.color.category.colors %}
+                                            {% if color.products %}
+                                                {% if color.name != product.color.name %}
+                                                    <a href="{{ url_for('main.product_detail', slug=color.products[0].slug) }}" class="color">
+                                                        {% if color.icon_url %}
+                                                            <img src="{{ url_for('static', filename=color.icon_url) }}" class="color-icon" alt="">
+                                                        {% endif %}
+                                                        <div class="color-name">
+                                                            {{color.name}}
+                                                        </div>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                         {% endif %}
+                    
+                        <div class="product__links">
+                            {% if product.ozon_link %}
+                                <a href="{{product.ozon_link}}" target="_blank" class="product__ozon-link">
+                                    Купить на озон
+                                </a>
+                            {% endif %}
+                            {% if product.wb_link %}
+                                <a href="{{product.wb_link}}" target="_blank" class="product__wb-link">
+                                    Купить на wildberries
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="product__characteristics">
+                        <div class="product-detail__title">
+                            Характеристики
+                        </div>
+                        <ul class="characteristics-list">
+                            {% for item in product.characteristics %}
+                                <li class="characteristic">
+                                    <div class="characteristic-name">
+                                        {{item.characteristic.name}}
+                                    </div>
+                                    <div class="characteristic-value">
+                                        {{item.value}}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="mobile-block">
+                        <div class="product__targets">
+                            <div class="product-detail__title">
+                                Можно обрабатывать:
+                            </div>
+                            <ul class="targets-list">
+                                {% for item in product.targets %}
+                                <li class="target-item">
+                                    <div class="target-icon">
+                                        <svg width="10px" height="10px" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle cx="8" cy="8" r="8" fill="#fff"></circle> </g></svg>  
+                                    </div>
+                                    <div class="target-name">
+                                        {{item.name}} 
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="product__description">
+                            <div class="product-detail__title">
+                                Описание
+                            </div>
+                            <div class="description" style="white-space: pre-line;">
+                                {{product.description}}
+                            </div>
+                        </div>
+
+                        <div class="product__application">
+                            <div class="product-detail__title">
+                                Способ применения
+                            </div>
+                            <div class="application" style="white-space: pre-line;">
+                                {{product.application}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        
+
+            
+            </div>
+        </div>
+    </section>
+
+    <script>
+        colorList = document.querySelector('.color-list');
+        colorActive = document.querySelector('.color-active')
+        colorActive.addEventListener('click', function(e) {
+            e.preventDefault();
+            colorList.classList.toggle('show');
+        });
+    </script>
+
+{% endblock %}

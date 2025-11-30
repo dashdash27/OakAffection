@@ -1,0 +1,106 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка - Цвета товаров
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        
+        <div class="title-wrapper">
+            <h1>Список цветов</h1>
+            <a href="{{ url_for('admin.color_category_list') }}">Категории цветов</a>
+            <a href="{{ url_for('.create_color') }}" class="create-btn">Добавить цвет + </a>
+        </div>
+        <div class="colors table">
+            <div class="table-header table-row">
+                <div class="table-cell table-cell-index color-index">
+                    №
+                </div>
+                <div class="table-cell color-name">
+                    Название
+                </div>
+                <div class="table-cell color-icon">
+                    Иконка
+                </div>
+                <div class="table-cell color-category">
+                    Категория цвета
+                </div>
+                <div class="table-cell color-products">
+                    Товары с этим цветом
+                </div>
+                <div class="table-cell color-btns table-btns">
+                    Действия
+                </div>
+            </div>
+            {% for color in colors %}
+                <div class="target table-row">
+                    <div class="color-index table-cell table-cell-index">
+                        {{loop.index}}
+                    </div>
+                    <div class="color-name table-cell">
+                        {{color.name}}
+                    </div>
+                    <div class="color-icon table-cell">
+                        {% if color.icon_url %}
+                            <img src="{{ url_for('static', filename=color.icon_url) }}"/>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                    <div class="color-category table-cell">
+                        {{ color.category.name }}
+                    </div>
+                    <div class="color-products table-cell">
+                        {% for product in color.products %}
+                            {% if product.delete_mark %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}">
+                                {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}">
+                                {% endif %}
+                                    {{product.name}}
+                                <span style="color: rgb(224, 66, 103)">(на удаление)</span>
+                                </a>    
+                            {% else %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}"> {{product.name}}
+                                        <span style="color: rgb(25, 48, 181)">(редактируется)</span></a>
+                                    {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}"> {{product.name}}
+                                        <span style="color: rgb(15, 173, 15)">(опубликован)</span></a>
+                                    {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for draft in color.product_drafts %}
+                            {% if not draft.product %}
+                                <a href="{{ url_for('admin.edit_product_orphan_draft', draft_id=draft.id) }}" > {{draft.name}}
+                                    <span style="color: rgb(6, 140, 177)">(новый, редактируется)</span>
+                                </a>
+                            {% else %}
+                                {% if draft.product not in color.products %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=draft.id) }}" > {{draft.name}}
+                                        <span style="color: rgb(25, 48, 181)">(редактируется)</span>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="table-cell table-btns color-btns">
+                        <a href="{{ url_for('admin.edit_color', color_id=color.id) }}" class="edit-btn btn">Редактировать</a>
+                        <form method="POST" action="{{ url_for('admin.delete_color') }}" 
+                            onsubmit="return confirm('Вы уверены, что хотите удалить цвет \'{{ color.name | e }}\'?');">
+                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                            <input type="hidden" name="color_id" value="{{color.id}}">
+                            <button type="submit" class="delete-btn btn">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

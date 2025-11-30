@@ -1,0 +1,109 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка - Товары
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <div class="title-wrapper">
+                <h1>Товары</h1>
+                <a href="{{ url_for('.create_product_draft') }}" class="create-btn">Добавить новый товар + </a>
+            </div>
+            <div class="filters">
+                <a href="{{ url_for('.product_list') }}" class="filter">Список всех товаров </a>
+                <a href="{{ url_for('.edited_product_list') }}" class="filter">Редактированные товары </a>
+                <a href="{{ url_for('.delete_marked_product_list') }}" class="filter filter-active">Отмеченные на удаление</a>
+                <a href="{{ url_for('.added_product_list') }}" class="filter">Добавленные товары</a>
+            </div>
+            <div class="products table">
+                <div class="table-header table-row">
+                    <div class="table-cell table-cell-index product-index">
+                        №
+                    </div>
+                    <div class="table-cell product-name">
+                        Название товара
+                    </div>
+                    <div class="table-cell product-price">
+                        Цена ₽
+                    </div>
+                    <div class="table-cell product-new">
+                        Новинка
+                    </div>
+                    <div class="table-cell product-status">
+                        Статус
+                    </div>
+                    <div class="table-cell product-main-photo">
+                        Основное фото
+                    </div>
+                    <div class="table-cell product-media">
+                        Фото и видео
+                    </div>
+                    <div class="table-cell product-btns table-btns">
+                        Действия
+                    </div>
+                </div>
+                
+                {% for product in delete_marked_products %}
+                    <div class="product table-row">
+                        <div class="product-index table-cell table-cell-index">
+                            {{loop.index}}
+                        </div>
+                        <div class="product-name table-cell">
+                            {{product.name}}
+                        </div>
+                        <div class="product-price table-cell">
+                             {% if product.price %}
+                                {{product.price}}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="product-new table-cell">
+                            {% if product.is_new %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="#58ac2a" fill-rule="evenodd" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1.177-7.86l-2.765-2.767L7 12.431l3.119 3.121a1 1 0 0 0 1.414 0l5.952-5.95l-1.062-1.062z"/></svg>
+                            {% endif %}
+                        </div>
+                        <div class="product-status table-cell">
+                            <div class="status" style="background: #fee4e4;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 1024 1024"><title>Delete-filled SVG Icon</title><path fill="#e12d51" d="M864 256H736v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32m-200 0H360v-72h304z"/></svg>
+                                <div class="status-text" style="color: rgb(192, 50, 50)">
+                                    На удаление 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-main-photo table-cell">
+                            {% if product.photos %}
+                                <img src="{{ url_for('static', filename=product.photos[0].photo_url) }}"/>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="product-media table-cell">
+                            <div class="wrapper">
+                                {% if product.photos | length == 0 %}
+                                    <span style="background-color: rgb(255, 255, 49);">{{product.photos | length }} фото,</span> <br>
+                                {% else %}
+                                    {{product.photos | length }} фото <br>
+                                {% endif %}
+                                {{product.videos | length }} видео
+                            </div>
+                        </div>
+                        
+                        <div class="table-cell table-btns product-btns">
+                            <form method="POST" action="{{ url_for('admin.mark_product_for_delete') }}">
+                                <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                                <input type="hidden" name="product_id" value="{{product.id}}">
+                                <button type="submit" class="delete-btn btn">Снять с удаления</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    {{page_title}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/form.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-title">
+                {{page_title}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-text">Название группы товаров <span>*</span></div>
+                {{ form.name(class="form-input input-name")}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Группирующая характеристика
+                </div>
+                {% if group and (group.products or group.product_drafts) %}
+                    <div class="form-comment">
+                        У данной группы есть товары, поэтому изменить группирующую характеристику не получится. Это возможно сделать только если все товары из группы будут удалены.
+                    </div>
+                    <div style="display:none">
+                        {{ form.characteristic_id(class="form-control characteristic-select") }}
+                    </div>
+                    <div class="group-char">
+                        {{group.characteristic}}
+                    </div>
+                {% else %}
+                    {{ form.characteristic_id(class="form-control characteristic-select") }}
+                {% endif %}
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Товары в этой группе
+                </div>
+                <div class="form-comment">
+                    Прикрепить товар в группе можно на странице редактирования товара.
+                </div>
+                {% if group %}
+                    <div class="products">
+                        {% if group %}
+                        {% for product in group.products %}
+                            {% if product.delete_mark %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}">
+                                {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}">
+                                {% endif %}
+                                    {{product.name}}
+                                <span style="color: rgb(224, 66, 103)">(на удаление)</span>
+                                </a>    
+                            {% else %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}"> {{product.name}}
+                                        <span style="color: rgb(25, 48, 181)">(редактируется)</span></a>
+                                    {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}"> {{product.name}}
+                                        <span style="color: rgb(15, 173, 15)">(опубликован)</span></a>
+                                    {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for draft in group.product_drafts %}
+                            {% if not draft.product %}
+                                <a href="{{ url_for('admin.edit_product_orphan_draft', draft_id=draft.id) }}" > {{draft.name}}
+                                    <span style="color: rgb(6, 140, 177)">(новый, редактируется)</span>
+                                </a>
+                            {% else %}
+                                {% if draft.product not in group.products %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=draft.id) }}" > {{draft.name}}
+                                        <span style="color: rgb(25, 48, 181)">(редактируется)</span>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    </div>
+                {% endif %}
+
+            <div class="btns">
+                <a class="btn close-btn" href="{{ url_for('admin.index') }}">Отменить</a>
+                <input class="btn submit-btn" id="submit" name="submit" type="submit" value="{{button_name}}">
+            </div>
+
+        </form>   
+    </div>
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка - Товары
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <div class="title-wrapper">
+                <h1>Товары</h1>
+                <a href="{{ url_for('.create_product_draft') }}" class="create-btn">Добавить новый товар + </a>
+            </div>
+            <div class="filters">
+                <a href="{{ url_for('.product_list') }}" class="filter-active filter">Список всех товаров </a>
+                <a href="{{ url_for('.edited_product_list') }}" class=" filter">Редактированные товары </a>
+                <a href="{{ url_for('.delete_marked_product_list') }}" class="filter">Отмеченные на удаление</a>
+                <a href="{{ url_for('.added_product_list') }}" class="filter">Добавленные товары</a>
+            </div>
+            <div class="products table">
+                <div class="table-header table-row">
+                    <div class="table-cell table-cell-index product-index">
+                        №
+                    </div>
+                    <div class="table-cell product-name">
+                        Название товара
+                    </div>
+                    <div class="table-cell product-price">
+                        Цена ₽
+                    </div>
+                    <div class="table-cell product-new">
+                        Новинка
+                    </div>
+                    <div class="table-cell product-status">
+                        Статус
+                    </div>
+                    <div class="table-cell product-main-photo">
+                        Основное фото
+                    </div>
+                    <div class="table-cell product-media">
+                        Фото и видео
+                    </div>
+                    <div class="table-cell product-btns table-btns">
+                        Действия
+                    </div>
+                </div>
+
+                {% if products %}
+                    <div class="product table-row table-row-subtitle">
+                        Опубликованные товары:
+                    </div>
+                {% endif %}
+                
+                {% for product in products %}
+                    {% if product.draft %}
+                        {% if product.delete_mark%}
+                            {% set current_product = product %}
+                        {% else %}
+                            {% set current_product = product.draft %}
+                        {%  endif %}
+                    {% else %}
+                        {% set current_product = product %}
+                    {% endif%}
+                    <div class="product table-row">
+                        <div class="product-index table-cell table-cell-index">
+                            {{loop.index}}
+                        </div>
+                        <div class="product-name table-cell">
+                            <div class="name">
+                                {{current_product.name}}
+                            </div>
+                            <a class="link" href="{{ url_for('main.product_detail', slug=product.slug) }}" target="_blank">Посмотреть на сайте</a>
+                        </div>
+                        <div class="product-price table-cell">
+                            {% if current_product.price %}
+                                {{current_product.price}}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="product-new table-cell">
+                            {% if current_product.is_new %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="#58ac2a" fill-rule="evenodd" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1.177-7.86l-2.765-2.767L7 12.431l3.119 3.121a1 1 0 0 0 1.414 0l5.952-5.95l-1.062-1.062z"/></svg>
+                            {% endif %}
+                        </div>
+                        <div class="product-status table-cell">
+                            {% if product.delete_mark %}
+                                <div class="status" style="background: #fee4e4;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 1024 1024"><title>Delete-filled SVG Icon</title><path fill="#e12d51" d="M864 256H736v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32m-200 0H360v-72h304z"/></svg>
+                                    <div class="status-text" style="color: rgb(192, 50, 50)">
+                                        На удаление
+                                    </div>
+                                </div>
+                            {% else %}
+                                {% if product.draft %}
+                                    <div class="status" style="background: rgb(234, 234, 255)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 1024 1024"><title>Edit-filled SVG Icon</title><path fill="rgb(75, 58, 171)" d="M880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32m-622.3-84c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9"/></svg>
+                                        <div class="status-text" style="color: rgb(75, 58, 171)">
+                                            Редактируется
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="status" style="background: rgb(249, 255, 230)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 512 512"><title>Cloud-done SVG Icon</title><path fill="#13a43f" d="M424.44 227.25a16 16 0 0 1-12.12-12.39c-7.68-36.68-24.45-68.15-49.18-92A153.57 153.57 0 0 0 256 80c-35.5 0-68.24 11.69-94.68 33.8a156.24 156.24 0 0 0-42 56a16 16 0 0 1-11.37 9.15c-27 5.62-51.07 17.34-69.18 33.87C13.39 235.88 0 267.42 0 304c0 36 14.38 68.88 40.49 92.59C65.64 419.43 99.56 432 136 432h260c32.37 0 60.23-8.57 80.59-24.77C499.76 388.78 512 361.39 512 328c0-57.57-42-90.58-87.56-100.75m-95.2-8.94l-107.8 128a16 16 0 0 1-12 5.69h-.27a16 16 0 0 1-11.88-5.28l-45.9-50.87c-5.77-6.39-5.82-16.33.3-22.4a16 16 0 0 1 23.16.63l33.9 37.58l96-114a16 16 0 1 1 24.48 20.62Z"/></svg>
+                                        <div class="status-text" style="color: rgb(21, 122, 62)">
+                                            Опубликован
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="product-main-photo table-cell">
+                            {% if current_product.photos %}
+                                <img src="{{ url_for('static', filename=current_product.photos[0].photo_url) }}"/>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="product-media table-cell">
+                            <div class="wrapper">
+                                {% if current_product.photos | length == 0 %}
+                                    <span style="background-color: rgb(245, 251, 90);">{{current_product.photos | length }} фото,</span> <br>
+                                {% else %}
+                                    {{current_product.photos | length }} фото <br>
+                                {% endif %}
+                                {{current_product.videos | length }} видео
+                            </div>
+                        </div>
+                        
+                        <div class="table-cell table-btns product-btns">
+                            {% if product.delete_mark %}
+                                <form method="POST" action="{{ url_for('admin.mark_product_for_delete') }}">
+                                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                                    <input type="hidden" name="product_id" value="{{product.id}}">
+                                    <button type="submit" class="delete-btn btn">Снять с удаления</button>
+                                </form>
+                            {% else %}
+                                {% if product.draft %}
+                                    <a href="{{ url_for('admin.edit_product_draft', draft_id=product.draft.id) }}" class="edit-btn btn">Редактировать</a>
+                                {% else %}
+                                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="edit-btn btn">Редактировать</a>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('admin.mark_product_for_delete') }}">
+                                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                                    <input type="hidden" name="product_id" value="{{product.id}}">
+                                    <button type="submit" class="delete-btn btn">Пометить на удаление</button>
+                                </form>
+                                {% if product.draft %}
+                                    <form method="POST" action="{{ url_for('admin.delete_product_draft') }}"
+                                        onsubmit="return confirm('Вы уверены, что хотите отменить изменения продукта {{product.draft.name}}?');">
+                                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                                        <input type="hidden" name="draft_id" value="{{product.draft.id}}">
+                                        <button type="submit" class="delete-btn btn">Отменить изменения</button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {% if orphan_drafts %}
+                    <div class="product table-row table-row-subtitle">
+                        Новые товары, которые требуют подтверждения для публикации на сайт:
+                    </div>
+                {% endif %}
+
+                {% for orphan_draft in orphan_drafts %}
+                    <div class="product table-row">
+                        <div class="product-index table-cell table-cell-index">
+                            {{loop.index}}
+                        </div>
+                        <div class="product-name table-cell">
+                            {{orphan_draft.name}}
+                        </div>
+                        <div class="product-price table-cell">
+                            {% if orphan_draft.price %}
+                                {{orphan_draft.price}}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                        <div class="product-new table-cell">
+                            {% if orphan_draft.is_new %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="#58ac2a" fill-rule="evenodd" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1.177-7.86l-2.765-2.767L7 12.431l3.119 3.121a1 1 0 0 0 1.414 0l5.952-5.95l-1.062-1.062z"/></svg>
+                            {% endif %}
+                        </div>
+                        <div class="product-status table-cell">
+                            <div class="status" style="background: rgb(234, 234, 255)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 1024 1024"><title>Edit-filled SVG Icon</title><path fill="rgb(75, 58, 171)" d="M880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32m-622.3-84c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9"/></svg>
+                                <div class="status-text" style="color: rgb(75, 58, 171)">
+                                    Новый, редактируется
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-main-photo table-cell">
+                            {% if orphan_draft.photos %}
+                                <img src="{{ url_for('static', filename=orphan_draft.photos[0].photo_url) }}"/>
+                            {% endif %}
+                        </div>
+                        <div class="product-media table-cell">
+                            <div class="wrapper">
+                                {% if orphan_draft.photos | length == 0 %}
+                                    <span style="background-color: rgb(253, 255, 111);">{{orphan_draft.photos | length }} фото</span> <br>
+                                {% else %}
+                                    {{orphan_draft.photos | length }} фото <br>
+                                {% endif %}
+                                {{orphan_draft.videos | length }} видео
+                            </div>
+                        </div>
+                        
+                        <div class="table-cell table-btns product-btns">
+                            <a href="{{ url_for('admin.edit_product_orphan_draft', draft_id=orphan_draft.id) }}" class="edit-btn btn">Редактировать</a>
+                            <form method="POST" action="{{ url_for('admin.delete_product_draft') }}" 
+                                onsubmit="return confirm('Вы уверены, что хотите удалить черновик продукта {{orphan_draft.name}}?');">
+                                <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                                <input type="hidden" name="draft_id" value="{{orphan_draft.id}}">
+                                <button type="submit" class="delete-btn btn">Удалить</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+    </div>
+{% endblock %}

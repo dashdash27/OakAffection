@@ -1,0 +1,1 @@
+from .publisher import publish_all_changes

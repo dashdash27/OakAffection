@@ -1,0 +1,42 @@
+.new {
+    padding: 50px 0 100px 0;
+}
+.new__title {
+    font-size: 28px;
+    font-weight: 600;
+}
+.new .new__inner {
+    position: relative;
+    padding: 0 50px;
+    margin-top: 50px;
+}
+.new .new__inner .swiper-button-next,
+.new .new__inner .swiper-button-prev {
+    right: -5px;
+    width: 30px;
+    height: 33px;
+}
+.new .new__inner .swiper-button-prev {
+    left: -5px;
+}
+.new .card__media-wrapper {
+    height: 300px;
+}
+
+@media (min-width: 450px) {
+    .new .card__media-wrapper {
+        height: 400px;
+    }
+}
+
+@media (min-width: 500px) {
+    .new .card__media-wrapper {
+        height: 250px;
+    }
+}
+
+@media (min-width: 650px) {
+    .new .card__media-wrapper {
+        height: 290px;
+    }
+}

@@ -1,0 +1,64 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+   Админка - Категории цветов товаров
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        
+        <div class="title-wrapper">
+            <h1>Список категорий цветов</h1>
+            <a href="{{ url_for('.create_color_category') }}" class="create-btn">Добавить категорию цветов + </a>
+        </div>
+        <div class="color-categories table">
+            <div class="table-header table-row">
+                <div class="table-cell table-cell-index color-category-index">
+                    №
+                </div>
+                <div class="table-cell color-category-name">
+                    Название
+                </div>
+                <div class="table-cell color-category-colors">
+                    Цвета из категории
+                </div>
+                <div class="table-cell color-category-btns table-btns">
+                    Действия
+                </div>
+            </div>
+            {% for category in categories %}
+                <div class="target table-row">
+                    <div class="color-category-index table-cell table-cell-index">
+                        {{loop.index}}
+                    </div>
+                    <div class="color-category-name table-cell">
+                        {{category.name}}
+                    </div>
+                    <div class="color-category-colors table-cell">
+                        {% for color in category.colors %}
+                            <div class="category-color-wrapper">
+                                {% if color.icon_url %}
+                                    <img src="{{ url_for('static', filename=color.icon_url) }}"/>
+                                {% endif %}
+                                <div class="name">{{color}}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="table-cell table-btns color-category-btns">
+                        <a href="{{ url_for('admin.edit_color_category', category_id=category.id) }}" class="edit-btn btn">Редактировать</a>
+                        <form method="POST" action="{{ url_for('admin.delete_color_category') }}" 
+                            onsubmit="return confirm('Вы уверены, что хотите удалить категорию цветов \'{{ category.name | e }}\'? В таком случае удалятся все цвета из этой категории');">
+                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                            <input type="hidden" name="color_category_id" value="{{category.id}}">
+                            <button type="submit" class="delete-btn btn">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

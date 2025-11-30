@@ -1,0 +1,51 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка - Характеристики товаров
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        
+        <div class="title-wrapper">
+            <h1>Список характеристик товаров</h1>
+            <a href="{{ url_for('.create_characteristic') }}" class="create-btn">Добавить характеристику + </a>
+        </div>
+        <div class="chars table">
+            <div class="table-header table-row">
+                <div class="table-cell table-cell-index category-index">
+                    №
+                </div>
+                <div class="table-cell char-name">
+                    Название
+                </div>
+                <div class="table-cell char-btns table-btns">
+                    Действия
+                </div>
+            </div>
+            {% for char in chars %}
+                <div class="char table-row">
+                    <div class="char-index table-cell table-cell-index">
+                        {{loop.index}}
+                    </div>
+                    <div class="char-name table-cell">
+                        {{char.name}}
+                    </div>
+                    <div class="table-cell table-btns char-btns">
+                        <a href="{{ url_for('admin.edit_characteristic', characteristic_id=char.id) }}" class="edit-btn btn">Редактировать</a>
+                        <form method="POST" action="{{ url_for('admin.delete_characteristic') }}" 
+                            onsubmit="return confirm('Вы уверены, что хотите удалить характеристику \'{{ char.name | e }}\'?');">
+                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                            <input type="hidden" name="characteristic_id" value="{{char.id}}">
+                            <button type="submit" class="delete-btn btn">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

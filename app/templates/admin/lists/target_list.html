@@ -1,0 +1,51 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка - Предметы обработки
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        
+        <div class="title-wrapper">
+            <h1>Список предметов обработки</h1>
+            <a href="{{ url_for('.create_target') }}" class="create-btn">Добавить предмет обработки + </a>
+        </div>
+        <div class="targets table">
+            <div class="table-header table-row">
+                <div class="table-cell table-cell-index target-index">
+                    №
+                </div>
+                <div class="table-cell target-name">
+                    Название
+                </div>
+                <div class="table-cell target-btns table-btns">
+                    Действия
+                </div>
+            </div>
+            {% for target in targets %}
+                <div class="target table-row">
+                    <div class="target-index table-cell table-cell-index">
+                        {{loop.index}}
+                    </div>
+                    <div class="target-name table-cell">
+                        {{target.name}}
+                    </div>
+                    <div class="table-cell table-btns target-btns">
+                        <a href="{{ url_for('admin.edit_target', target_id=target.id) }}" class="edit-btn btn">Редактировать</a>
+                        <form method="POST" action="{{ url_for('admin.delete_target') }}" 
+                            onsubmit="return confirm('Вы уверены, что хотите удалить предмет обработки \'{{ target.name | e }}\'? В таком случае этот предмет удалится и у всех товаров на сайте.');">
+                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                            <input type="hidden" name="target_id" value="{{target.id}}">
+                            <button type="submit" class="delete-btn btn">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

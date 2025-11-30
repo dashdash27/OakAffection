@@ -1,0 +1,291 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    {{page_title}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/form.css') }}">
+{% endblock %}
+
+{% block content %}
+   <div class="container">
+
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-title">
+                {{page_title}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Основная информация
+                </div>
+                <div class="form-item form-name">
+                    <div class="form-text">Название продукта <span>*</span></div>
+                    {{ form.name(class="form-input input-name", required=false) }}
+                    <div class="name-error error-message"></div>
+                </div>
+
+                 <div class="form-item">
+                    <div class="form-text">Цена (₽)</div>
+                    {{ form.price(class="form-input input-price", required=false, type="text") }}
+                    <div class="price-error error-message"></div>
+                </div>
+
+                <div class="form-item">
+                    <div class="form-text">Мини-описание (100-150 слов) <span>*</span></div>
+                    {{ form.description_tag(class="form-input input-description-tag", required=false) }}
+                    <div class="description-tag-error error-message"></div>
+                </div>
+            </div>
+
+            <div class="form-item form-new">
+                {{ form.is_new(class="input-check") }}
+                <div class="form-text check-text">Новинка</div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Характеристики</div>
+
+                <!-- Шаблон для дублирования-->
+                <div class="characteristic-template" style="display:none;">
+                    <div class="characteristic-item">
+                        <div class="char-kind">
+                            <div class="char-kind-text form-text">Характеристика</div>
+                            {{ empty_char.characteristic_id(class="char-kind-select", disabled=true) }}
+                        </div>
+                        <div class="char-value">
+                            <div class="char-value-text form-text">Значение</div>
+                            {{ empty_char.value(class="char-value-unput form-input", required=false, disabled=true) }}
+                        </div>
+                        <button type="button" class="delete-btn delete-characteristic">
+                            -
+                        </button>
+                    </div>
+                </div>
+
+                <div class="characteristics-list">
+
+                    {% for subform in form.characteristics %}
+                        <div class="characteristic-item">
+                            <div class="char-kind">
+                                <div class="char-kind-text form-text">Характеристика</div>
+                                {{subform.characteristic_id(class="char-kind-select")}}
+                            </div>
+                            <div class="char-value">
+                                <div class="char-value-text form-text">Значение</div>
+                                {{ subform.value(class="char-value-unput form-input") }}
+                            </div>
+                            <button type="button" class="delete-btn delete-characteristic">-</button>
+                        </div>
+                    {% endfor %}
+
+                </div>
+                
+                <div class="characteristics-error error-message"></div>
+
+                <button type="button" class="add-btn" id="add-characteristic">Добавить +</button>
+                
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Группа товаров
+                </div>
+
+                <div class="form-comment">
+                    Конкретную группу можно выбрать только в том случае, если характеристика группы установлена у товара. Иначе группа будет недоступной для выбора.
+                </div>
+
+                <select name="{{ form.group_id.name }}" id="{{ form.group_id.id }}" class="group-select form-input">
+                    {% for value, label in form.group_id.choices %}
+                        {% set characteristic_id = group_char_map[value] if value in group_char_map else '' %}
+                        <option value="{{ value }}" data-characteristic-id="{{ characteristic_id }}"
+                            {% if form.group_id.data == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <div class="group-error error-message"></div>
+
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Цвет</div>
+
+                <select name="{{ form.color_id.name }}" id="{{ form.color_id.id }}" class="color-select form-input">
+                    {% for value, label in form.color_id.choices %}
+                        {% set category_name = color_group_map[value] if value in color_group_map else '' %}
+                        <option class="color-item-option" value="{{ value }}"
+                            {% if value == form.color_id.data %}selected{% endif %}>
+                            <div class="option-color">{{ label }}</div>
+                            <div class="option-category">({{ category_name }})</div>
+                        </option>
+                    {% endfor %}
+                </select>
+                <div class="color-error error-message"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Описание и применение</div>
+
+                <div class="form-item form-description">
+                    <div class="form-text">Описание</div>
+                    {{ form.description(class="form-input input-description") }}
+                </div>
+
+                <div class="form-item form-application">
+                    <div class="form-text">Применение</div>
+                    {{ form.application(class="form-input input-application") }}
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Ссылки на маркетплейсы
+                </div>
+                <div class="form-comment">
+                    Добавляйте только рабочие ссылки, иначе ссылка на сайте отобразится, но открываться не будет
+                </div>
+                <div class="form-item">
+                    <div class="form-text">Ссылка на ozon</div>
+                    {{ form.ozon_link(class="form-input") }}
+                </div>
+                <div class="form-item">
+                    <div class="form-text">Ссылка на wildberries</div>
+                    {{ form.wb_link(class="form-input") }}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Категории <span>*</span></div>
+                <div class="form-comment">
+                    После добавления категорий товару он будет отображаться не только на страницах этих категорий, но и на страницах категорий-родителей.
+                    Например, товар с категорией "Для игрушек" будет также отображаться в категории всех масел и в категории наружных масел.
+                </div>
+                <div class="form-item categories">
+                    <div class="form-text">Выбранные категории</div>
+                    <div class="categories-error error-message"></div>
+                    {{ form.categories(class="form-control categories-select", multiple=True, required=false) }}
+                </div>
+                <div class="category-error error-message"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Что можно обрабатывать
+                </div>
+                <div class="form-item targets">
+                    <div class="form-text">Выбранные пункты</div>
+                    {{ form.targets(class="form-control targets-select", multiple=True) }}
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="form-subtitle">Изображения</div>
+                <div class="form-comment">
+                    Обязательно добавить хотя бы одно изображение
+                </div>
+                <div id="photos-list" class="media-list">
+                    {% set count = namespace(var=0) %}
+                    {% for photo_form in form.photos %}
+                        
+                        <div class="photo-entry media-entry">
+                            <input type="hidden" name="photos-{{ loop.index0 }}-num" value="{{ loop.index0 }}">
+                            <input 
+                                type="file" 
+                                name="photos-{{ loop.index0 }}-photo" 
+                                id="photos-{{ loop.index0 }}-photo" 
+                                class="photo-input media-input" 
+                                accept="image/*"
+                            />
+                            <label for="photos-{{ loop.index0 }}-photo" class="custom-photo-input custom-media-input">Выбрать фото</label>
+                            <div class="custom-photo-name custom-media-name">
+                               {{ photo_urls[loop.index0].split('/')[-1] if photo_urls and photo_urls|length > loop.index0 else "" }}
+                            </div>
+                            <button type="button" id="delete-photo-btn" class="delete-btn delete-photo-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 14 14"><path fill="#e65c85" fill-rule="evenodd" d="M1.707.293A1 1 0 0 0 .293 1.707L5.586 7L.293 12.293a1 1 0 1 0 1.414 1.414L7 8.414l5.293 5.293a1 1 0 0 0 1.414-1.414L8.414 7l5.293-5.293A1 1 0 0 0 12.293.293L7 5.586z" clip-rule="evenodd"/></svg>
+                            </button>
+                            {% if photo_urls and photo_urls|length > loop.index0 %}
+                                <img src="{{ url_for('static', filename=photo_urls[loop.index0]) }}" class="preview-photo preview-media"/>
+                            {% endif %}
+                            <div class="photo-error media-error error-message"></div>
+                            <div class="form-item" style="width: 100%"">
+                                <div class="form-text">Описание картинки (~ 4-6 слов) <span>*</span></div>
+                                <input
+                                    class="form-input"
+                                    id="photos-{{ loop.index0 }}-alt"
+                                    name="photos-{{ loop.index0 }}-alt"
+                                    required
+                                    type="text"
+                                    value="{{ photo_form.alt.data or '' }}"
+                                >
+                            </div>
+                            {% set count.var = count.var + 1 %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="add-btn" id="add-photo-btn">Добавить +</button>
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">Видео</div>
+                <div id="videos-list" class="media-list">
+                    {% set count = namespace(var=0) %}
+                    {% for video_form in form.videos %}
+
+                        <div class="video-entry media-entry">
+                            <input type="hidden" name="videos-{{ loop.index0 }}-num" value="{{ loop.index0 }}">
+                            <input 
+                                type="file" 
+                                name="videos-{{ loop.index0 }}-video" 
+                                id="videos-{{ loop.index0 }}-video" 
+                                class="video-input media-input" 
+                                accept="video/*"
+                            />
+                            <label for="videos-{{ loop.index0 }}-video" class="custom-video-input custom-media-input">Выбрать видео</label>
+                            <div class="custom-video-name custom-media-name">
+                               {{ video_urls[loop.index0].split('/')[-1] if video_urls and video_urls|length > loop.index0 else "" }}
+                            </div>
+                            <button type="button" id="delete-video-btn" class="delete-btn delete-video-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 14 14"><path fill="#e65c85" fill-rule="evenodd" d="M1.707.293A1 1 0 0 0 .293 1.707L5.586 7L.293 12.293a1 1 0 1 0 1.414 1.414L7 8.414l5.293 5.293a1 1 0 0 0 1.414-1.414L8.414 7l5.293-5.293A1 1 0 0 0 12.293.293L7 5.586z" clip-rule="evenodd"/></svg>
+                            </button>
+                            {% if video_urls and video_urls|length > loop.index0 %}
+                                <video src="{{ url_for('static', filename=video_urls[loop.index0]) }}" class="preview-video preview-media" />
+                            {% endif %}
+                            <div class="video-error media-error error-message"></div>
+                            {% set count.var = count.var + 1 %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="add-btn" id="add-video-btn">Добавить +</button>
+            </div>
+
+            <div class="all-errors"></div>
+            
+            <div class="btns">
+                <a class="btn close-btn" href="#" onclick="history.back(); return false;">Отменить</a>
+                <input class="btn submit-btn" id="submit" name="submit" type="submit" value="{{button_name}}">
+            </div>
+        </form>
+
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin/base.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin/product_group.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin/product_characteristic.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin/product_photo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin/product_video.js') }}"></script>
+
+
+    <!-- For select-->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="{{ url_for('static', filename='js/admin/select.js') }}"></script>
+
+    <!-- Validation -->
+    <script src="{{ url_for('static', filename='js/admin/validation.js') }}"></script>
+{% endblock %}

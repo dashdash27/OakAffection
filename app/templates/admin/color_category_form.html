@@ -1,0 +1,55 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    {{page_title}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/form.css') }}">
+{% endblock %}
+{% block content %}
+    <div class="container">
+
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-title">
+                {{page_title}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-text">Название категории цвета <span>*</span></div>
+                {{ form.name(class="form-input input-name")}}
+            </div>
+
+            <div class="from-section" style="margin-top: 50px"">
+                <div class="form-subtitle">
+                    Цвета из этой категории
+                </div>
+                <div class="form-comment">
+                    Прикрепить цвет к группе цветов можно на странице редактирования цвета.
+                </div>
+                <div class="colors">
+                    {% if category %}
+                    {% for color in category.colors %}
+                            <div class="color-wrapper">
+                                {% if color.icon_url %}
+                                    <img src="{{ url_for('static', filename=color.icon_url) }}"/>
+                                {% endif %}
+                                <div class="name">{{color}}</div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="btns">
+                <a class="btn close-btn" href="{{ url_for('admin.color_category_list') }}">Отменить</a>
+                <input class="btn submit-btn" id="submit" name="submit" type="submit" value="{{button_name}}">
+            </div>
+
+        </form>
+        
+    </div>
+
+{% endblock %}

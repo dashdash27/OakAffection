@@ -1,0 +1,146 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка OakAffection
+{% endblock %}
+
+{% block css %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/home.css') }}">
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<div class="home">
+			<div class="home-title">Адин-панель OAK Affection</div>
+
+			<div class="cards-wrapper">
+				{% if updated_products or orphan_drafts or delete_marked_products %}
+					<div class="changes-card card">
+						<div class="changes-title card-title">
+							В товарах произошли изменения
+						</div>
+						<div class="boxes">
+							<div class="updated-box">
+								<div class="text">
+									Изменено:
+								</div>
+								<div class="number">
+									{{updated_products|length}} 
+								</div>
+							</div>
+							<div class="added-box">
+								<div class="text">
+									Добавлено:
+								</div>
+								<div class="number">
+									{{orphan_drafts|length}}
+								</div>
+							</div>
+							<div class="deleted-box">
+								<div class="text">
+									Удалено:
+								</div>
+								<div class="number">
+									{{delete_marked_products|length}}
+								</div>
+							</div>
+						</div>
+						<div class="changes-comment">
+							Публикация изменений товаров на сайт произойдет только после вашего подтверждения.
+							Перед подтверждением еще раз внимательно проверьте все изменения. 
+							<a href="{{ url_for('admin.product_list') }}">Проверить изменения</a>
+						</div>
+						<form method="POST" action="{{ url_for('admin.publish_changes') }}" 
+							onsubmit="return confirm('Вы уверены, что хотите подтвердить изменения? После подтверждения все изменения опубликуются на сайте. Отменить изменния не получится.');">
+							<input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+							<button class="publish-changes" type="submit">Подтведить изменения</button>
+						</form>
+					</div>
+				{% endif %}
+				
+
+				<div class="items">
+					<div class="card item product">
+						<div class="card-title">
+							Товары
+						</div>
+						<div class="number">
+							<span>{{products|length}}</span> опубликовано на сайте
+						</div>
+						<div class="item-btns">
+							<a href="{{ url_for('.create_product_draft') }}">Добавить</a>
+							<a href="{{ url_for('admin.product_list') }}">Посмотреть</a>
+						</div>
+					</div>
+
+					<div class="card item category">
+						<div class="card-title">
+							Категории товаров
+						</div>
+						<div class="number">
+							<span>{{categories|length}}</span> всего
+						</div>
+						<div class="item-btns">
+							<a href="{{ url_for('.create_category') }}">Добавить</a>
+							<a href="{{ url_for('admin.category_list') }}">Посмотреть</a>
+						</div>
+					</div>
+
+					<div class="card item targets">
+						<div class="card-title">
+							Предметы для обработки маслами
+						</div>
+						<div class="number">
+							<span>{{targets|length}}</span> всего
+						</div>
+						<div class="item-btns">
+							<a href="{{ url_for('.create_target') }}">Добавить</a>
+							<a href="{{ url_for('admin.target_list') }}">Посмотреть</a>
+						</div>
+					</div>
+
+					<div class="card item characteristics">
+						<div class="card-title">
+							Характеристики товаров
+						</div>
+						<div class="number">
+							<span>{{characteristics|length}}</span> всего
+						</div>
+						<div class="item-btns">
+							<a href="{{ url_for('.create_characteristic') }}">Добавить</a>
+							<a href="{{ url_for('admin.characteristic_list') }}">Посмотреть</a>
+						</div>
+					</div>
+
+					<div class="card item colors">
+						<div class="card-title">
+							Цвета
+						</div>
+						<div class="number">
+							<span>{{colors|length}}</span> всего
+						</div>
+						<div class="item-btns">
+							<a href="{{ url_for('.create_color') }}">Добавить</a>
+							<a href="{{ url_for('admin.color_list') }}">Посмотреть</a>
+						</div>
+					</div>
+					<div class="card item product-groups">
+						<div class="card-title">
+							Группы товаров
+						</div>
+						<div class="number">
+							<span>{{product_groups|length}}</span> всего
+						</div>
+						<div class="item-btns">
+							<a href="{{ url_for('.create_product_group') }}">Добавить</a>
+							<a href="{{ url_for('admin.product_group_list') }}">Посмотреть</a>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			
+		</div>
+	</div>
+{% endblock %}

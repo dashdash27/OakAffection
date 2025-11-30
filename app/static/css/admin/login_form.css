@@ -1,0 +1,76 @@
+body {
+    --accent-color: #3f50b1;
+    --error-color: rgb(234, 68, 104);
+    background-color: var(--accent-color);
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+}
+* {
+    box-sizing: border-box;
+}
+.container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+.logo {
+    margin: 0 auto;
+    display: block;
+    width: 150px;
+}
+
+.login-form {
+    margin-top: 40px;
+    width: 400px;
+    background-color: #fff;
+    padding: 50px;
+    border-radius: 7px;;
+}
+.title {
+    font-size: 33px;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 40px;
+}
+.input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 20px;
+}
+.input-label {
+    color: rgb(77, 86, 105);
+    font-weight: 600;
+}
+.input {
+    padding: 10px 15px;
+    border: 1px solid rgb(185, 189, 194);
+    border-radius: 5px;
+}
+
+.btn {
+    margin-top: 30px;
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    background-color: var(--accent-color);
+    border-radius: 5px;
+    border: none;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn:hover {
+    filter: brightness(1.2)
+}
+
+.flash-error {
+    color: red;
+    width: 100%;
+    background-color: #ffd7d7;
+    border-radius: 7px;
+    padding: 10px 15px;
+}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='img/favicons/favicon-16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicons/favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/favicons/favicon-192.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/favicons/favicon-180.png') }}">
+
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicons/favicon.svg') }}">
+
+    <link rel="preload" href="{{ url_for('static', filename='img/logo.svg') }}" as="image" />
+    <link rel="preload" href="{{ url_for('static', filename='img/logo-white.svg') }}" as="image" />
+
+    <meta name="description" content="{% block description %}{% endblock %}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_menu.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+    {% block css %}{% endblock %}
+
+    
+    <!-- Подключение темы из local Storage-->
+     <script>
+        const blackLogoPath = "{{ url_for('static', filename='img/logo.svg') }}";
+        const whiteLogoPath = "{{ url_for('static', filename='img/logo-white.svg') }}";
+     </script>
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark-theme');
+            }
+        })();
+    </script>
+
+    <script src="{{ url_for('static', filename='js/theme.js') }}" defer type="module"></script>
+    <script src="{{ url_for('static', filename='js/mobile_menu.js') }}" defer type="module"></script>
+    {% block js %}
+    {% endblock %}
+
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header__inner">
+
+                <a href="{{ url_for('main.index') }}" class="logo-link" style="height: 50px">
+                    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Логотип компании Oak Affection" class="logo" style="width: 100px;">
+                </a>
+
+                <nav class="menu">
+                    <ul>
+                        <li>
+                            <a href="{{ url_for('main.index') }}#wood-oils">Продукция</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('main.index') }}#new">Новинки</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('main.index') }}#about">О компании</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('main.index') }}#footer">Контакты</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <button id="theme-toggle" class="theme-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 16 16"><path fill="#000000" d="M8.796 9.048c-1.552-2.238-1.199-5.323.61-8.1c-3.47-.12-6.6 2.232-7.269 5.672c-.742 3.82 1.83 7.533 5.749 8.294a7.226 7.226 0 0 0 7.526-3.218c-2.794.177-5.27-.711-6.616-2.648"/></svg>
+                </button>
+
+                <button class="menu-btn" aria-label="Открыть меню">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16M4 6h16M4 18h16"/></svg>
+                </button>
+
+                <script>
+                    // изменяем логотип
+                    const themeToggle = document.getElementById('theme-toggle');
+                    const logo = document.querySelector(".logo");
+                    if (localStorage.getItem('theme') === 'dark') {
+                        logo.src = whiteLogoPath;
+                        themeToggle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 32 32"><path fill="#ffffff" d="M15 2h2v5h-2zm6.688 6.9l3.506-3.506l1.414 1.414l-3.506 3.506zM25 15h5v2h-5zm-3.312 8.1l1.414-1.413l3.506 3.506l-1.414 1.414zM15 25h2v5h-2zm-9.606.192L8.9 21.686l1.414 1.414l-3.505 3.506zM2 15h5v2H2zm3.395-8.192l1.414-1.414L10.315 8.9L8.9 10.314zM16 12a4 4 0 1 1-4 4a4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6a6 6 0 0 0-6-6Z"/></svg>'
+                    }
+                    else {
+                        logo.src = blackLogoPath;
+                        themeToggle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 16 16"><path fill="#000000" d="M8.796 9.048c-1.552-2.238-1.199-5.323.61-8.1c-3.47-.12-6.6 2.232-7.269 5.672c-.742 3.82 1.83 7.533 5.749 8.294a7.226 7.226 0 0 0 7.526-3.218c-2.794.177-5.27-.711-6.616-2.648"/></svg>';
+                    }
+                </script>
+
+            </div>
+        </div>
+    </header>
+
+    <div class="mobile-menu" aria-expanded="false">
+            <nav class="mobile-nav">
+                <ul class="mobile-nav__ul">
+                    <li class="mobile-menu__item-h2">
+                        <a href="{{ url_for('main.show_oils', category_key='oils') }}">
+                            Масла для обработки дерева
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h3">
+                        <a href="{{ url_for('main.show_oils', category_key='indoor_oils') }}">
+                            Для внутренних работ
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='kitchen_oils') }}">
+                            Для кухонной утвари
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='furniture_oils') }}">
+                            Для мебели
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='bath_oils') }}">
+                            Для бань и саун
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='toy_oils') }}">
+                            Для игрушек
+                        </a>
+                    </li>
+
+                    <li class="mobile-menu__item-h3">
+                        <a href="{{ url_for('main.show_oils', category_key='outdoor_oils') }}">
+                            Для наружных работ
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='terrace_oils') }}">
+                            Для террас
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='facade_oils') }}">
+                            Для фасадов
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='garden_furniture_oils') }}">
+                            Для садовой мебели
+                        </a>
+                    </li>
+
+                    <li class="mobile-menu__item-h3">
+                        <a href="{{ url_for('main.show_oils', category_key='other_oils') }}">
+                            Другое
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='tinted_oils') }}">
+                            Колерованные масла
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h4">
+                        <a href="{{ url_for('main.show_oils', category_key='liquids') }}">
+                            Грунтовочные масла и растворители
+                        </a>
+                    </li>
+
+                    <li class="mobile-menu__item-h2">
+                        <a href="{{ url_for('main.index') }}#footer">
+                            Контакты
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h2">
+                        <a href="{{ url_for('main.index') }}#about">
+                            О компании
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item-h2">
+                        <a href="{{ url_for('main.index') }}#new">
+                            Новинки
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>    
+    <footer id="footer">
+        <div class="container">
+            <div class="footer__inner">
+                <div class="footer__one footer__item">
+                    <div class="footer__item-title">
+                        Социальные сети
+                    </div>
+                    <div class="footer__item-inner">
+                        <a href="https://t.me/oakaffection" target="_blank" rel="noopener noreferrer" class="footer__link">
+                            <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>Telegram-fill SVG Icon</title><g fill="none"><g clip-path="url(#akarIconsTelegramFill0)"><path fill="#ffffff" fill-rule="evenodd" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12S5.373 0 12 0s12 5.373 12 12M12.43 8.859c-1.167.485-3.5 1.49-6.998 3.014c-.568.226-.866.447-.893.663c-.046.366.412.51 1.034.705c.085.027.173.054.263.084c.613.199 1.437.432 1.865.441c.389.008.823-.152 1.302-.48c3.268-2.207 4.955-3.322 5.061-3.346c.075-.017.179-.039.249.024c.07.062.063.18.056.212c-.046.193-1.84 1.862-2.77 2.726c-.29.269-.495.46-.537.504c-.094.097-.19.19-.282.279c-.57.548-.996.96.024 1.632c.49.323.882.59 1.273.856c.427.291.853.581 1.405.943c.14.092.274.187.405.28c.497.355.944.673 1.496.623c.32-.03.652-.331.82-1.23c.397-2.126 1.179-6.73 1.36-8.628a2.111 2.111 0 0 0-.02-.472a.506.506 0 0 0-.172-.325c-.143-.117-.365-.142-.465-.14c-.451.008-1.143.249-4.476 1.635" clip-rule="evenodd"/></g><defs><clipPath id="akarIconsTelegramFill0"><path fill="#fff" d="M0 0h24v24H0z"/></clipPath></defs></g></svg>
+                            <div class="link-text">
+                                t.me/oakaffection
+                            </div>
+                        </a>
+                        <a href="https://www.pinterest.com/oakaffection" target="_blank" rel="noopener noreferrer" class="footer__link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>Pinterest-fill SVG Icon</title><defs><path id="akarIconsPinterestFill0" fill="#fff" d="M0 0h24v24H0z"/></defs><g fill="none"><g clip-path="url(#akarIconsPinterestFill1)"><g clip-path="url(#akarIconsPinterestFill2)"><path fill="#ffffff" d="M0 12c0 5.123 3.211 9.497 7.73 11.218c-.11-.937-.227-2.482.025-3.566c.217-.932 1.401-5.938 1.401-5.938s-.357-.715-.357-1.774c0-1.66.962-2.9 2.161-2.9c1.02 0 1.512.765 1.512 1.682c0 1.025-.653 2.557-.99 3.978c-.281 1.189.597 2.159 1.769 2.159c2.123 0 3.756-2.239 3.756-5.471c0-2.861-2.056-4.86-4.991-4.86c-3.398 0-5.393 2.549-5.393 5.184c0 1.027.395 2.127.889 2.726a.36.36 0 0 1 .083.343c-.091.378-.293 1.189-.332 1.355c-.053.218-.173.265-.4.159c-1.492-.694-2.424-2.875-2.424-4.627c0-3.769 2.737-7.229 7.892-7.229c4.144 0 7.365 2.953 7.365 6.899c0 4.117-2.595 7.431-6.199 7.431c-1.211 0-2.348-.63-2.738-1.373c0 0-.599 2.282-.744 2.84c-.282 1.084-1.064 2.456-1.549 3.235C9.584 23.815 10.77 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0S0 5.373 0 12"/></g></g><defs><clipPath id="akarIconsPinterestFill1"><use href="#akarIconsPinterestFill0"/></clipPath><clipPath id="akarIconsPinterestFill2"><use href="#akarIconsPinterestFill0"/></clipPath></defs></g></svg>
+                            <div class="link-text">
+                                pinterest.com/oakaffection
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="footer__two footer__item">
+                    <div class="footer__item-title">
+                        Контакты
+                    </div>
+                    <div class="footer__item-inner">
+                        <a href="mailto:oakaffection@gmail.com" target="_blank" rel="noopener noreferrer" class="footer__link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24"><title>Gmail SVG Icon</title><path fill="#ffffff" d="m18.73 5.41l-1.28 1L12 10.46L6.55 6.37l-1.28-1A2 2 0 0 0 2 7.05v11.59A1.36 1.36 0 0 0 3.36 20h3.19v-7.72L12 16.37l5.45-4.09V20h3.19A1.36 1.36 0 0 0 22 18.64V7.05a2 2 0 0 0-3.27-1.64"/></svg>
+                            <div class="link-text">
+                                oakaffection@gmail.com
+                            </div>
+                        </a>
+                        <a href="tel:+79604870478" target="_blank" rel="noopener noreferrer" class="footer__link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><title>Phone-handset-solid SVG Icon</title><path fill="#ffffff" d="M15.22 20.64a20.37 20.37 0 0 0 7.4 4.79l3.77-3a.67.67 0 0 1 .76 0l7 4.51a2 2 0 0 1 .33 3.18l-3.28 3.24a4 4 0 0 1-3.63 1.07a35.09 35.09 0 0 1-17.15-9A33.79 33.79 0 0 1 1.15 8.6a3.78 3.78 0 0 1 1.1-3.55l3.4-3.28a2 2 0 0 1 3.12.32L13.43 9a.63.63 0 0 1 0 .75l-3.07 3.69a19.75 19.75 0 0 0 4.86 7.2" class="clr-i-solid clr-i-solid-path-1"/><path fill="none" d="M0 0h36v36H0z"/></svg>
+                            <div class="link-text">
+                                +7 960 487 0 478
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="freepik">
+                Designed by Freepik
+            </div>
+        </div>
+    </footer>
+
+    
+</body>
+</html>
