@@ -1,5 +1,5 @@
 from app.models import Product, Category
-from app.extensions import STATIC_DIR
+from app.extensions import BASE_DIR
 from app.logger import logger
 from app.routes import categories_dict
 
@@ -10,7 +10,7 @@ import os
 
 def generate_sitemap():
     base_url = "https://oakaffection.ru"
-    filepath = os.path.join(STATIC_DIR, 'sitemap.xml')
+    filepath = os.path.join(BASE_DIR.parent, 'sitemap.xml')
 
     urlset = ET.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
 

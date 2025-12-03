@@ -26,9 +26,9 @@
                     <div class="card">
                         <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__media-wrapper">
                             {% if product.photos %}
-                                <img class="card__media" src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">
+                                <img class="card__media lozad" data-src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">
                             {% else %}
-                                <img class="card__media-no-photo" src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
+                                <img class="card__media-no-photo lozad" data-src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
                             {% endif %}
                         </a>
                         <div class="card__name">

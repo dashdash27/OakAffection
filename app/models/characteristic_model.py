@@ -1,23 +1,21 @@
 from app.extensions import db
 
-
 class Characteristic(db.Model):
     __tablename__ = 'characteristics'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
 
-    product_characteristics = db.relationship('ProductCharacteristic', back_populates='characteristic')
+    # Каскадное удаление для связей с ProductCharacteristic и ProductDraftCharacteristic
+    product_characteristics = db.relationship('ProductCharacteristic', back_populates='characteristic', cascade='all, delete-orphan')
     groups = db.relationship('ProductGroup', back_populates='characteristic')
-
-    # draft
-    product_draft_characteristics = db.relationship('ProductDraftCharacteristic', back_populates='characteristic')
+    product_draft_characteristics = db.relationship('ProductDraftCharacteristic', back_populates='characteristic', cascade='all, delete-orphan')
 
     def __str__(self):
         return self.name
 
+
 class ProductCharacteristic(db.Model):
     __tablename__ = 'products_characteristics'
-
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     characteristic_id = db.Column(db.Integer, db.ForeignKey('characteristics.id'))
@@ -26,9 +24,9 @@ class ProductCharacteristic(db.Model):
     product = db.relationship('Product', back_populates='characteristics')
     characteristic = db.relationship('Characteristic', back_populates='product_characteristics')
 
+
 class ProductDraftCharacteristic(db.Model):
     __tablename__ = 'product_drafts_characteristics'
-
     id = db.Column(db.Integer, primary_key=True)
     product_draft_id = db.Column(db.Integer, db.ForeignKey('product_drafts.id'))
     characteristic_id = db.Column(db.Integer, db.ForeignKey('characteristics.id'))

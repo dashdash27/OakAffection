@@ -3,7 +3,7 @@ const playPauseBtns = document.querySelectorAll('.play-pause-btn');
 const muteBtns = document.querySelectorAll('.mute-btn');
 
 const swiper = new Swiper('.swiper', {
-    lazy: true,
+    preloadImages: false,
     loadPrevNext: true,
     watchSlidesProgress: true,
     watchSlidesVisibility: true,

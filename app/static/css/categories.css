@@ -63,6 +63,7 @@
 
 .category__item img {
     width: 100%;
+    aspect-ratio: 1 / 1;
     border-radius: 10px;
     transition: 0.2s;
 }
@@ -124,6 +125,11 @@
 .category__item:hover img {
     filter: brightness(0.85);
     transition: 0.2s;
+}
+
+.outdoor img,
+.other img  {
+    aspect-ratio: 1000/667;
 }
 
 @media (min-width: 600px) {

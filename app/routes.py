@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, abort
 from app.models import Product, Category, ProductCharacteristic, products_categories
 
 from app.logger import logger
@@ -53,7 +53,7 @@ def get_products_by_category(category_name):
 
     products = Product.query.join(products_categories).filter(
         products_categories.c.category_id.in_(category_ids)
-    ).all()
+    ).order_by(Product.name.asc()).all()
 
     return products
 
@@ -65,6 +65,8 @@ def index():
 @main_bp.route('/product/<slug>')
 def product_detail(slug):
     product = Product.query.filter_by(slug=slug).first_or_404()
+    if not product:
+        abort(404)
 
     product_group_characteristic_value = None
     sorted_group_products = None
@@ -109,6 +111,8 @@ def product_detail(slug):
 def show_oils(category_key):
     category_name = categories_dict.get(category_key)
     category = Category.query.filter_by(name=category_name).first()
+    if not category:
+        abort(404)
     
     products = get_products_by_category(category_name)
 

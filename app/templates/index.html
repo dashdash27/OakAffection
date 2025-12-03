@@ -6,12 +6,9 @@
 {% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/new.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
+{% endblock %}
 
-    <!-- Swiper CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}">
+{% block js %}
 {% endblock %}
 
 {% block content %}
@@ -37,7 +34,11 @@
                 <img src="{{ url_for('static', filename='img/icons/arrow-right.svg') }}" alt="" class="hero__button-icon" aria-hidden="true">
             </a>
 
-            <img class="hero__image" src="{{ url_for('static', filename='img/tree.png') }}" alt="Большое зеленое дерево">
+            <picture>
+                <source media="(max-width: 768px)" srcset="{{ url_for('static', filename='img/mobile-tree.png') }}">
+                <img fetchpriority="high" class="hero__image" src="{{ url_for('static', filename='img/tree.png') }}" alt="Большое зеленое дерево">
+            </picture>
+
             <div id="wood-oils"></div>
         </div>
     </section>
@@ -50,7 +51,6 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
                 </div>
             </a>
-            
 
             <section class="indoor">
                 
@@ -64,7 +64,7 @@
                 <div class="category__inner">
 
                     <a href="{{ url_for('main.show_oils', category_key='kitchen_oils') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/wooden-ceramic-dishes.jpg') }}" alt="Предметы кухонной утвари">
+                        <img data-src="{{ url_for('static', filename='img/categories/wooden-ceramic-dishes.jpg') }}" class="lozad" alt="Предметы кухонной утвари">
                         <div class="category__item-title">
                             <h4>Масла для кухонной утвари</h4>
                             <div class="category__item-title-text">
@@ -77,7 +77,7 @@
                     </a>
 
                     <a href="{{ url_for('main.show_oils', category_key='furniture_oils') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/wooden-furniture.jpg') }}"" alt="Деревянная мебель в комнате" class="indoor__item-img">
+                        <img data-src="{{ url_for('static', filename='img/categories/wooden-furniture.jpg') }}" class="lozad" alt="Деревянная мебель в комнате" class="indoor__item-img">
                         <div class="category__item-title">
                             <h4>Масла для обработки деревянной мебели</h4>
                             <div class="category__item-title-text">
@@ -90,11 +90,11 @@
                     </a>
 
                     <a href="{{ url_for('main.show_oils', category_key='bath_oils') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/bathhouse.jpg') }}"" alt="Баня и сауна">
+                        <img data-src="{{ url_for('static', filename='img/categories/bathhouse.jpg') }}" class="lozad" alt="Баня и сауна">
                         <div class="category__item-title">
                             <h4>Масла для обработки бань и саун</h4>
                             <div class="category__item-title-text">
-                                Для мебели
+                                Для бань и саун
                             </div>
                             <div class="category__item-title-arrow">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"><title>Arrow-right-outline SVG Icon</title><path fill="#ffffff" d="M13.47 8.53a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 1 1-1.06-1.06l2.72-2.72H6.5a.75.75 0 0 1 0-1.5h9.69z"/></svg>
@@ -103,7 +103,7 @@
                     </a>
 
                     <a href="{{ url_for('main.show_oils', category_key='toy_oils') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/wooden-toys.jpg') }}"" alt="Деревянная игрушка">
+                        <img data-src="{{ url_for('static', filename='img/categories/wooden-toys.jpg') }}" class="lozad" alt="Деревянная игрушка">
                         <div class="category__item-title">
                             <h4>Масла для бработки деверянных игрушек</h4>
                             <div class="category__item-title-text">
@@ -127,7 +127,7 @@
 
                 <div class="category__inner">
                     <a href="{{ url_for('main.show_oils', category_key='terrace_oils') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/wooden-terrace.jpg') }}"" alt="Терраса в частном доме с деревянным покрытием">
+                        <img data-src="{{ url_for('static', filename='img/categories/wooden-terrace.jpg') }}" class="lozad" alt="Терраса в частном доме с деревянным покрытием">
                         <div class="category__item-title">
                             <h4>Масла для обработки деревянных террас</h4>
                             <div class="category__item-title-text">
@@ -140,7 +140,7 @@
                     </a>
 
                     <a href="{{ url_for('main.show_oils', category_key='facade_oils') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/wooden-house.jpg') }}"" alt="Деревянный дом в лесу">
+                        <img data-src="{{ url_for('static', filename='img/categories/wooden-house.jpg') }}" class="lozad" alt="Деревянный дом в лесу">
                         <div class="category__item-title">
                             <h4>Масла для обработки деревянных фасадов</h4>
                             <div class="category__item-title-text">
@@ -153,7 +153,7 @@
                     </a>
 
                     <a href="{{ url_for('main.show_oils', category_key='garden_furniture_oils') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/garden-furniture.jpg') }}"" alt="Садовая мебель: деревянные столы и стулья на фоне природы">
+                        <img data-src="{{ url_for('static', filename='img/categories/garden-furniture.jpg') }}" class="lozad" alt="Садовая мебель: деревянные столы и стулья на фоне природы">
                         <div class="category__item-title">
                             <h4>Масла для обработки деревянной садовой мебели</h4>
                             <div class="category__item-title-text">
@@ -175,7 +175,7 @@
                 </a>
                 <div class="category__inner">
                     <a href="{{ url_for('main.show_oils', category_key='tinted_oils') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/tinted-oils.jpg') }}"" alt="Банки с колерованными маслами">
+                        <img data-src="{{ url_for('static', filename='img/categories/tinted-oils.jpg') }}" class="lozad" alt="Банки с колерованными маслами">
                         <div class="category__item-title">
                             <h4>Колерованные масла (масла с пигментом)</h4>
                             <div class="category__item-title-text">
@@ -188,7 +188,7 @@
                     </a>
 
                     <a href="{{ url_for('main.show_oils', category_key='liquids') }}" class="category__item">
-                        <img src="{{ url_for('static', filename='img/categories/primer.jpg') }}"" alt="Покрытие деревянной поверхности грунтовкой">
+                        <img data-src="{{ url_for('static', filename='img/categories/primer.jpg') }}" class="lozad" alt="Покрытие деревянной поверхности грунтовкой">
                         <div class="category__item-title">
                             <h4>Грунтовочные масла и растворители</h4>
                             <div class="category__item-title-text">
@@ -259,9 +259,9 @@
                                 <div class="card swiper-slide">
                                     <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__media-wrapper">
                                         {% if product.photos %}
-                                            <img class="card__media" src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">
+                                            <img class="card__media lozad" data-src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">
                                         {% else %}
-                                            <img class="card__media-no-photo" src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
+                                            <img class="card__media-no-photo lozad" data-src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
                                         {% endif %}
                                     </a>
                                     <div class="card__name">
@@ -292,39 +292,42 @@
     {% endif %}
 
     
-    <script src="{{ url_for('static', filename='js/swiper/swiper-bundle.min.js') }}"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/swiper@latest/swiper-bundle.min.js" defer></script>
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function () {
+            var swiper = new Swiper(".newSwiper", {
+            spaceBetween: 30,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            loop: false,
+            breakpoints: {
+                320: {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                },
+                500: {
+                slidesPerView: 2,
+                spaceBetween: 25,
+                },
+                800: {
+                slidesPerView: 3,
+                spaceBetween: 25,
+                },
+                1024: {
+                slidesPerView: 4,
+                spaceBetween: 20,
+                },
+            }
+            });
+        });
+    </script>
     <script>
-
-    var swiper = new Swiper(".newSwiper", {
-        slidesPerView: 'auto',       // показываем 4 карточки в ряду
-        spaceBetween: 30,       // расстояние между слайдами
-        slidesPerGroup: 1,
-        navigation: {
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
-        },
-        loop: false,            // зацикливание отключено, можно включить по желанию
-        breakpoints: {          // адаптивность для мобильных устройств
-        320: {
-            slidesPerView: 1,
-            spaceBetween: 20,
-        },
-        500: {
-            slidesPerView: 2,
-            spaceBetween: 25,
-        },
-        800: {
-            slidesPerView: 3,
-            spaceBetween: 25,
-        },
-        1024: {
-            slidesPerView: 4,
-            spaceBetween: 20,
-        },
-    }
-});
-
+        // Загружаем Swiper CSS асинхронно
+        loadCSS("{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}");
+        loadCSS("{{ url_for('static', filename='css/about.css') }}");
+        loadCSS("{{ url_for('static', filename='css/new.css') }}");
     </script>
 
 {% endblock %}

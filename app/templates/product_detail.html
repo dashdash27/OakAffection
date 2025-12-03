@@ -5,17 +5,11 @@
 
 {% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/product_detail.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabs.css') }}">
-
-    <!-- Swiper CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/slider.css') }}">
 {% endblock %}
 
 {% block js %}
-    <script defer src="{{ url_for('static', filename='js/swiper/swiper-bundle.min.js') }}"></script>
-    <!-- Swiper is in video -->
-    <script defer src="{{ url_for('static', filename='js/video.js') }}"></script>
+    
 {% endblock %}
 
 {% block content %}
@@ -25,34 +19,39 @@
 
                 <div class="column-1">
                     <div class="product__media">
-                        <div class="swiper">
-                            <div class="swiper-wrapper">
+                        <div class="swiper my-swiper">
+                            <div class="swiper-wrapper my-swiper-wrapper">
                                 {% if not product.photos and not product.videos %}
-                                    <div class="swiper-slide">
+                                    <div class="swiper-slide my-swiper-slide">
                                         <img class="swiper-slide-no-photo" src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
                                     </div>
                                 {% endif %}
 
                                 {% if product.photos %}
                                     {% for photo in product.photos %}
-                                        <div class="swiper-slide">
-                                            <img src="{{ url_for('static', filename=photo.photo_url) }}" loading="lazy" alt="{{photo.alt}}" />
-                                            <div class="swiper-lazy-preloader"></div>
-                                        </div>
+                                        {% if loop.index == 1 %}
+                                            <div class="swiper-slide my-swiper-slide">
+                                                <img fetchpriority="high" src="{{ url_for('static', filename=photo.photo_url) }}" alt="{{photo.alt}}" />
+                                            </div>
+                                        {% else %}
+                                            <div class="swiper-slide my-swiper-slide">
+                                                <img class="lozad" data-src="{{ url_for('static', filename=photo.photo_url) }}" alt="{{photo.alt}}" />
+                                            </div>
+                                        {% endif %}
                                     {% endfor %}
                                 {% endif %}
 
                                 {% if product.videos %}
                                     {% for video in product.videos %}
-                                        <div class="swiper-slide">
-                                            <video autoplay muted loop class="video" autoplay loading="lazy" src="{{ url_for('static', filename=video.video_url) }}">
-                                                <source src="{{ url_for('static', filename=video.video_url) }}" type="video/mp4">
+                                        <div class="swiper-slide my-swiper-slide">
+                                            <video class="lozad video" autoplay muted loop data-src="{{ url_for('static', filename=video.video_url) }}">
+                                                <source data-src="{{ url_for('static', filename=video.video_url) }}" type="video/mp4">
                                             </video>
                                             <div class="controls">
-                                                <button class="play-pause-btn">
+                                                <button class="play-pause-btn" aria-label="Остановить или воспроизвести видео">
                                                     <img src="{{ url_for('static', filename='img/icons/pause.svg') }}" alt="">
                                                 </button>
-                                                <button class="mute-btn">
+                                                <button class="mute-btn" aria-label="Переключить громкость">
                                                     <img src="{{ url_for('static', filename='img/icons/mute.svg') }}" alt="">
                                                 </button>
                                             </div>
@@ -62,9 +61,9 @@
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="swiper-button-next"></div>
-                        <div class="swiper-button-prev"></div>
-                        <div class="swiper-pagination" style="bottom: -40px; position: absolute;"></div>
+                        <div class="swiper-button-next my-swiper-button-next"></div>
+                        <div class="swiper-button-prev my-swiper-button-prev"></div>
+                        <div class="swiper-pagination my-swiper-pagination" style="bottom: -40px; position: absolute;"></div>
                     </div>
 
                     <div class="desktop-block">
@@ -167,7 +166,7 @@
                                                 {% if color.name != product.color.name %}
                                                     <a href="{{ url_for('main.product_detail', slug=color.products[0].slug) }}" class="color">
                                                         {% if color.icon_url %}
-                                                            <img src="{{ url_for('static', filename=color.icon_url) }}" class="color-icon" alt="">
+                                                            <img data-src="{{ url_for('static', filename=color.icon_url) }}" class="color-icon lozad" alt="">
                                                         {% endif %}
                                                         <div class="color-name">
                                                             {{color.name}}
@@ -182,18 +181,20 @@
                             </div>
                          {% endif %}
                     
-                        <div class="product__links">
-                            {% if product.ozon_link %}
-                                <a href="{{product.ozon_link}}" target="_blank" class="product__ozon-link">
-                                    Купить на озон
-                                </a>
-                            {% endif %}
-                            {% if product.wb_link %}
-                                <a href="{{product.wb_link}}" target="_blank" class="product__wb-link">
-                                    Купить на wildberries
-                                </a>
-                            {% endif %}
-                        </div>
+                        {% if product.ozon_link or product.wb_link %}
+                            <div class="product__links">
+                                {% if product.ozon_link %}
+                                    <a href="{{product.ozon_link}}" target="_blank" class="product__ozon-link">
+                                        Купить на озон
+                                    </a>
+                                {% endif %}
+                                {% if product.wb_link %}
+                                    <a href="{{product.wb_link}}" target="_blank" class="product__wb-link">
+                                        Купить на wildberries
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="product__characteristics">
@@ -201,7 +202,7 @@
                             Характеристики
                         </div>
                         <ul class="characteristics-list">
-                            {% for item in product.characteristics %}
+                            {% for item in product.characteristics|sort(attribute='characteristic.name') %}
                                 <li class="characteristic">
                                     <div class="characteristic-name">
                                         {{item.characteristic.name}}
@@ -252,9 +253,6 @@
                     </div>
                 </div>
 
-        
-
-            
             </div>
         </div>
     </section>
@@ -266,6 +264,15 @@
             e.preventDefault();
             colorList.classList.toggle('show');
         });
+    </script>
+
+    <script defer src="{{ url_for('static', filename='js/swiper/swiper-bundle.min.js') }}" defer></script>
+    <!-- Swiper is in video -->
+    <script defer src="{{ url_for('static', filename='js/video.js') }}" defer></script>
+
+    <script>
+        // Загружаем Swiper CSS асинхронно
+        loadCSS("{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}");
     </script>
 
 {% endblock %}

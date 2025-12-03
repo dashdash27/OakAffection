@@ -1,12 +1,6 @@
 /* Fonts */
 @font-face {
   font-family: "Montserrat";
-  src: url("/static/fonts/montserrat-regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Montserrat";
   src: url("/static/fonts/montserrat-medium.woff2") format("woff2");
   font-weight: 500;
   font-style: normal;
@@ -15,12 +9,6 @@
   font-family: "Montserrat";
   src: url("/static/fonts/montserrat-semibold.woff2") format("woff2");
   font-weight: 600;
-  font-style: normal;
-}
-@font-face {
-  font-family: "Montserrat";
-  src: url("/static/fonts/montserrat-bold.woff2") format("woff2");
-  font-weight: 700;
   font-style: normal;
 }
 
@@ -44,6 +32,7 @@ html {
 }
 body {
     font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
     box-sizing: border-box;
 
     background-color: var(--bg-color);
@@ -58,6 +47,14 @@ body.no-scroll {
 .container {
     padding: 0 20px;
     background-color: none;
+}
+
+.lozad {
+    opacity: 0;
+}
+.lozad.loaded {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
 }
 
 @media (min-width: 600px) {

@@ -175,9 +175,61 @@ a.color-active .color-icon {
     right: 15px;
 }
 
-
 .desktop-block {
     display: none;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+.tabs input[type="radio"] {
+    display: none;
+}
+.tabs input[type="radio"] + label {
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 17px;
+    border: 1px solid #e0e0e000;
+    color:#60636e;
+    border-radius: 30px;
+}
+.tabs input[type="radio"] + label:hover {
+    color: var(--accent-color);
+    border: 1px solid var(--bg-sub-color)
+}
+.tabs input[type="radio"]:checked + label {
+    color:#228f09;
+    background-color: var(--bg-sub-color);
+}
+.tab-content {
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 29px;
+    font-weight: 500;
+}
+.tab-content > div {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition: max-height 1s ease, opacity 1s ease;
+}
+#tab1:checked ~ .tab-content #content1,
+#tab2:checked ~ .tab-content #content2,
+#tab3:checked ~ .tab-content #content3 {
+  max-height: max-content;
+  opacity: 1;
+  visibility: visible;
+  transition: max-height 1s ease, opacity 1s ease;
+}
+
+.tab-content {
+    width: 100%;
 }
 
 @media (min-width: 800px) {

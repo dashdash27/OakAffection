@@ -16,11 +16,3 @@ class ProductGroup(db.Model):
 
     def __str__(self):
         return self.name
-    
-    # @property
-    # def original_characteristics(self):
-    #     return self._original_characteristics or []
-
-    # @original_characteristics.setter
-    # def original_characteristics(self, value):
-    #     self._original_characteristics = value

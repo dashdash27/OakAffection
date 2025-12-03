@@ -9,3 +9,4 @@ app/static/videos/uploads/*
 !app/static/videos/uploads/.gitkeep
 app/static/img/colors/*
 !app/static/img/colors/.gitkeep
+create_admin.py

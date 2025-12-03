@@ -32,10 +32,18 @@ def fill_product_by_draft(product, draft):
     product.color_id = draft.color_id
     
     # Обновление даты обновления у категорий
+    for category in draft.categories:
+        # если это новая категория
+        if category not in product.categories:
+            update_category_last_updated(category, product.categories)
+    for category in product.categories:
+        # если это удаленная категория
+        if category not in draft.categories:
+            update_category_last_updated(category, product.categories)
+
     product.categories.clear()
     db.session.flush()
     for category in draft.categories:
-        update_category_last_updated(category)
         product.categories.append(category)
 
     product.targets.clear()
@@ -126,7 +134,8 @@ def delete_product(product):
 
     # обновляем дату обновления у категорий 
     for category in product.categories:
-        update_category_last_updated(category)
+        # товар удалился - обновляем у всех категорий
+        update_category_last_updated(category, None)
 
     db.session.delete(product)
     

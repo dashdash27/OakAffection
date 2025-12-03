@@ -41,7 +41,63 @@ header {
     height: 30px;
 }
 
-/* -- Media --- */
+/* Mobile menu */
+.mobile-menu {
+    position: fixed;
+    width: 90%;
+    height: 100vh;
+    background-color: var(--bg-color);
+    top: 0;
+    left: 0;
+    z-index: 999;
+    border-right: 2px solid var(--bg-sub-color);
+    padding-top: 60px;
+
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+.mobile-menu.open {
+    transform: translateX(0);
+}
+.mobile-nav {
+    padding: 30px 30px 10px 20px;
+    max-height: 98%; /* Максимальная высота равна высоте экрана */
+    overflow-y: auto;
+}
+.mobile-menu__item-h2 a, .mobile-menu__item-h3 a, .mobile-menu__item-h4 a {
+    font-weight: 600;
+    color: var(--text-color);
+}
+.mobile-menu__item-h2 {
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+.mobile-menu__item-h2 a {
+    font-size: 19px;
+}
+.mobile-menu__item-h3 {
+    margin-bottom: 10px;
+    margin-top: 30px;
+}
+.mobile-menu__item-h3 a {
+    font-size: 13px;
+    text-transform: uppercase;
+}
+.mobile-menu__item-h4 {
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
+.mobile-menu__item-h4 a {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+@media (min-width: 600px) {
+    .mobile-nav {
+        padding: 50px 30px 10px 50px;
+    }
+}
+
 @media (min-width: 1024px) {
     .menu,
     .menu-btn {

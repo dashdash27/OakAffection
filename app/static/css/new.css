@@ -18,9 +18,98 @@
 }
 .new .new__inner .swiper-button-prev {
     left: -5px;
+    position: absolute;
 }
 .new .card__media-wrapper {
     height: 300px;
+}
+
+
+.card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.card__media-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    height: 200px;
+    background-color: var(--bg-sub-color);
+    border-radius: 5px;
+    border: 0.5px solid transparent;
+    transition: 0.1s;
+}
+.card__media {
+    width: 70%;        /* ширина адаптируется под контейнер */
+    height: auto;       /* высота считается автоматически с сохранением пропорций */
+    max-height: 75%;  /* ограничение по максимальной высоте */
+    object-fit: contain;
+}
+.card__media-no-photo {
+    width: 70px;
+}
+.card__name {
+    margin-top: 15px;
+    font-size: 13px;
+    line-height: 22px;
+    font-weight: 600;
+    height: 60px;
+    overflow: hidden;
+}
+a.card__button {
+    width: max-content;
+    color: var(--text-color);
+    display: inline-block;
+    border: 0.5px solid var(--text-sub-color);
+    border-radius: 5px;
+    text-align: center;
+    padding: 9px 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+a.card__button:hover {
+    background-color: var(--accent-color);
+    filter: brightness(1.2);
+    transition: 0.2s;
+    color: white;
+}
+.dark-theme a.card__button:hover {
+    background-color: var(--accent-color);
+    filter: brightness(0.8);
+    transition: 0.2s;
+    color: white;
+}
+.card__addition {
+    width: 100%;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 10px;
+}
+.card__isnew {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 11px;
+}
+.card-arrow svg path {
+    fill: var(--text-color);
+    background-color: transparent;
+}
+/* -- Hover -- */
+.card__media-wrapper:hover .card__media {
+    transform: scale(1.05);
+    transition: 0.3s;
+}
+.card__media-wrapper:hover {
+    filter: brightness(0.95);
+    transition: 0.3s;
+}
+.dark-theme .card__media-wrapper:hover {
+    filter: brightness(1.1);
+    transition: 0.3s;
 }
 
 @media (min-width: 450px) {

@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /adminlogin/
+Sitemap: https://oakaffection.ru/sitemap.xml
