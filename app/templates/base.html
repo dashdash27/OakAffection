@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
     {% block css %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
 
     
     <!-- Подключение темы из local Storage-->
@@ -268,7 +269,7 @@
         observer.observe();
     </script>
     <script>
-        loadCSS("{{ url_for('static', filename='css/footer.css') }}");
+        //loadCSS("{{ url_for('static', filename='css/footer.css') }}");
     </script>
 </body>
 </html>
