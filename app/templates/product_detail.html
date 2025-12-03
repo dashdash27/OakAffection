@@ -6,6 +6,7 @@
 {% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/product_detail.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}">
 {% endblock %}
 
 {% block js %}
@@ -272,7 +273,7 @@
 
     <script>
         // Загружаем Swiper CSS асинхронно
-        loadCSS("{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}");
+        //loadCSS("{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}");
     </script>
 
 {% endblock %}
