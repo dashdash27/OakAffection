@@ -15,6 +15,8 @@ class Config:
     
     WTF_CSRF_ENABLED = True
 
+    SERVER_NAME = '89.104.74.97:1234'
+
     # База данных
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     if not SQLALCHEMY_DATABASE_URI:
