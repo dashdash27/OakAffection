@@ -23,11 +23,6 @@ def setup_logger():
 
     formatter = logging.Formatter('%(asctime)s %(levelname)-8s [%(request_id)s] %(message)s')
 
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    console_handler.setLevel(logging.DEBUG)
-    console_handler.addFilter(RequestIdFilter())
-
     log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs')
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
@@ -40,7 +35,6 @@ def setup_logger():
     # Добавляем обработчики только если их еще нет
     if logger.hasHandlers():
         logger.handlers.clear()
-    logger.addHandler(console_handler)
     logger.addHandler(file_handler)
 
     return logger

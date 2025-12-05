@@ -54,9 +54,6 @@ def create_app():
         @app.before_request
         def assign_request_id():
             g.request_id = str(uuid.uuid4())
-            # 🔒 Логирование доступа к админке
-            if request.path.startswith('/admin'):
-                logger.info(f"Действия админа: {request.remote_addr} -> {request.url}")
         
         logger.info("Приложение успешно запущено")
     except Exception as e:

@@ -85,7 +85,6 @@ def product_detail(slug):
             return int(''.join(filter(str.isdigit, s)))
 
         if product.group.characteristic.name == "Объем":
-            logger.info(f"Сортировка идет по {product.group.characteristic.name}")
             sorted_group_products = sorted(
                 product.group.products,
                 key=lambda p: extract_digit_value(
