@@ -5,6 +5,7 @@ from app.admin.helpers import generate_unique_slug, contains_equal_photo_url, co
 from app.admin.file_cleanup import photos_to_delete, videos_to_delete
 
 import os
+from datetime import datetime
 
 def create_product_by_draft(draft):
     logger.info(f">>> Создается новый товар '{draft.name}'")
@@ -30,6 +31,8 @@ def fill_product_by_draft(product, draft):
     product.description_tag = draft.description_tag
     product.group_id = draft.group_id
     product.color_id = draft.color_id
+
+    product.last_updated = datetime.now()
     
     # Обновление даты обновления у категорий
     for category in draft.categories:

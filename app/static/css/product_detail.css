@@ -139,7 +139,7 @@ a.color {
     padding: 10px 15px;
 }
 a.color-active {
-    width: 230px;
+    width: 250px;
     position: relative;
 }
 .color-list {
@@ -160,6 +160,8 @@ a.color-active {
 .color-list.show {
     display: flex;
     flex-direction: column;
+    max-height: 250px;
+    overflow-y: auto;
 }
 .color-icon {
     width: 20px;

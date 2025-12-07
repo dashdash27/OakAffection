@@ -185,12 +185,12 @@
                         {% if product.ozon_link or product.wb_link %}
                             <div class="product__links">
                                 {% if product.ozon_link %}
-                                    <a href="{{product.ozon_link}}" target="_blank" class="product__ozon-link">
+                                    <a href="{{product.ozon_link}}" target="_blank" rel="nofollow noopener noreferrer" class="product__ozon-link">
                                         Купить на озон
                                     </a>
                                 {% endif %}
                                 {% if product.wb_link %}
-                                    <a href="{{product.wb_link}}" target="_blank" class="product__wb-link">
+                                    <a href="{{product.wb_link}}" target="_blank" rel="nofollow noopener noreferrer" class="product__wb-link">
                                         Купить на wildberries
                                     </a>
                                 {% endif %}
