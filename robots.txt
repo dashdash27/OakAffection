@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /admin/
 Disallow: /adminlogin/
 Disallow: /logout
-Sitemap: https://oakaffection.ru/sitemap.xml
+Sitemap: http://oakaffection.ru/sitemap.xml

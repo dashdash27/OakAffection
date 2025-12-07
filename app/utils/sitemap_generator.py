@@ -9,7 +9,7 @@ import os
 
 
 def generate_sitemap():
-    base_url = "https://oakaffection.ru"
+    base_url = "http://oakaffection.ru"
     filepath = os.path.join(BASE_DIR.parent, 'sitemap.xml')
 
     urlset = ET.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
@@ -21,7 +21,7 @@ def generate_sitemap():
             ET.SubElement(url, 'lastmod').text = lastmod.isoformat()
     
     # добавляем главную страницу
-    add_url(f"{base_url}/", datetime(2025, 12, 1))
+    add_url(f"{base_url}/", datetime(2025, 12, 7))
 
     # перебираем все продукты
     products = Product.query.all()
