@@ -25,7 +25,7 @@ class Config:
     BASE_DIR = Path(__file__).resolve().parent
     STATIC_DIR = BASE_DIR / 'static'
     
-    SESSION_COOKIE_SECURE = False       # Только HTTPS (потом включить!!)
+    SESSION_COOKIE_SECURE = True      # Только HTTPS (потом включить!!)
     SESSION_COOKIE_HTTPONLY = True      # Защита от XSS
     SESSION_COOKIE_SAMESITE = 'Strict'  # Максимальная защита CSRF
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=30) # длительность сессии
