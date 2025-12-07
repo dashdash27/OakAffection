@@ -21,19 +21,19 @@ def generate_sitemap():
             ET.SubElement(url, 'lastmod').text = lastmod.isoformat()
     
     # добавляем главную страницу
-    add_url(f"{base_url}/", datetime(2025, 12, 7))
+    add_url(f"http://oakaffection.ru/", datetime(2025, 12, 7))
 
     # перебираем все продукты
     products = Product.query.all()
     for product in products:
-        product_url = f"{base_url}/product/{product.slug}"
+        product_url = f"http://oakaffection.ru/product/{product.slug}"
         add_url(product_url, product.last_updated)
 
     categories = Category.query.all()
     for category in categories:
         for key, val in categories_dict.items():
             if val == category.name:
-                category_url = f"{base_url}/{key}"
+                category_url = f"http://oakaffection.ru/{key}"
                 add_url(category_url, category.last_updated)
 
 
