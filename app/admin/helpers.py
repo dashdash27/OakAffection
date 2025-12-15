@@ -127,12 +127,5 @@ def save_file_to_folder(file_data, target_folder, filename):
         logger.error(f"--> ошибка при сохранении файла '{filename}': {e}")
         return False
     
-def update_category_last_updated(category, old_categories):
+def update_category_last_updated(category):
     category.last_updated = datetime.now()
-
-    help_category = category
-    if help_category.parent:
-        help_category = help_category.parent
-        # если категория-родитель уже была, то ее обновлять не нужно
-        if old_categories and help_category not in old_categories:
-            help_category.last_updated = datetime.now()

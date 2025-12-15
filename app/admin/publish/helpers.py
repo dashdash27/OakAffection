@@ -1,8 +1,9 @@
 from app.logger import logger
 from app.extensions import STATIC_DIR, db
-from app.models import Product, ProductPhoto, ProductVideo, ProductCharacteristic
+from app.models import Product, ProductPhoto, ProductVideo, ProductCharacteristic, Category
 from app.admin.helpers import generate_unique_slug, contains_equal_photo_url, contains_equal_video_url, update_category_last_updated
 from app.admin.file_cleanup import photos_to_delete, videos_to_delete
+from app.helpers import get_products_by_category
 
 import os
 from datetime import datetime
@@ -34,20 +35,24 @@ def fill_product_by_draft(product, draft):
 
     product.last_updated = datetime.now()
     
-    # Обновление даты обновления у категорий
-    for category in draft.categories:
-        # если это новая категория
-        if category not in product.categories:
-            update_category_last_updated(category, product.categories)
-    for category in product.categories:
-        # если это удаленная категория
-        if category not in draft.categories:
-            update_category_last_updated(category, product.categories)
+    # Старый словарь с категориями
+    old_products_by_categories_dict = {}
+    categories = Category.query.all()
+    for category in categories:
+        old_products_by_categories_dict[category] = get_products_by_category(category.name)
 
+    # Добавляем новые категории
     product.categories.clear()
     db.session.flush()
     for category in draft.categories:
         product.categories.append(category)
+    db.session.flush()
+
+    # Проверяем, что изменилось
+    for category in categories:
+        if old_products_by_categories_dict[category] != get_products_by_category(category.name):
+            update_category_last_updated(category)
+    
 
     product.targets.clear()
     db.session.flush()
@@ -135,10 +140,16 @@ def delete_product(product):
         photos_to_delete.add(p.photo_url)
         logger.debug(f" -- фото товара '{p.photo_url}' добавлено на удаление")
 
-    # обновляем дату обновления у категорий 
-    for category in product.categories:
-        # товар удалился - обновляем у всех категорий
-        update_category_last_updated(category, None)
+    # с категориями
+    old_products_by_categories_dict = {}
+    categories = Category.query.all()
+    for category in categories:
+        old_products_by_categories_dict[category] = get_products_by_category(category.name)
 
     db.session.delete(product)
+    db.session.flush()
+
+    for category in categories:
+        if old_products_by_categories_dict[category] != get_products_by_category(category.name):
+            update_category_last_updated(category)
     
