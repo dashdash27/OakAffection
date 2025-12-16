@@ -18,7 +18,7 @@ def generate_sitemap():
         url = ET.SubElement(urlset, 'url')
         ET.SubElement(url, 'loc').text = loc
         if lastmod:
-            ET.SubElement(url, 'lastmod').text = lastmod.isoformat()
+            ET.SubElement(url, 'lastmod').text = lastmod.strftime('%Y-%m-%d')
     
     # добавляем главную страницу
     add_url(f"https://oakaffection.ru/", datetime(2025, 12, 7))
