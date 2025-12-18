@@ -173,6 +173,7 @@
 }
 
 @media (min-width: 1024px) {
+
     .indoor .category__item {
         width: 24%;
     }

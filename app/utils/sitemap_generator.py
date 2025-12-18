@@ -21,7 +21,7 @@ def generate_sitemap():
             ET.SubElement(url, 'lastmod').text = lastmod.strftime('%Y-%m-%d')
     
     # добавляем главную страницу
-    add_url(f"https://oakaffection.ru/", datetime(2025, 12, 7))
+    add_url(f"https://oakaffection.ru/", datetime(2025, 12, 18))
 
     # перебираем все продукты
     products = Product.query.all()

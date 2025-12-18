@@ -1,7 +1,7 @@
 .hero {
     height: 680px;
     position: relative;
-    padding-top: 50px;
+    padding-top: 25px;
 }
 .main-h1 {
     position: absolute;
@@ -26,7 +26,7 @@
 .hero__button {
     margin-top: 20px;
     padding: 7px 20px;
-    background-color: var(--accent-color);
+    background-color: rgb(85, 125, 36);
     border-radius: 20px;
     display: inline-flex;
     align-items: center;
@@ -51,26 +51,26 @@
     border: 2px solid var(--text-sub-color);
 }
 .hero__image {
-    width: 230px;
+    width: 300px;
     position: absolute;
     right: 10px;
     bottom: 0;
 }
 
 /* --- Media --- */
-@media (min-width: 500px) and (max-width: 768px) {
+@media (min-width: 550px) and (max-width: 768px) {
     .hero {
         height: 420px;
     }
     .hero__image {
-        width: 210px;
-        bottom: 30px;
+        width: 250px;
+        bottom: 60px;
     }
 }
 
 @media (min-width: 600px) and (max-width: 767px) {
     .hero__image {
-        width: 220px;
+        width: 260px;
         right: 50px;
     }
 }
@@ -95,9 +95,9 @@
         font-size: 13px;
     }
     .hero__image {
-        width: 300px;
+        width: 350px;
         right: 50px;
-        bottom: 0;
+        bottom: 10px;
     }
 }
 
@@ -116,7 +116,8 @@
         width: 420px;
     }
     .hero__image {
-        width: 400px;
+        width: 500px;
+        bottom: 10px;
     }
     .hero__button {
         padding: 13px 25px;
@@ -125,5 +126,12 @@
     }
     .hero__button-text {
         font-size: 15px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .hero__image {
+        width: 600px;
+        bottom: -50px;
     }
 }

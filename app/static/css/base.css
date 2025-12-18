@@ -17,14 +17,14 @@
     --bg-sub-color: rgb(230, 230, 230);
     --text-color: #000000;
     --text-sub-color: #292b30;
-    --accent-color: rgb(4, 139, 4);
+    --accent-color: rgb(85, 125, 36);
 }
 .dark-theme {
     --bg-color: rgb(28, 32, 38);
     --bg-sub-color: rgb(43, 48, 54);
     --text-color: #e6e6e6;
     --text-sub-color: #a8a8a8;
-    --accent-color: rgb(4, 139, 4);
+    --accent-color: rgb(85, 125, 36);
 }
 html {
     scroll-behavior: smooth;
