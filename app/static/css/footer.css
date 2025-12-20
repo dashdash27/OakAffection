@@ -38,11 +38,42 @@ footer {
     width: 35px;
     height: 35px;
 }
+/* Contacts */
+.tels-box {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap:wrap;
+    row-gap: 30px;
+    column-gap: 100px;
+}
+.tel .link-text {
+    font-size: 18px;
+}
+.tel .link-text:hover {
+    text-decoration: underline;
+}
+.tel-mess {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+}
+.tel-mess a img {
+    height: 42px;
+    width: 42px;
+}
+.tel-mess .max-link img {
+    height: 35px;
+    width: 35px;
+    margin-left: 5px;
+}
+
 .freepik {
     font-size: 13px;
     color: rgb(226, 226, 226);
     margin-top: 30px;
 }
+
 
 @media (min-width: 768px) {
     .footer__inner {
