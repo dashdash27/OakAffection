@@ -106,9 +106,9 @@
                         <h1 class="product__name">
                             {{product.name}}
                         </h1>
-                        {% if product.subname %}
-                            <div class="product__subname">
-                                {{product.subname}}
+                        {% if product.price %}
+                            <div class="product__price">
+                                {{product.price}} ₽
                             </div>
                         {% endif %}
 
@@ -186,12 +186,12 @@
                             <div class="product__links">
                                 {% if product.ozon_link %}
                                     <a href="{{product.ozon_link}}" target="_blank" rel="nofollow noopener noreferrer" class="product__ozon-link">
-                                        Купить на озон
+                                        Купить на <span style="color: #005BFF">ozon</span>
                                     </a>
                                 {% endif %}
                                 {% if product.wb_link %}
                                     <a href="{{product.wb_link}}" target="_blank" rel="nofollow noopener noreferrer" class="product__wb-link">
-                                        Купить на wildberries
+                                        Купить на <span style="color: #CB11AB">wildberries</span>
                                     </a>
                                 {% endif %}
                             </div>
