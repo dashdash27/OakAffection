@@ -15,10 +15,14 @@ footer {
 .footer__item {
     width: max-content;
 }
-.footer__item-title {
+.footer__item-title, 
+a.footer__item-title {
     font-weight: 600;
     font-size: 22px;
     color: white;
+}
+a.footer__item-title {
+    text-decoration: underline;
 }
 .footer__item-inner {
     margin-top: 30px;

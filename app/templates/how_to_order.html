@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Как оформить заказ OAKAFFECTION {% endblock %}
+{% block description %}Как оформить заказ на сайте OAKAFFECTION{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/terms.css') }}">
+{% endblock %}
+
+{% block content %}
+    <article class="terms">
+        <div class="container">
+            <h1 class="terms__title">
+                Как сделать заказ?
+            </h1>
+            <div class="terms__text">
+                <p>
+                    Сайт находится в процессе модернизации. Готовим новые функции по приёму оплаты и доставке товара. Ожидайте скорого запуска в полном объёме.
+                </p>
+                <p>
+                    Внимание! Доставка осуществляется за счёт средств покупателя. 
+                </p>
+                <p>
+                    Для оформления заказа, приёма оплаты и доставки просьба отправить письмо с контактным телефоном, наименованием и количеством выбранного товара на адрес электронной почты 
+                    <a href="mailto:oakaffection@gmail.com" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color)">
+                        oakaffection@gmail.com
+                    </a>.
+                    Мы сразу же свяжемся с Вами и обсудим детали оплаты и доставки.
+                </p>
+            </div>
+        </div>
+    </article>
+{% endblock %}
