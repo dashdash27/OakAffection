@@ -31,20 +31,21 @@
                                 <img class="card__media-no-photo lozad" data-src="{{ url_for('static', filename='img/icons/nophoto.png') }}" alt="Иконка с отсутствием фото">
                             {% endif %}
                         </a>
-                        <div class="card__name">
-                                {{product.name}}
-                            </div>
-                       <div class="card__addition">
-                            <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__button">
-                                Посмотреть
-                            </a>
-                            <div class="card__isnew">
-                                {% if product.is_new %}
+                        <div class="card__addition">
+                            {% if product.price %}
+                                <div class="card__price">
+                                    {{product.price}} ₽
+                                </div>
+                            {% endif %}
+                            {% if product.is_new %}
+                                <div class="card__isnew">
                                     Новинка
-                                {% endif %}
-                            </div>
-                       </div>
-                        
+                                </div>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__name">
+                            {{product.name}}
+                        </a>
                     </div>
                 {% endfor %}
             </div>
