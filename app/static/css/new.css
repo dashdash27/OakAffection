@@ -24,7 +24,6 @@
     height: 300px;
 }
 
-
 .card {
     display: flex;
     flex-direction: column;
@@ -42,61 +41,41 @@
     transition: 0.1s;
 }
 .card__media {
-    width: 70%;        /* ширина адаптируется под контейнер */
-    height: auto;       /* высота считается автоматически с сохранением пропорций */
-    max-height: 75%;  /* ограничение по максимальной высоте */
+    width: 70%;   
+    height: auto;
+    max-height: 75%;
     object-fit: contain;
 }
 .card__media-no-photo {
     width: 70px;
 }
-.card__name {
+a.card__name {
+    display: block;
     margin-top: 15px;
-    font-size: 13px;
-    line-height: 22px;
+    font-size: 16px;
+    line-height: 24px;
     font-weight: 600;
     height: 60px;
     overflow: hidden;
-}
-a.card__button {
-    width: max-content;
-    color: var(--text-color);
-    display: inline-block;
-    border: 0.5px solid var(--text-sub-color);
-    border-radius: 5px;
-    text-align: center;
-    padding: 9px 10px;
-    font-size: 11px;
-    font-weight: 600;
-}
-a.card__button:hover {
-    background-color: var(--accent-color);
-    filter: brightness(1.2);
-    transition: 0.2s;
-    color: white;
-}
-.dark-theme a.card__button:hover {
-    background-color: var(--accent-color);
-    filter: brightness(0.8);
-    transition: 0.2s;
-    color: white;
+    color: var(--text-color)
 }
 .card__addition {
     width: 100%;
-    margin-top: 5px;
+    margin-top: 15px;
     display: flex;
     align-items: center;
     justify-content: start;
     gap: 10px;
 }
+.card__price {
+    font-weight: 600;
+    font-size: 23px;
+    letter-spacing: 1px;
+}
 .card__isnew {
     color: var(--accent-color);
     font-weight: 600;
-    font-size: 11px;
-}
-.card-arrow svg path {
-    fill: var(--text-color);
-    background-color: transparent;
+    font-size: 13px;
 }
 /* -- Hover -- */
 .card__media-wrapper:hover .card__media {
@@ -110,6 +89,9 @@ a.card__button:hover {
 .dark-theme .card__media-wrapper:hover {
     filter: brightness(1.1);
     transition: 0.3s;
+}
+a.card__name:hover {
+    text-decoration: underline;
 }
 
 @media (min-width: 450px) {
@@ -127,5 +109,21 @@ a.card__button:hover {
 @media (min-width: 650px) {
     .new .card__media-wrapper {
         height: 290px;
+    }
+}
+@media (min-width: 1024px) {
+    a.card__name {
+        font-size: 17px;
+        height: 80px;
+        line-height: 28px;
+    }
+    .card__addition {
+        gap: 30px;
+    }
+    .card__price {
+        font-size: 26px;
+    }
+    .card__isnew {
+        font-size: 14px;
     }
 }
