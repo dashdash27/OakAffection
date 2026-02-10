@@ -27,7 +27,7 @@
             </div>
             <div class="products__inner">
                 {% for product in products %}
-                    <div class="card" data-cart-state="idle" data-id="{{product.id}}">
+                    <div class="card" data-id="{{product.id}}">
                         <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__media-wrapper">
                             {% if product.photos %}
                                 <img class="card__media lozad" data-src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">

@@ -106,15 +106,17 @@ a.path__item-catalog:hover {
 }
 
 /* -- Cart Actions */
-.card__cart-view {
+.card__actions {
+    min-height: 42px;
+}
+a.card__cart-view, .card__cart-add {
     display: none;
 }
-.card[data-cart-state="idle"] .card__cart-add {
-    display: block;
-}
-.card[data-cart-state="in-cart"] .card__cart-add {
+.card[data-cart-state="in-cart"] .card__cart-add,
+.card[data-cart-state="idle"] .card__cart-view {
     display: none;
 }
+.card[data-cart-state="idle"] .card__cart-add,
 .card[data-cart-state="in-cart"] .card__cart-view {
     display: block;
 }
@@ -132,6 +134,7 @@ a.card__cart-view {
     background-color: transparent;
     color: var(--accent-color);
 }
+
 
 @media (min-width: 400px) {
     .card__media-wrapper {
