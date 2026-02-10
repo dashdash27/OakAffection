@@ -4,11 +4,11 @@
 {% block description %}{% endblock %}
 
 {% block css %}
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout/cart.css') }}">
 {% endblock %}
 
 {% block js %}
-    
+    <script src="{{ url_for('static', filename='js/checkout/cart.js') }}" defer type="module"></script>
 {% endblock %}
 
 {% block content %}
@@ -17,6 +17,9 @@
             <h1 class="cart__title">
                 Корзина
             </h1>
+            <div class="cart-items">
+
+            </div>
         </div>
     </section>
 {% endblock %}

@@ -17,12 +17,39 @@ function addItemToCart(id) {
     });
 }
 
+function renderCart() {
+    const cartItems = document.querySelector('.cart-items');
+    if (!cartItems) return;
+
+    const cart = loadCartFromLS();
+    const ids = Object.keys(cart);
+
+    if(ids.length === 0) {
+        cartItems.innerHTML = 'Корзина пуста';
+        return;
+    }
+
+    let html = '<ul>';
+    ids.forEach(id => {
+        html += `<li>Товар #<strong>${id}</strong> — <strong>${cart[id]}</strong> шт</li>`;
+    });
+    html += '</ul>';
+
+    cartItems.innerHTML = html;
+}
+
 function initCartSystem() {
     // cleanProductIdsInLS();
     const cart = loadCartFromLS();
-    document.querySelectorAll('.card').forEach(card => {
-        syncProductStateUI(card.dataset.id, cart);
-    });
+
+    if (window.location.pathname.includes('/cart')) {
+        renderCart();
+    }
+    else {
+        document.querySelectorAll('.card').forEach(card => {
+            syncProductStateUI(card.dataset.id, cart);
+        });
+    }
 }
 
 function syncProductStateUI(id, cart) {

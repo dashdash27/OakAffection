@@ -1,0 +1,8 @@
+.cart {
+    padding-top: 100px;
+    min-height: calc(100vh - 268px);
+}
+.cart__title {
+    font-size: 28px;
+    font-weight: 600;
+}
