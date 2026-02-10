@@ -40,6 +40,13 @@ header {
     width: 30px;
     height: 30px;
 }
+.cart-link svg {
+    width: 40px;
+    height: 40px;
+}
+.cart-link svg path {
+    fill: var(--text-color);
+}
 
 /* Mobile menu */
 .mobile-menu {
