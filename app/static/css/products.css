@@ -105,6 +105,34 @@ a.path__item-catalog:hover {
     border-bottom: 2px solid var(--text-sub-color);
 }
 
+/* -- Cart Actions */
+.card__cart-view {
+    display: none;
+}
+.card[data-cart-state="idle"] .card__cart-add {
+    display: block;
+}
+.card[data-cart-state="in-cart"] .card__cart-add {
+    display: none;
+}
+.card[data-cart-state="in-cart"] .card__cart-view {
+    display: block;
+}
+.card__cart-add, a.card__cart-view {
+    width: 100%;
+    text-align: center;
+    background-color: var(--accent-color);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid var(--accent-color);
+    cursor: pointer;
+}
+a.card__cart-view {
+    background-color: transparent;
+    color: var(--accent-color);
+}
+
 @media (min-width: 400px) {
     .card__media-wrapper {
         height: 260px;
