@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block content %}
-    <section class="product">
+    <section class="product" data-id="{{product.id}}">
         <div class="container">
             <div class="product__inner">
 
@@ -181,6 +181,23 @@
                                 </div>
                             </div>
                          {% endif %}
+
+                        <!-- Cart actions -->
+                         <div class="product__actions">
+                            <button class="product__cart-add">
+                                Добавить в корзину
+                            </button>
+                            <div class="product__in-cart-actions">
+                                <div class="product__quantity">
+                                    <button class="qty-btn qty-btn-minus">-</button>
+                                    <span class="qty-value">2</span>
+                                    <button class="qty-btn qty-btn-plus">+</button>
+                                </div>
+                                <a href="{{ url_for('checkout.cart') }}" class="product__cart-view">
+                                    В корзину 
+                                </a>
+                            </div>
+                         </div>
                     
                         {% if product.ozon_link or product.wb_link %}
                             <div class="product__links">
