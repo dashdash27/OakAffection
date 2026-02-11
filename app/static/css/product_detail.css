@@ -33,6 +33,7 @@
 /* -- Cart Actions */
 .product__actions {
     margin-top: 30px;
+    min-height: 42px;
 }
 .product__cart-add, a.product__cart-view {
     display: block;
