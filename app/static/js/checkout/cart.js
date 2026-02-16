@@ -1,4 +1,7 @@
-// Helpers
+// Constants:
+const QUANTITY_MAX = 30;
+
+// Helpers:
 function loadCartFromLS() {
     return JSON.parse(localStorage.getItem('cart')) || {};
 }
@@ -16,18 +19,40 @@ function addItemToCart(id) {
         newCart: cart
     });
 }
-function updateCartItemQuantity(id, delta) {
+function deleteItemFromCart(id) {
     let cart = loadCartFromLS();
-    if (id in cart) {
-        cart[id] += delta;
-    }
-
+    delete cart[id];
     localStorage.setItem('cart', JSON.stringify(cart));
     syncProductStateUI(id, cart);
     cartChannel.postMessage({ 
         productId: id,
         newCart: cart
     });
+}
+function updateCartItemQuantity(id, delta) {
+    let cart = loadCartFromLS();
+    
+    if (id in cart) {
+        cart[id] = Number(cart[id]) + Number(delta);
+
+        if (cart[id] > QUANTITY_MAX) {
+            cart[id] = QUANTITY_MAX;
+            return;
+        }
+
+        if (cart[id] <= 0) {
+            deleteItemFromCart(id);
+            return;
+        }
+        else {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            syncProductStateUI(id, cart);
+            cartChannel.postMessage({ 
+                productId: id,
+                newCart: cart
+            });
+        }
+    }
 }
 
 function renderCart() {
@@ -37,7 +62,7 @@ function renderCart() {
     const cart = loadCartFromLS();
     const ids = Object.keys(cart);
 
-    if(ids.length === 0) {
+    if (ids.length === 0) {
         cartItems.innerHTML = 'Корзина пуста';
         return;
     }
