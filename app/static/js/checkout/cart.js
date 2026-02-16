@@ -19,7 +19,7 @@ function addItemToCart(id) {
         newCart: cart
     });
 }
-function deleteItemFromCart(id) {
+function removeItemFromCart(id) {
     let cart = loadCartFromLS();
     delete cart[id];
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -41,7 +41,7 @@ function updateCartItemQuantity(id, delta) {
         }
 
         if (cart[id] <= 0) {
-            deleteItemFromCart(id);
+            removeItemFromCart(id);
             return;
         }
         else {
