@@ -1,6 +1,8 @@
 // Constants:
 const QUANTITY_MAX = 30;
 
+let productsCache = null;
+
 // Helpers:
 function loadCartFromLS() {
     try {
@@ -89,7 +91,7 @@ function updateCartItemQuantity(id, delta) {
     }
 }
 
-function renderCart() {
+function renderCart(items) {
     const cartItems = document.querySelector('.cart-items');
     if (!cartItems) return;
 
@@ -110,12 +112,40 @@ function renderCart() {
     cartItems.innerHTML = html;
 }
 
-function initCartSystem() {
+async function syncCartWithServer(ids) {
+    try {
+        const response = await fetch('/api/checkout/cart-sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_ids: ids })
+        })
+        
+        console.log(`Статус fetch ${response.ok}`)
+
+        if (response.ok) {
+            const data = await response.json();
+            return { success: true, data: data };
+        }
+        return { success: false, message: "Ошибка сервера при загрузке цен" };
+    } catch (error) {
+        return { success: false, message: "Проблема с сетью: " + error.message };
+    }
+}
+
+async function initCartSystem() {
     cleanProductIdsInLS();
     const cart = loadCartFromLS();
 
     if (window.location.pathname.includes('/cart')) {
-        renderCart();
+        const ids = Object.keys(cart);
+        const result = await syncCartWithServer(ids);
+
+        if (result.success) {
+            productsCache = result.data;
+            renderCart(productsCache);
+        } else {
+            console.log("Не удалось получить данные о товарах в корзине")
+        }
     }
     else {
         document.querySelectorAll('.card').forEach(card => {
