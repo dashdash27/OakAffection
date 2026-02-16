@@ -3,7 +3,41 @@ const QUANTITY_MAX = 30;
 
 // Helpers:
 function loadCartFromLS() {
-    return JSON.parse(localStorage.getItem('cart')) || {};
+    try {
+        const data = localStorage.getItem('cart');
+        const cart = data ? JSON.parse(data) : {};
+        return (typeof cart === 'object' && cart !== null && !Array.isArray(cart)) ? cart : {};
+    }
+    catch (e) {
+        return {}
+    }
+}
+function cleanProductIdsInLS() {
+    const rawData = localStorage.getItem('cart');
+    const cart = loadCartFromLS();
+    let isDirty = false;
+
+    if (rawData && rawData !== '{}' && Object.keys(cart).length === 0) {
+        isDirty = true; 
+    }
+
+    const cleanCart = {};
+    
+    for (let id in cart) {
+        const count = Number(cart[id]);
+        const numericId = Number(id);
+
+        if (!isNaN(numericId) && !isNaN(count) && count > 0 && count <= QUANTITY_MAX) {
+            cleanCart[numericId] = count;
+        } else {
+            isDirty = true;
+        }
+    }
+
+    if (isDirty) {
+        localStorage.setItem('cart', JSON.stringify(cleanCart));
+        console.log("Корзина была очищена от некорректных данных");
+    }
 }
 function addItemToCart(id) {
     let cart = loadCartFromLS();
@@ -77,7 +111,7 @@ function renderCart() {
 }
 
 function initCartSystem() {
-    // cleanProductIdsInLS();
+    cleanProductIdsInLS();
     const cart = loadCartFromLS();
 
     if (window.location.pathname.includes('/cart')) {
