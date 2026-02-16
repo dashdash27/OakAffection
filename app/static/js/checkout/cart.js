@@ -93,19 +93,16 @@ function updateCartItemQuantity(id, delta) {
 
 function renderCart(items) {
     const cartItems = document.querySelector('.cart-items');
-    if (!cartItems) return;
-
     const cart = loadCartFromLS();
-    const ids = Object.keys(cart);
 
-    if (ids.length === 0) {
+    if (items.length === 0) {
         cartItems.innerHTML = 'Корзина пуста';
         return;
     }
 
     let html = '<ul>';
-    ids.forEach(id => {
-        html += `<li>Товар #<strong>${id}</strong> — <strong>${cart[id]}</strong> шт</li>`;
+    items.forEach(item => {
+        html += `<li>#${item["id"]}<strong> ${item["name"]}</strong> — ${cart[item["id"]]} <strong></strong> шт</li>`;
     });
     html += '</ul>';
 
@@ -114,9 +111,14 @@ function renderCart(items) {
 
 async function syncCartWithServer(ids) {
     try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         const response = await fetch('/checkout/api/cart/sync', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Accept': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ product_ids: ids })
         })
         
@@ -142,9 +144,10 @@ async function initCartSystem() {
 
         if (result.success) {
             productsCache = result.data;
+            console.log(result.data)
             renderCart(productsCache);
         } else {
-            console.log("Не удалось получить данные о товарах в корзине")
+            console.log(`Не удалось получить данные о товарах в корзине ${result.error}`)
         }
     }
     else {
