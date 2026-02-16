@@ -114,7 +114,7 @@ function renderCart(items) {
 
 async function syncCartWithServer(ids) {
     try {
-        const response = await fetch('/api/checkout/cart-sync', {
+        const response = await fetch('/checkout/api/cart/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ product_ids: ids })
