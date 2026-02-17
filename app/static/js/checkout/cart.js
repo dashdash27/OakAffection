@@ -113,8 +113,9 @@ function renderCart(products) {
 
         cartItem.querySelector('.cart__item-name').textContent = product.name;
         cartItem.querySelector('.cart-item__count').textContent = cart[product.id] || 1;
-        cartItem.querySelector('.cart__item-total').textContent = product.price;
-        cartItem.querySelector('.cart__item-img').src = product.photo_path
+        cartItem.querySelector('.cart__item-total').textContent = product.price * cart[product.id];
+        cartItem.querySelector('.cart__item-img').src = product.photo_path;
+
 
         cartItemsContainer.appendChild(cartItem);
     })
