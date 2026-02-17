@@ -91,22 +91,33 @@ function updateCartItemQuantity(id, delta) {
     }
 }
 
-function renderCart(items) {
-    const cartItems = document.querySelector('.cart-items');
-    const cart = loadCartFromLS();
+function renderCart(products) {
+    const cartItemsContainer = document.querySelector('.cart__items');
+    const cartItemTemplate = document.querySelector('.cart__item-template');
 
-    if (items.length === 0) {
-        cartItems.innerHTML = 'Корзина пуста';
+    cartItemsContainer.innerHTML = "";
+
+    if (products.length === 0) {
+        cartItemsContainer.innerHTML = 'Корзина пуста';
         return;
     }
 
-    let html = '<ul>';
-    items.forEach(item => {
-        html += `<li>#${item["id"]}<strong> ${item["name"]}</strong> — ${cart[item["id"]]} <strong></strong> шт</li>`;
-    });
-    html += '</ul>';
+    const cart = loadCartFromLS();
 
-    cartItems.innerHTML = html;
+    products.forEach(product => {
+        const clone = cartItemTemplate.content.cloneNode(true);
+        const cartItem = clone.querySelector('.cart__item');
+        console.log(product)
+
+        cartItem.dataset.id = product.id;
+
+        cartItem.querySelector('.cart__item-name').textContent = product.name;
+        cartItem.querySelector('.cart-item__count').textContent = cart[product.id] || 1;
+        cartItem.querySelector('.cart__item-total').textContent = product.price;
+        cartItem.querySelector('.cart__item-img').src = product.photo_path
+
+        cartItemsContainer.appendChild(cartItem);
+    })
 }
 
 async function syncCartWithServer(ids) {

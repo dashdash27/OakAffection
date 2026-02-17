@@ -17,9 +17,45 @@
             <h1 class="cart__title">
                 Корзина
             </h1>
-            <div class="cart-items">
+            <div class="cart__table">
+                <div class="cart__table-header">
+                    <div class="cart__col">Товар</div>
+                    <div class="cart__col">Количество</div>
+                    <div class="cart__col">Цена</div>
+                    <div class="cart__col">Удалить</div>
+                </div>
+                <div class="cart__items">
 
+                </div>  
             </div>
+
+            <template class="cart__item-template">
+                <div class="cart__item" data-id="">
+                    <div class="cart__item-info">
+                        <div class="cart__item-img-wrapper">
+                            <img src="" alt="" class="cart__item-img">
+                        </div>
+                        <div class="cart__item-text">
+                            <div class="cart__item-name">
+                                Название товара
+                            </div>
+                            <div class="cart__item-variant"></div>
+                        </div>
+                    </div>
+
+                    <div class="cart__item-controls">
+                        <button class="cart-item__btn-minus">-</button>
+                        <span class="cart-item__count">2</span>
+                        <button class="cart-item__btn-plus">+</button>
+                    </div>
+
+                    <div class="cart__item-total">454</div>
+
+                    <button class="cart__item-remove">Удалить</button>
+
+                </div>
+            </template>
+
         </div>
     </section>
     <script src="{{ url_for('static', filename='js/checkout/cart.js') }}"></script>
