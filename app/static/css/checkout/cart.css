@@ -52,8 +52,12 @@
 .cart__item-text {
     margin-top: 40px;
 }
-.cart__item-name {
+a.cart__item-name {
+    display: block;
     width: 300px;
+}
+a.cart__item-name:hover {
+    text-decoration: underline;
 }
 .cart__item-controls {
     display: flex;
