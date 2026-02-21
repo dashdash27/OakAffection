@@ -74,3 +74,7 @@ a.cart__item-name:hover {
 .cart__item-total {
     font-size: 25px;
 }
+.cart__item-remove svg {
+    width: 25px;
+    height: 25px;
+}
