@@ -227,7 +227,7 @@ function syncProductStateUI(id, cart) {
             // recount total
             const totalLabel = cartItem.querySelector('.cart__item-total');
             const productPrice = Number(productsCache.find(p => String(p.id) === String(id)).price);
-            if (totalLabel) totalLabel.textContent = (cart[id] * productPrice).toLocaleString('ru-RU');
+            if (totalLabel) totalLabel.textContent = `${(cart[id] * productPrice).toLocaleString('ru-RU')} ₽`;
         }
         else {
             cartItem.remove()
