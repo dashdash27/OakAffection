@@ -117,6 +117,8 @@ function renderCart(products) {
 
     const cart = loadCartFromLS();
 
+    let totalAmount = 0;
+
     products.forEach(product => {
         const clone = cartItemTemplate.content.cloneNode(true);
         const cartItem = clone.querySelector('.cart__item');
@@ -140,7 +142,10 @@ function renderCart(products) {
         };
 
         cartItemsContainer.appendChild(cartItem);
+
+        totalAmount += cartItemTotal;
     })
+    document.querySelector('.cart__total-amount').textContent = `${totalAmount.toLocaleString('ru-RU')} ₽`;
 }
 
 async function syncCartWithServer(ids) {
@@ -224,7 +229,7 @@ function syncProductStateUI(id, cart) {
             const countLabel = cartItem.querySelector('.cart-item__count');
             if (countLabel) countLabel.textContent = cart[id];
 
-            // recount total
+            // recount total cart-item
             const totalLabel = cartItem.querySelector('.cart__item-total');
             const productPrice = Number(productsCache.find(p => String(p.id) === String(id)).price);
             if (totalLabel) totalLabel.textContent = `${(cart[id] * productPrice).toLocaleString('ru-RU')} ₽`;
@@ -232,6 +237,14 @@ function syncProductStateUI(id, cart) {
         else {
             cartItem.remove()
         }
+
+        // Recount total cart amount
+        const totalAmount = productsCache.reduce((sum, product) => {
+            const count = cart[product.id] || 0;
+            return sum + (Number(product.price) || 0) * count;
+        }, 0);
+        document.querySelector('.cart__total-amount').textContent = `${totalAmount.toLocaleString('ru-RU')} ₽`;
+        
     }
 }
 

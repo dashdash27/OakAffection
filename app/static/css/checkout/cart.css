@@ -78,3 +78,18 @@ a.cart__item-name:hover {
     width: 25px;
     height: 25px;
 }
+
+/* Footer */
+.cart__footer {
+    margin-top: 30px;
+}
+.cart__total {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.cart__total-text,
+.cart__total-amount {
+    font-size: 25px;
+    font-weight: 600;
+}
