@@ -55,6 +55,7 @@
 a.cart__item-name {
     display: block;
     width: 300px;
+    color: var(--text-color);
 }
 a.cart__item-name:hover {
     text-decoration: underline;
