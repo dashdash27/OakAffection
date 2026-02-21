@@ -130,8 +130,6 @@ function renderCart(products) {
         cartItem.querySelector('.cart__item-name').href = `/product/${product.slug}`;
         cartItem.querySelector('.cart-item__count').textContent = cart[product.id];
         cartItem.querySelector('.cart__item-total').textContent = `${(Number(product.price) || 0) * cart[product.id]} ₽`;
-
-        console.log(product.slug);
         
         const cartItemImg = cartItem.querySelector('.cart__item-img');
         cartItemImg.src = product.photo_path;
@@ -298,6 +296,16 @@ document.addEventListener('click', (e) => {
 
         updateCartItemQuantity(productId, 1);
         return;
+    }
+
+    // 7. Delete cart item
+    const removeCartItemBtn = e.target.closest('.cart__item-remove');
+    if (removeCartItemBtn) {
+        e.preventDefault();
+        const product = removeCartItemBtn.closest('.cart__item');
+        const productId = product.dataset.id;
+
+        removeItemFromCart(productId);
     }
 })
 
