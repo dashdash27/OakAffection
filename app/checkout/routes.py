@@ -35,11 +35,16 @@ def sync_cart():
 
     result = []
     for p in products:
+        if not p.price:
+            continue
+        
+        photo_path = p.photos[0].photo_url if p.photos else "img/icons/nophoto.png"
+
         result.append({
             "id": p.id,
             "name": p.name,
-            "price": int(p.price) if p.price else None,
-            "photo_path": f"/static/{p.photos[0].photo_url}" if p.photos[0] else None
+            "price": int(p.price),
+            "photo_path": f"/static/{photo_path}"
         })
     
     return jsonify(result), 200

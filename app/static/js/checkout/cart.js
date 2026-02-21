@@ -30,7 +30,7 @@ function cleanProductIdsInLS() {
         const numericId = Number(id);
 
         if (!isNaN(numericId) && !isNaN(count) && count > 0 && count <= QUANTITY_MAX) {
-            cleanCart[numericId] = count;
+            cleanCart[id] = count;
         } else {
             isDirty = true;
         }
@@ -90,6 +90,19 @@ function updateCartItemQuantity(id, delta) {
         }
     }
 }
+function syncLSWithServerIds(serverIds) {
+    let cart = loadCartFromLS();
+    let changed = false;
+    Object.keys(cart).forEach(id => {
+    if (!serverIds.includes(String(id))) {
+            delete cart[id];
+            changed = true;
+        }
+    });
+    if (changed) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+}
 
 function renderCart(products) {
     const cartItemsContainer = document.querySelector('.cart__items');
@@ -107,15 +120,22 @@ function renderCart(products) {
     products.forEach(product => {
         const clone = cartItemTemplate.content.cloneNode(true);
         const cartItem = clone.querySelector('.cart__item');
-        console.log(product)
+        
+        // если данные разошлись с LS
+        if (!cart[product.id]) return; 
 
         cartItem.dataset.id = product.id;
 
         cartItem.querySelector('.cart__item-name').textContent = product.name;
         cartItem.querySelector('.cart-item__count').textContent = cart[product.id] || 1;
-        cartItem.querySelector('.cart__item-total').textContent = product.price * cart[product.id];
-        cartItem.querySelector('.cart__item-img').src = product.photo_path;
-
+        cartItem.querySelector('.cart__item-total').textContent = `${(Number(product.price) || 0) * cart[product.id]} ₽`;
+        
+        const cartItemImg = cartItem.querySelector('.cart__item-img');
+        cartItemImg.src = product.photo_path;
+        cartItemImg.onerror = () => { 
+            cartItemImg.src = '/static/img/icons/nophoto.png'; 
+            cartItemImg.onerror = null;
+        };
 
         cartItemsContainer.appendChild(cartItem);
     })
@@ -133,8 +153,6 @@ async function syncCartWithServer(ids) {
             },
             body: JSON.stringify({ product_ids: ids })
         })
-        
-        console.log(`Статус fetch ${response.ok}`)
 
         if (response.ok) {
             const data = await response.json();
@@ -156,10 +174,10 @@ async function initCartSystem() {
 
         if (result.success) {
             productsCache = result.data;
-            console.log(result.data)
+            syncLSWithServerIds(productsCache.map(p => String(p.id)))
             renderCart(productsCache);
         } else {
-            console.log(`Не удалось получить данные о товарах в корзине ${result.error}`)
+            console.log(`Не удалось получить данные о товарах в корзине ${result.message}`)
         }
     }
     else {
@@ -178,7 +196,6 @@ function syncProductStateUI(id, cart) {
     // 1 - product cards
     const card = document.querySelector(`.card[data-id="${id}"]`);
     if (card) {
-        console.log(`Элемент найден ${id}`);
         if (id in cart) {
             card.setAttribute('data-cart-state', 'in-cart');
         }
