@@ -44,7 +44,8 @@ def sync_cart():
             "id": p.id,
             "name": p.name,
             "price": int(p.price),
-            "photo_path": f"/static/{photo_path}"
+            "photo_path": f"/static/{photo_path}",
+            "slug": p.slug
         })
     
     return jsonify(result), 200

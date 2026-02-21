@@ -127,8 +127,11 @@ function renderCart(products) {
         cartItem.dataset.id = product.id;
 
         cartItem.querySelector('.cart__item-name').textContent = product.name;
-        cartItem.querySelector('.cart-item__count').textContent = cart[product.id] || 1;
+        cartItem.querySelector('.cart__item-name').href = `/product/${product.slug}`;
+        cartItem.querySelector('.cart-item__count').textContent = cart[product.id];
         cartItem.querySelector('.cart__item-total').textContent = `${(Number(product.price) || 0) * cart[product.id]} ₽`;
+
+        console.log(product.slug);
         
         const cartItemImg = cartItem.querySelector('.cart__item-img');
         cartItemImg.src = product.photo_path;
