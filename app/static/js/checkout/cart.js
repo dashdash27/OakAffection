@@ -77,7 +77,7 @@ function updateCartItemQuantity(id, delta) {
         }
 
         if (cart[id] <= 0) {
-            removeItemFromCart(id);
+            cart[id] = 1;
             return;
         }
         else {
@@ -191,8 +191,6 @@ async function initCartSystem() {
 }
 
 function syncProductStateUI(id, cart) {
-    const idsInCart = Object.keys(cart);
-
     // 1 - product cards
     const card = document.querySelector(`.card[data-id="${id}"]`);
     if (card) {
@@ -214,6 +212,19 @@ function syncProductStateUI(id, cart) {
         }
         else {
             product.setAttribute('data-cart-state', 'idle');
+        }
+    }
+
+    // 3 - Cart Item
+    const cartItem = document.querySelector(`.cart__item[data-id="${id}"]`);
+    if (cartItem) {
+        if (id in cart) {
+            const countLabel = cartItem.querySelector('.cart-item__count');
+            if (countLabel) countLabel.textContent = cart[id];
+        }
+        else {
+            // TODO: удалить эту строку из render-cart
+            cartItem.remove()
         }
     }
 }
@@ -261,6 +272,28 @@ document.addEventListener('click', (e) => {
         const productId = product.dataset.id;
 
         updateCartItemQuantity(productId, -1);
+        return;
+    }
+
+    // 5. Counter - in cart item
+    const cartItemMinus = e.target.closest('.cart-item__btn-minus');
+    if (cartItemMinus) {
+        e.preventDefault();
+        const product = cartItemMinus.closest('.cart__item');
+        const productId = product.dataset.id;
+
+        updateCartItemQuantity(productId, -1);
+        return;
+    }
+
+    // 6. Counter + in cart item
+    const cartItemPlus = e.target.closest('.cart-item__btn-plus');
+    if (cartItemPlus) {
+        e.preventDefault();
+        const product = cartItemPlus.closest('.cart__item');
+        const productId = product.dataset.id;
+
+        updateCartItemQuantity(productId, 1);
         return;
     }
 })
