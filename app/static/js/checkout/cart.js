@@ -129,7 +129,8 @@ function renderCart(products) {
         cartItem.querySelector('.cart__item-name').textContent = product.name;
         cartItem.querySelector('.cart__item-name').href = `/product/${product.slug}`;
         cartItem.querySelector('.cart-item__count').textContent = cart[product.id];
-        cartItem.querySelector('.cart__item-total').textContent = `${(Number(product.price) || 0) * cart[product.id]} ₽`;
+        const cartItemTotal = Number(product.price) * cart[product.id];
+        cartItem.querySelector('.cart__item-total').textContent = `${cartItemTotal.toLocaleString('ru-RU')} ₽`;
         
         const cartItemImg = cartItem.querySelector('.cart__item-img');
         cartItemImg.src = product.photo_path;
@@ -222,9 +223,13 @@ function syncProductStateUI(id, cart) {
         if (id in cart) {
             const countLabel = cartItem.querySelector('.cart-item__count');
             if (countLabel) countLabel.textContent = cart[id];
+
+            // recount total
+            const totalLabel = cartItem.querySelector('.cart__item-total');
+            const productPrice = Number(productsCache.find(p => String(p.id) === String(id)).price);
+            if (totalLabel) totalLabel.textContent = (cart[id] * productPrice).toLocaleString('ru-RU');
         }
         else {
-            // TODO: удалить эту строку из render-cart
             cartItem.remove()
         }
     }
