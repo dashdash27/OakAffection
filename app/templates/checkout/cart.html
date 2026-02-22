@@ -19,10 +19,10 @@
             </h1>
             <div class="cart__table">
                 <div class="cart__table-header">
-                    <div class="cart__col">Товар</div>
-                    <div class="cart__col">Количество</div>
-                    <div class="cart__col">Цена</div>
-                    <div class="cart__col">Удалить</div>
+                    <div class="cart__col cart__col-product">Товар</div>
+                    <div class="cart__col cart__col-count">Количество</div>
+                    <div class="cart__col cart__col-total">Цена</div>
+                    <div class="cart__col cart__col-remove">Удалить</div>
                 </div>
                 <div class="cart__items">
 
@@ -37,14 +37,14 @@
                         565
                     </div>
                 </div>
-                <a href="" class="cart__sumbit">
+                <a href="" class="cart__submit">
                     Оформить заказ
                 </a>
             </div>
 
             <template class="cart__item-template">
                 <div class="cart__item" data-id="">
-                    <div class="cart__item-info">
+                    <div class="cart__item-info cart__col-product">
                         <div class="cart__item-img-wrapper">
                             <img src="" alt="" class="cart__item-img">
                         </div>
@@ -56,19 +56,27 @@
                         </div>
                     </div>
 
-                    <div class="cart__item-controls">
-                        <button class="cart-item__btn-minus">-</button>
+                    <div class="cart__item-controls cart__col-count">
+                        <button class="cart-item__btn-minus">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 12L18 12" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                        </button>
                         <span class="cart-item__count"></span>
-                        <button class="cart-item__btn-plus">+</button>
+                        <button class="cart-item__btn-plus">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 12H18M12 6V18" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                        </button>
                     </div>
 
-                    <div class="cart__item-total"></div>
+                    <div class="cart__item-total cart__col-total"></div>
 
-                    <button class="cart__item-remove">
+                    <button class="cart__item-remove cart__col-remove">
                         <svg fill="var(--text-color)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M5.755,20.283,4,8H20L18.245,20.283A2,2,0,0,1,16.265,22H7.735A2,2,0,0,1,5.755,20.283ZM21,4H16V3a1,1,0,0,0-1-1H9A1,1,0,0,0,8,3V4H3A1,1,0,0,0,3,6H21a1,1,0,0,0,0-2Z"></path></g></svg>
                     </button>
                 </div>
             </template>
+
+            <div class="cart__empty">
+                Корзина пуста
+            </div>
 
         </div>
     </section>

@@ -105,14 +105,18 @@ function syncLSWithServerIds(serverIds) {
 }
 
 function renderCart(products) {
-    const cartItemsContainer = document.querySelector('.cart__items');
-    const cartItemTemplate = document.querySelector('.cart__item-template');
+    const cartSection = document.querySelector('.cart')
+    const cartItemsContainer = cartSection.querySelector('.cart__items');
+    const cartItemTemplate = cartSection.querySelector('.cart__item-template');
 
     cartItemsContainer.innerHTML = "";
 
     if (products.length === 0) {
-        cartItemsContainer.innerHTML = 'Корзина пуста';
+        cartSection.dataset.state = "empty";
         return;
+    }
+    else {
+        cartSection.dataset.state = "filled";
     }
 
     const cart = loadCartFromLS();
@@ -235,7 +239,11 @@ function syncProductStateUI(id, cart) {
             if (totalLabel) totalLabel.textContent = `${(cart[id] * productPrice).toLocaleString('ru-RU')} ₽`;
         }
         else {
-            cartItem.remove()
+            cartItem.remove();
+            console.log(cart);
+            if (Object.keys(cart).length === 0) {
+                document.querySelector('.cart').dataset.state = "empty";
+            }
         }
 
         // Recount total cart amount
@@ -244,7 +252,10 @@ function syncProductStateUI(id, cart) {
             return sum + (Number(product.price) || 0) * count;
         }, 0);
         document.querySelector('.cart__total-amount').textContent = `${totalAmount.toLocaleString('ru-RU')} ₽`;
-        
+    }
+    else {
+        // TODO: render коризну
+        //renderCart(productsCache);
     }
 }
 
