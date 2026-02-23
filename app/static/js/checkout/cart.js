@@ -15,6 +15,7 @@ function loadCartFromLS() {
     }
 }
 function cleanProductIdsInLS() {
+    // return cleanCart
     const rawData = localStorage.getItem('cart');
     const cart = loadCartFromLS();
     let isDirty = false;
@@ -40,6 +41,8 @@ function cleanProductIdsInLS() {
         localStorage.setItem('cart', JSON.stringify(cleanCart));
         console.log("Корзина была очищена от некорректных данных");
     }
+
+    return cleanCart
 }
 function addItemToCart(id) {
     let cart = loadCartFromLS();
@@ -90,11 +93,36 @@ function updateCartItemQuantity(id, delta) {
         }
     }
 }
+async function syncCacheWithLS(cart) {
+    // Download some info about new products
+    const cartIds = Object.keys(cart);
+
+    const missingIds = cartIds.filter(id => 
+        !productsCache.some(product => String(product.id) === String(id))
+    );
+
+    if (missingIds.length > 0) {
+        const result = await syncCartWithServer(missingIds);
+        if (result.success) {
+            const newProducts = result.data;
+            productsCache.push(...newProducts);
+            const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)))
+            renderCart(productsCache, currentCart);
+        } else {
+            console.log(`Не удалось подгрузить данные о новых товарах в корзине ${result.message}`)
+        }
+    }
+
+}
 function syncLSWithServerIds(serverIds) {
+    // Delete missing products in cart after server responce (basic is productsIds)
+    // Если что-то добавили в LS за это время, оно очистится + очистятся ошибочные id (если товар удалился например)
+    // return uodated cart
+
     let cart = loadCartFromLS();
     let changed = false;
     Object.keys(cart).forEach(id => {
-    if (!serverIds.includes(String(id))) {
+        if (!serverIds.includes(String(id))) {
             delete cart[id];
             changed = true;
         }
@@ -102,9 +130,11 @@ function syncLSWithServerIds(serverIds) {
     if (changed) {
         localStorage.setItem('cart', JSON.stringify(cart));
     }
+
+    return cart
 }
 
-function renderCart(products) {
+function renderCart(products, cart) {
     const cartSection = document.querySelector('.cart')
     const cartItemsContainer = cartSection.querySelector('.cart__items');
     const cartItemTemplate = cartSection.querySelector('.cart__item-template');
@@ -119,16 +149,14 @@ function renderCart(products) {
         cartSection.dataset.state = "filled";
     }
 
-    const cart = loadCartFromLS();
-
     let totalAmount = 0;
 
     products.forEach(product => {
         const clone = cartItemTemplate.content.cloneNode(true);
         const cartItem = clone.querySelector('.cart__item');
         
-        // если данные разошлись с LS
-        if (!cart[product.id]) return; 
+        // если данные разошлись с LS - в корзине нет такого товара, который подгружен в productCache
+        if (!cart[product.id]) return;
 
         cartItem.dataset.id = product.id;
 
@@ -153,6 +181,7 @@ function renderCart(products) {
 }
 
 async function syncCartWithServer(ids) {
+    // Fetch to server to get info about products
     try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         const response = await fetch('/checkout/api/cart/sync', {
@@ -176,8 +205,7 @@ async function syncCartWithServer(ids) {
 }
 
 async function initCartSystem() {
-    cleanProductIdsInLS();
-    const cart = loadCartFromLS();
+    const cart = cleanProductIdsInLS();
 
     if (window.location.pathname.includes('/cart')) {
         const ids = Object.keys(cart);
@@ -185,8 +213,8 @@ async function initCartSystem() {
 
         if (result.success) {
             productsCache = result.data;
-            syncLSWithServerIds(productsCache.map(p => String(p.id)))
-            renderCart(productsCache);
+            const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)));
+            renderCart(productsCache, currentCart);
         } else {
             console.log(`Не удалось получить данные о товарах в корзине ${result.message}`)
         }
@@ -201,7 +229,7 @@ async function initCartSystem() {
     }
 }
 
-function syncProductStateUI(id, cart) {
+async function syncProductStateUI(id, cart) {
     // 1 - product cards
     const card = document.querySelector(`.card[data-id="${id}"]`);
     if (card) {
@@ -227,6 +255,7 @@ function syncProductStateUI(id, cart) {
     }
 
     // 3 - Cart Item
+    const cartSection = document.querySelector('.cart');
     const cartItem = document.querySelector(`.cart__item[data-id="${id}"]`);
     if (cartItem) {
         if (id in cart) {
@@ -254,8 +283,10 @@ function syncProductStateUI(id, cart) {
         document.querySelector('.cart__total-amount').textContent = `${totalAmount.toLocaleString('ru-RU')} ₽`;
     }
     else {
-        // TODO: render коризну
-        //renderCart(productsCache);
+        if (cartSection) {
+            await syncCacheWithLS(cart);
+            renderCart(productsCache, cart);
+        }
     }
 }
 
