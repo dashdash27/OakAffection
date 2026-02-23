@@ -166,6 +166,7 @@ function renderCart(products, cart) {
         cartItem.querySelector('.cart-item__count').textContent = cart[product.id];
         const cartItemTotal = Number(product.price) * cart[product.id];
         cartItem.querySelector('.cart__item-total').textContent = `${cartItemTotal.toLocaleString('ru-RU')} ₽`;
+        cartItem.querySelector('.cart__item-img-wrapper').href = `/product/${product.slug}`;
         
         const cartItemImg = cartItem.querySelector('.cart__item-img');
         cartItemImg.src = product.photo_path;

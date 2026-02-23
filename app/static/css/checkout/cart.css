@@ -86,6 +86,18 @@ a.cart__item-name {
 a.cart__item-name:hover {
     text-decoration: underline;
 }
+.cart__item-img-wrapper:hover .cart__item-img {
+    transform: scale(1.05);
+    transition: 0.3s;
+}
+.cart__item-img-wrapper:hover {
+    filter: brightness(0.95);
+    transition: 0.3s;
+}
+.dark-theme .cart__item-img-wrapper:hover {
+    filter: brightness(1.1);
+    transition: 0.3s;
+}
 
 /* Counters */
 .cart__item-controls {
