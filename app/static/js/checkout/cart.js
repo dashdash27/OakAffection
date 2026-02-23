@@ -151,7 +151,8 @@ function renderCart(products, cart) {
 
     let totalAmount = 0;
 
-    products.forEach(product => {
+    const sortedProducts = [...products].sort((a, b) => Number(a.id) - Number(b.id));
+    sortedProducts.forEach(product => {
         const clone = cartItemTemplate.content.cloneNode(true);
         const cartItem = clone.querySelector('.cart__item');
         
