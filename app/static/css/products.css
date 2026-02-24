@@ -126,7 +126,8 @@ a.card__cart-view, .card__cart-add {
     background-color: var(--accent-color);
     color: white;
     padding: 10px;
-    border-radius: 5px;
+    font-size: 14px;
+    border-radius: 30px;
     border: 2px solid var(--accent-color);
     cursor: pointer;
     font-weight: 600;
@@ -184,5 +185,8 @@ a.card__cart-view {
     }
     .card__isnew {
         font-size: 14px;
+    }
+    .card__cart-add, a.card__cart-view {
+        font-size: 17px;
     }
 }
