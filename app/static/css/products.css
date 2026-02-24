@@ -13,7 +13,7 @@
     display: grid;
     grid-template-columns: repeat(2, 48%); /* 2 колонки фиксированной ширины */
     justify-content: space-between; /* максимальный промежуток между колонками */
-    gap: 30px 0;
+    gap: 40px 0;
     width: 100%;
 }
 .card {
@@ -167,7 +167,7 @@ a.card__cart-view {
 }
 @media (min-width: 1024px) {
     .products__inner {
-        gap: 40px 0;
+        gap: 60px 0;
     }
     .card__media-wrapper {
         height: 310px;
