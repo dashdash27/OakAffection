@@ -1,5 +1,62 @@
 // Constants:
 const QUANTITY_MAX = 30;
+const DISCOUNT_RULES = [
+    { threshold: 10000, value: 0.20, label: '20%' },
+    { threshold: 30000, value: 0.25, label: '25%' }
+].sort((a, b) => a.threshold - b.threshold);
+
+function getCartFinances(total) {
+    // ищем первую скидку
+    const currentRule = [...DISCOUNT_RULES]
+        .reverse()
+        .find(rule => total >= rule.threshold);
+
+    // ищем вторую скидку
+    const nextRule = DISCOUNT_RULES.find(rule => total < rule.threshold);
+
+    // считаем текущую скидку
+    const discountSum = currentRule ? Math.round(total * currentRule.value) : 0;
+
+    // считаем, сколько не хватает до следующей ссылки
+    const nextDiff = nextRule ? nextRule.threshold - total : 0;
+
+    return {
+        total: total,
+        discountPercent: currentRule ? currentRule.label : null,
+        discountSum: discountSum,
+        finalPrice: total - discountSum,
+
+        nextThreshold: nextRule ? { 
+            diff: nextDiff,
+            label: nextRule.label
+        } : null
+    }
+}
+
+function updateCartTotalUI(finances) {
+    console.log(finances);
+    const cartSection = document.querySelector('.cart');
+    const cartTotalAmount = document.querySelector('.cart__total-amount');
+    const cartTotalFinal = document.querySelector('.cart__total-final');
+    const cartUpsell = document.querySelector('.cart__upsell');
+    let state = 'none';
+    let upsellStr = '';
+
+    cartTotalAmount.textContent = `${finances.total.toLocaleString('ru-RU')} ₽`;
+    cartTotalFinal.textContent = `${finances.finalPrice.toLocaleString('ru-RU')} ₽`;
+
+    // есть скидка
+    if (finances.discountSum > 0) {
+        state = 'applied';
+        upsellStr += `Скидка <b>${finances.discountPercent}</b> ваша!`;
+    } 
+    if (finances.nextThreshold) {
+        upsellStr += ` Добавьте товаров еще на <b> ${finances.nextThreshold.diff.toLocaleString('ru-RU')} ₽</b> , чтобы получить скидку <b> ${finances.nextThreshold.label}</b>!`;
+    }
+    cartUpsell.innerHTML = upsellStr;
+
+    cartSection.setAttribute('data-discount-state', state);
+}
 
 let productsCache = null;
 
@@ -179,7 +236,8 @@ function renderCart(products, cart) {
 
         totalAmount += cartItemTotal;
     })
-    document.querySelector('.cart__total-amount').textContent = `${totalAmount.toLocaleString('ru-RU')} ₽`;
+    const fin = getCartFinances(totalAmount);
+    updateCartTotalUI(fin)
 }
 
 async function syncCartWithServer(ids) {
@@ -282,7 +340,7 @@ async function syncProductStateUI(id, cart) {
             const count = cart[product.id] || 0;
             return sum + (Number(product.price) || 0) * count;
         }, 0);
-        document.querySelector('.cart__total-amount').textContent = `${totalAmount.toLocaleString('ru-RU')} ₽`;
+        updateCartTotalUI(getCartFinances(totalAmount));
     }
     else {
         if (cartSection) {
