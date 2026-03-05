@@ -43,9 +43,11 @@ def create_app():
 
         from app.routes import main_bp
         from app.admin.routes import admin_bp, login_bp
+        from app.checkout.routes import checkout_bp
         app.register_blueprint(login_bp)
         app.register_blueprint(main_bp)
         app.register_blueprint(admin_bp)
+        app.register_blueprint(checkout_bp)
 
 
         with app.app_context():
