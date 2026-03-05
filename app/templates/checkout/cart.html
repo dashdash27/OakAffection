@@ -127,12 +127,6 @@
     <script src="{{ url_for('static', filename='js/checkout/cart.js') }}"></script>
 
     <script>
-        /**
-         * Генерирует текст для чека заказа.
-         * Используется для копирования в буфер обмена и отправки в мессенджеры.
-         * 
-         * @returns {string} Отформатированная строка с составом заказа и итоговой суммой.
-         */
         function generateOrderText() {
             const items = Array.from(document.querySelectorAll('.cart__item')).map(item => {
                 const name = item.querySelector('.cart__item-name').textContent.trim();

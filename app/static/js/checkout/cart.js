@@ -34,7 +34,6 @@ function getCartFinances(total) {
 }
 
 function updateCartTotalUI(finances) {
-    console.log(finances);
     const cartSection = document.querySelector('.cart');
     const cartTotalAmount = document.querySelector('.cart__total-amount');
     const cartTotalFinal = document.querySelector('.cart__total-final');
@@ -329,7 +328,6 @@ async function syncProductStateUI(id, cart) {
         }
         else {
             cartItem.remove();
-            console.log(cart);
             if (Object.keys(cart).length === 0) {
                 document.querySelector('.cart').dataset.state = "empty";
             }
