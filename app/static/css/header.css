@@ -40,6 +40,13 @@ header {
     width: 30px;
     height: 30px;
 }
+.cart-link svg {
+    width: 40px;
+    height: 40px;
+}
+.cart-link svg path {
+    fill: var(--text-color);
+}
 
 /* Mobile menu */
 .mobile-menu {
@@ -60,7 +67,7 @@ header {
     transform: translateX(0);
 }
 .mobile-nav {
-    padding: 30px 30px 10px 20px;
+    padding: 30px 30px 70px 20px;
     max-height: 98%; /* Максимальная высота равна высоте экрана */
     overflow-y: auto;
 }
