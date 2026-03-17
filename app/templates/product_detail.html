@@ -10,11 +10,11 @@
 {% endblock %}
 
 {% block js %}
-    
+    <script src="{{ url_for('static', filename='js/checkout/cart.js') }}" defer type="module"></script>
 {% endblock %}
 
 {% block content %}
-    <section class="product">
+    <section class="product" data-id="{{product.id}}">
         <div class="container">
             <div class="product__inner">
 
@@ -181,6 +181,27 @@
                                 </div>
                             </div>
                          {% endif %}
+
+                        <!-- Cart actions -->
+                         <div class="product__actions">
+                            <button class="product__cart-add">
+                                В корзину
+                            </button>
+                            <div class="product__in-cart-actions">
+                                <div class="product__quantity">
+                                    <button class="qty-btn qty-btn-minus" aria-label="Уменьшить количество">
+                                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 12L18 12" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                                    </button>
+                                    <span class="qty-value"></span>
+                                    <button class="qty-btn qty-btn-plus" aria-label="Увеличить количество">
+                                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 12H18M12 6V18" stroke="var(--text-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                                    </button>
+                                </div>
+                                <a href="{{ url_for('checkout.cart') }}" class="product__cart-view">
+                                    В корзине
+                                </a>
+                            </div>
+                         </div>
                     
                         {% if product.ozon_link or product.wb_link %}
                             <div class="product__links">

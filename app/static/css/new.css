@@ -94,6 +94,42 @@ a.card__name:hover {
     text-decoration: underline;
 }
 
+/* -- Cart Actions */
+.card__actions {
+    min-height: 42px;
+}
+a.card__cart-view, .card__cart-add {
+    display: none;
+}
+.card[data-cart-state="in-cart"] .card__cart-add,
+.card[data-cart-state="idle"] .card__cart-view {
+    display: none;
+}
+.card[data-cart-state="idle"] .card__cart-add,
+.card[data-cart-state="in-cart"] .card__cart-view {
+    display: block;
+}
+.card__cart-add, a.card__cart-view {
+    width: 100%;
+    text-align: center;
+    background-color: var(--accent-color);
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 30px;
+    border: 2px solid var(--accent-color);
+    cursor: pointer;
+    font-weight: 600;
+}
+a.card__cart-view {
+    background-color: transparent;
+    color: var(--accent-color);
+}
+.card__cart-add:hover, .card__cart-view:hover {
+    filter: brightness(1.2);
+    transition: 0.2s;
+}
+
 @media (min-width: 450px) {
     .new .card__media-wrapper {
         height: 400px;
@@ -125,5 +161,8 @@ a.card__name:hover {
     }
     .card__isnew {
         font-size: 14px;
+    }
+    .card__cart-add, a.card__cart-view {
+        font-size: 17px;
     }
 }

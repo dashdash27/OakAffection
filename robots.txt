@@ -2,4 +2,5 @@ User-agent: *
 Disallow: /admin/
 Disallow: /adminlogin/
 Disallow: /logout
-Sitemap: http://oakaffection.ru/sitemap.xml
+Disallow: /checkout/cart
+Sitemap: https://oakaffection.ru/sitemap.xml

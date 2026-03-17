@@ -49,6 +49,9 @@
     <!-- Description -->
     <meta name="description" content="{% block description %}{% endblock %}">
 
+    <!-- CSRF -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
@@ -118,11 +121,15 @@
                 </nav>
 
                 <button id="theme-toggle" class="theme-toggle" aria-label="Переключить цветовую тему">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 16 16"><path fill="#000000" d="M8.796 9.048c-1.552-2.238-1.199-5.323.61-8.1c-3.47-.12-6.6 2.232-7.269 5.672c-.742 3.82 1.83 7.533 5.749 8.294a7.226 7.226 0 0 0 7.526-3.218c-2.794.177-5.27-.711-6.616-2.648"/></svg>
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 16 16"><path fill="#000000" d="M8.796 9.048c-1.552-2.238-1.199-5.323.61-8.1c-3.47-.12-6.6 2.232-7.269 5.672c-.742 3.82 1.83 7.533 5.749 8.294a7.226 7.226 0 0 0 7.526-3.218c-2.794.177-5.27-.711-6.616-2.648"/></svg>
                 </button>
 
+                <a href="{{ url_for('checkout.cart') }}" class="cart-link" aria-label="Перейти на страницу корзины">
+                   <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24"><title></title><path fill="#000000" d="M2.5 4.25a.75.75 0 0 1 .75-.75h.558c.95 0 1.52.639 1.845 1.233c.217.396.374.855.497 1.271L6.25 6h12.498c.83 0 1.43.794 1.202 1.593l-1.828 6.409a2.75 2.75 0 0 1-2.644 1.996H9.53a2.75 2.75 0 0 1-2.652-2.022l-.76-2.772l-1.26-4.248l-.001-.008c-.156-.567-.302-1.098-.52-1.494C4.128 5.069 3.96 5 3.809 5H3.25a.75.75 0 0 1-.75-.75M9 21a2 2 0 1 0 0-4a2 2 0 0 0 0 4m7 0a2 2 0 1 0 0-4a2 2 0 0 0 0 4"/></svg>
+                </a>
+
                 <button class="menu-btn" aria-label="Открыть меню" aria-expanded="false">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16M4 6h16M4 18h16"/></svg>
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16M4 6h16M4 18h16"/></svg>
                 </button>
 
                 <script>
@@ -215,6 +222,12 @@
                     </li>
 
                     <li class="mobile-menu__item-h2">
+                        <a href="{{ url_for('checkout.cart') }}">
+                            Корзина
+                        </a>
+                    </li>
+
+                    <li class="mobile-menu__item-h2">
                         <a href="{{ url_for('main.index') }}#footer">
                             Контакты
                         </a>
@@ -229,6 +242,7 @@
                             Новинки
                         </a>
                     </li>
+                    
                 </ul>
             </nav>
     </div>
@@ -307,7 +321,7 @@
                 </div>
 
                 <div class="footer__three footer__item">
-                    <a href="{{ url_for('main.how_to_order') }}" class="footer__item-title">Как сделать заказ?</a>
+                    <a href="{{ url_for('main.how_to_order') }}" class="footer__item-title">Как оформить заказ?</a>
                 </div>
 
             </div>
@@ -324,9 +338,6 @@
         }
         });
         observer.observe();
-    </script>
-    <script>
-        //loadCSS("{{ url_for('static', filename='css/footer.css') }}");
     </script>
 </body>
 </html>
