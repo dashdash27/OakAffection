@@ -2,6 +2,8 @@ from app.logger import logger
 from app.models import Product
 from app.extensions import STATIC_DIR
 
+from .services.dadata import get_city_suggestions
+
 import os
 from flask import Blueprint, render_template, request, jsonify
 
@@ -10,6 +12,24 @@ checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 @checkout_bp.route('/cart')
 def cart():
     return render_template('checkout/cart.html')
+
+@checkout_bp.route('/checkout')
+def checkout():
+    return render_template('checkout/checkout.html')
+
+@checkout_bp.route('/api/suggestions/cities', methods=['GET'])
+def suggest_cities():
+    query = request.args.get('q', '').strip()
+    
+    if len(query) < 3:
+        return jsonify([]), 200
+    
+    city_suggestions = get_city_suggestions(query)
+
+    if city_suggestions is None:
+        return jsonify({"success": False, "error": "External service error"}), 502
+    
+    return jsonify(city_suggestions), 200
 
 
 @checkout_bp.route('/api/cart/sync', methods=['POST'])

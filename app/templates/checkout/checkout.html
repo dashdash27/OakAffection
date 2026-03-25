@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Оформление заказа{% endblock %}
+{% block description %}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout/checkout.css') }}">
+{% endblock %}
+
+{% block js %}
+    
+{% endblock %}
+
+{% block content %}
+    <section class="checkout" aria-label="Оформление заказа" data-step="city">
+        <div class="container">
+            <div class="checkout__title">Оформление заказа</div>
+            
+            <div class="checkout__step">
+                <div class="checkout__label">Город / Населенный пункт</div>
+                <input type="text" class="checkout__input city-input" placeholder="Куда привезти?">
+                <div class="checkout__suggestions city-suggestions"></div>
+            </div>
+
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/checkout/checkout.js') }}"></script>
+
+{% endblock %}
