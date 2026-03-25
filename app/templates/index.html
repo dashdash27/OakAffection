@@ -257,9 +257,9 @@
                     <!-- Тут расположены новинки, подгружаем из Flask-->
                     <div class="swiper newSwiper">
                         <div class="swiper-wrapper">
-                            <!-- Повторяющиеся карточки товаров -->
+                            <!-- Карточки товаров -->
                             {% for product in new_products %}
-                                <div class="card swiper-slide">
+                                <div class="card swiper-slide" data-id="{{product.id}}">
                                     <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__media-wrapper">
                                         {% if product.photos %}
                                             <img class="card__media lozad" data-src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">
@@ -282,6 +282,14 @@
                                     <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__name">
                                         {{product.name}}
                                     </a>
+                                    <div class="card__actions">
+                                        <button class="card__cart-add">
+                                            В корзину
+                                        </button>
+                                        <a href="{{ url_for('checkout.cart') }}" class="card__cart-view">
+                                            В корзине
+                                        </a>
+                                    </div>
                                 </div>
                             {% endfor %}
                         </div>
@@ -328,11 +336,6 @@
             });
         });
     </script>
-    <script>
-        // Загружаем Swiper CSS асинхронно
-        //loadCSS("{{ url_for('static', filename='css/swiper/swiper-bundle.min.css') }}");
-        //loadCSS("{{ url_for('static', filename='css/about.css') }}");
-        //loadCSS("{{ url_for('static', filename='css/new.css') }}");
-    </script>
+    <script src="{{ url_for('static', filename='js/checkout/cart.js') }}"></script>
 
 {% endblock %}

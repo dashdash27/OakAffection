@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/products.css') }}">
 {% endblock %}
 
+{% block js %}
+    <script src="{{ url_for('static', filename='js/checkout/cart.js') }}" defer type="module"></script>
+{% endblock %}
+
 {% block content %}
     <section class="products">
         <div class="container">
@@ -23,7 +27,7 @@
             </div>
             <div class="products__inner">
                 {% for product in products %}
-                    <div class="card">
+                    <div class="card" data-id="{{product.id}}">
                         <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__media-wrapper">
                             {% if product.photos %}
                                 <img class="card__media lozad" data-src="{{ url_for('static', filename=product.photos[0].photo_url) }}" alt="{{product.photos[0].alt}}">
@@ -46,6 +50,14 @@
                         <a href="{{ url_for('main.product_detail', slug=product.slug) }}" class="card__name">
                             {{product.name}}
                         </a>
+                        <div class="card__actions">
+                            <button class="card__cart-add">
+                                В корзину
+                            </button>
+                            <a href="{{ url_for('checkout.cart') }}" class="card__cart-view">
+                                В корзине
+                            </a>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

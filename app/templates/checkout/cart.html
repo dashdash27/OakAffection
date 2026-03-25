@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Корзина{% endblock %}
+{% block description %}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout/cart.css') }}">
+{% endblock %}
+
+{% block js %}
+    
+{% endblock %}
+
+{% block content %}
+    <section class="cart" aria-label="Корзина товаров">
+        <div class="container">
+            <h1 class="cart__title">
+                Корзина
+            </h1>
+            <div class="cart__table">
+                <div class="cart__table-header">
+                    <div class="cart__col cart__col-product">Товар</div>
+                    <div class="cart__col cart__col-count">Количество</div>
+                    <div class="cart__col cart__col-total">Цена</div>
+                    <div class="cart__col cart__col-remove">Удалить</div>
+                </div>
+                <div class="cart__items">
+
+                </div>  
+            </div>
+            <div class="cart__footer">
+                <div class="cart__total">
+                    
+                    <div class="cart__total-main">
+                        <div class="cart__total-text">
+                            Итого:
+                        </div>
+                        <div class="total-prices">
+                            <div class="cart__total-amount">0 ₽</div>
+                            <div class="cart__total-final">0 ₽</div>
+                        </div>
+                    </div>
+
+                    <div class="cart__upsell"></div>
+                </div>
+                <a href="" class="cart__submit">
+                    Оформить заказ
+                </a>
+            </div>
+
+            <template class="cart__item-template">
+                <div class="cart__item" data-id="">
+                    <div class="cart__item-info cart__col-product">
+                        <a href="" class="cart__item-img-wrapper">
+                            <img src="" alt="" class="cart__item-img">
+                        </a>
+                        <div class="cart__item-text">
+                            <a href="" class="cart__item-name"></a>
+                            <div class="cart__item-variant"></div>
+                        </div>
+                    </div>
+
+                    <div class="cart__item-controls cart__col-count">
+                        <button class="cart-item__btn-minus" aria-label="Уменьшить количество">
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 12L18 12" stroke="var(--text-sub-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                        </button>
+                        <span class="cart-item__count"></span>
+                        <button class="cart-item__btn-plus" aria-label="Увеличить количество">
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M6 12H18M12 6V18" stroke="var(--text-sub-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                        </button>
+                    </div>
+
+                    <div class="cart__item-total cart__col-total" aria-live="polite"></div>
+
+                    <button class="cart__item-remove cart__col-remove" aria-label="Удалить товар из корзины">
+                        <svg aria-hidden="true" focusable="false" fill="var(--text-sub-color)" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M5.755,20.283,4,8H20L18.245,20.283A2,2,0,0,1,16.265,22H7.735A2,2,0,0,1,5.755,20.283ZM21,4H16V3a1,1,0,0,0-1-1H9A1,1,0,0,0,8,3V4H3A1,1,0,0,0,3,6H21a1,1,0,0,0,0-2Z"></path></g></svg>
+                    </button>
+                </div>
+            </template>
+
+            <div class="cart__empty">
+                <div class="cart__empty-icon">
+                    <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24"><title></title><path fill="var(--text-color)" d="M2.5 4.25a.75.75 0 0 1 .75-.75h.558c.95 0 1.52.639 1.845 1.233c.217.396.374.855.497 1.271L6.25 6h12.498c.83 0 1.43.794 1.202 1.593l-1.828 6.409a2.75 2.75 0 0 1-2.644 1.996H9.53a2.75 2.75 0 0 1-2.652-2.022l-.76-2.772l-1.26-4.248l-.001-.008c-.156-.567-.302-1.098-.52-1.494C4.128 5.069 3.96 5 3.809 5H3.25a.75.75 0 0 1-.75-.75M9 21a2 2 0 1 0 0-4a2 2 0 0 0 0 4m7 0a2 2 0 1 0 0-4a2 2 0 0 0 0 4"/></svg>
+                </div>
+                <div class="cart__empty-text">
+                    <div class="cart__empty-title">
+                        В корзине пока ничего нет
+                    </div>
+                </div>
+                <a href="{{ url_for('main.index') }}#wood-oils" class="cart__empty-btn">
+                    К покупкам
+                </a>
+            </div>
+
+            <dialog class="order-modal">
+                <div class="order-modal__inner">
+                    <div class="order-modal__title">
+                        Оформление заказа
+                    </div>
+
+                    <div class="order-modal__preview">
+                        <div class="order-modal__receipt"></div>
+                    </div>
+
+                    <button class="order-modal__copy">
+                        📄 Копировать текст
+                    </button>
+
+                    <p class="order-modal__hint">
+                        Отправьте скопированный текст любым удобным способом — мы свяжемся для уточнения деталей:
+                    </p>
+
+                    <div class="order-modal__actions">
+                        <a href="https://t.me/+79604870478" class="order-btn order-btn--tg" target="_blank">Telegram</a>
+                        <a href="mailto:oakaffection@gmail.com" class="order-btn order-btn--email">Email</a>
+                    </div>
+
+                    <button class="order-modal__close" aria-label="Закрыть">
+                        &times;
+                    </button>
+
+                </div>
+            </dialog>
+
+        </div>
+    </section>
+    <script src="{{ url_for('static', filename='js/checkout/cart.js') }}"></script>
+
+    <script>
+        function generateOrderText() {
+            const items = Array.from(document.querySelectorAll('.cart__item')).map(item => {
+                const name = item.querySelector('.cart__item-name').textContent.trim();
+                const count = item.querySelector('.cart-item__count').textContent.trim();
+                const price = item.querySelector('.cart__item-total').textContent.trim();
+                return `• ${name} [${count} шт.] — ${price}`;
+            }).join('\n');
+            const totalAmount = document.querySelector('.cart__total-amount').textContent.replace(/\D/g, '');
+            const finances = getCartFinances(Number(totalAmount));
+            if (finances.discountSum > 0) {
+                return `НОВЫЙ ЗАКАЗ\n----------\n${items}\n----------\nИТОГО: ${finances.finalPrice.toLocaleString('ru-RU')} ₽ (c учетом скидки ${finances.discountPercent})`;
+            } else {
+                return `НОВЫЙ ЗАКАЗ\n----------\n${items}\n----------\nИТОГО: ${finances.finalPrice.toLocaleString('ru-RU')} ₽`;
+            }
+        }
+
+        const modal = document.querySelector('.order-modal');
+        const submitBtn = document.querySelector('.cart__submit');
+        let currentOrderText = "";
+
+        submitBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            currentOrderText = generateOrderText();
+            const orderReciept = document.querySelector('.order-modal__receipt');
+            if (orderReciept) orderReciept.innerText = currentOrderText;
+            
+            document.body.style.overflow = 'hidden';
+            modal.showModal();
+        });
+
+        const closeBtn = document.querySelector('.order-modal__close');
+        closeBtn.addEventListener('click', () => {
+            document.body.style.overflow = '';
+            modal.close();
+        });
+
+        const copyBtn = document.querySelector('.order-modal__copy');
+        let copyTimeout = null; 
+        if (copyBtn) {
+            const originalBtnText = copyBtn.innerHTML.trim();
+            copyBtn.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(currentOrderText);
+                    
+                    if (copyTimeout) {
+                        clearTimeout(copyTimeout);
+                    }
+
+                    copyBtn.innerHTML = "✓ Скопировано!";
+                    
+                    // Возвращаем как было через 2 секунды
+                    copyTimeout = setTimeout(() => {
+                        copyBtn.innerHTML = originalBtnText;
+                        copyTimeout = null;
+                    }, 2000);
+                    
+                } catch (err) {
+                    copyBtn.innerHTML = originalBtnText;
+                    console.error('Не удалось скопировать:', err);
+                    alert('Ошибка при копировании. Пожалуйста, выделите текст в чеке вручную.');
+                }
+            };
+        }
+        
+    </script>
+{% endblock %}
