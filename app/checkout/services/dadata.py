@@ -19,7 +19,7 @@ def format_suggestion(s):
         "fias_id": data.get('fias_id')
     }
 
-def get_city_suggestions(query):
+def get_city_suggestions(query): 
     url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address"
 
     data = {
