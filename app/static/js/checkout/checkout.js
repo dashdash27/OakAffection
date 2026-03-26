@@ -247,3 +247,9 @@ checkoutSection.addEventListener('click', (e) => {
         changeCheckoutState("contacts");
     }
 });
+
+// Contacts inputs
+const phoneInput = document.querySelector('.phone-input');
+const phoneMask = IMask(phoneInput, {
+  mask: '+{7}(000)000-00-00'
+});

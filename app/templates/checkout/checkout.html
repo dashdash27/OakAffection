@@ -35,9 +35,19 @@
                 <div class="checkout__suggestions pvz-suggestions"></div>
             </div>
 
+            <div class="checkout__step">
+                <div class="checkout__label">Контакты</div>
+                
+                <input type="text" class="checkout__input name-input" placeholder="Иванов Иван Иванович">
+                <input type="tel" class="checkout__input phone-input" placeholder="+7 (999)-999-99-99">
+                <input type="email" class="checkout__input email-input" placeholder="example@gmail.com">
+                
+            </div>
+
         </div>
     </section>
 
+    <script src="https://unpkg.com/imask"></script>
     <script src="{{ url_for('static', filename='js/checkout/checkout.js') }}"></script>
 
 {% endblock %}
