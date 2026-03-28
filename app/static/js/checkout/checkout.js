@@ -1,4 +1,30 @@
+// Constants:
 const QUANTITY_MAX = 30;
+const DISCOUNT_RULES = [
+    { threshold: 10000, value: 0.20, label: '20%' },
+    { threshold: 30000, value: 0.25, label: '25%' }
+].sort((a, b) => a.threshold - b.threshold);
+
+function getDiscountInfo(amount) {
+    // Ищем подходящее правило
+    const rule = DISCOUNT_RULES.reduce((acc, current) => {
+        return amount >= current.threshold ? current : acc;
+    }, null); // Стартуем с null, если ничего не подошло
+
+    if (!rule) {
+        return {
+            applied: false,
+            amount: amount
+        };
+    }
+
+    return {
+        applied: true,
+        label: rule.label,
+        amount: amount - Math.round(amount * rule.value)
+    };
+}
+
 const checkoutState = {
     currentCitySuggestions: [],
     selectedCity: null,
@@ -361,6 +387,8 @@ function cleanProductIdsInLS() {
 function renderSummary(products, cart) {
     const summaryItemsContainer = document.querySelector('.summary__items');
     const summaryItemTemplate = document.querySelector('.summary__item-template');
+    const summaryTotal = document.querySelector('.summary__total')
+    let totalSumm = 0;
 
     summaryItemsContainer.innerHTML = "";
 
@@ -371,10 +399,21 @@ function renderSummary(products, cart) {
 
         if (!cart[product.id]) return;
 
+        const price = Number(product.price) * cart[product.id];
+        totalSumm += price;
+
         summaryItem.querySelector('.summary__item-name').innerHTML = `${product.name} - ${cart[product.id]} шт`;
-        summaryItem.querySelector('.summary__item-price').innerHTML = `${Number(product.price) * cart[product.id]} руб`;
+        summaryItem.querySelector('.summary__item-price').innerHTML = `${price} ₽`;
         summaryItemsContainer.appendChild(summaryItem);
     })
+
+    const discount = getDiscountInfo(totalSumm);
+
+    if (discount.applied) {
+        summaryTotal.innerHTML = `Итого: ${discount.amount} ₽ (с учетом скидки ${discount.label})`
+    } else {
+        summaryTotal.innerHTML = `Итого: ${discount.amount} ₽`
+    }
 }
 
 async function syncCartWithServer(ids) {
