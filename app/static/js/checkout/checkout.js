@@ -3,21 +3,30 @@ const checkoutState = {
     selectedCity: null,
     deliveryOptions: null,
     selectedDeliveryOption: null,
-    selectedPvz: null
+    selectedPvz: null,
+    contacts: {
+        name: null,
+        phone: null,
+        email: null
+    }
 }
 // Elements
 const checkoutSection = document.querySelector('.checkout');
 const cityInput = document.querySelector('.city-input');
 const citySuggestions = document.querySelector('.city-suggestions');
 const deliveryOptions = document.querySelector('.checkout__delivery-options');
+const deliveryOptionsComment = document.querySelector('.delivery-options-comment');
 const pvzSearchInput = document.querySelector('.pvz-input');
+const pvzComment = document.querySelector('.pvz-comment');
 const pvzSuggestions = document.querySelector('.pvz-suggestions');
+const submitBtn = document.querySelector('.checkout__submit-btn');
 
 // Обновление интерфейса при редактировании/сбрасывании данных
 function changeCheckoutState(state) {
     checkoutSection.dataset.step = state;
 
     if (state === "city-choice") {
+        checkoutState.currentCitySuggestions = [];
         checkoutState.selectedCity = null;
         checkoutState.deliveryOptions = null;
         checkoutState.selectedDeliveryOption = null;
@@ -25,31 +34,39 @@ function changeCheckoutState(state) {
 
         cityInput.value = "";
         citySuggestions.innerHTML = "";
-        deliveryOptions.innerHTML = "Доставки появятся после выбора города";
-        pvzSuggestions.innerHTML = "ПВЗ появляется после заполнения города и выбора доставки";
-
-        return
+        deliveryOptions.innerHTML = "";
+        deliveryOptionsComment.innerHTML = "Варианты доставок появятся после выбора города";
+        pvzSearchInput.value = null;
+        pvzSearchInput.disabled = true;
+        pvzSuggestions.innerHTML = "";
+        pvzComment.innerHTML = "Выбрать ПВЗ можно будет после выбора доставки";
     }
     if (state === "delivery-choice") {
         checkoutState.selectedDeliveryOption = null;
         checkoutState.selectedPvz = null;
 
         citySuggestions.innerHTML = "";
-        pvzSuggestions.innerHTML = "ПВЗ появляется после заполнения выбора доставки";
-
-        return
+        deliveryOptionsComment.innerHTML = "";
+        pvzSearchInput.disabled = true;
+        pvzSuggestions.innerHTML = "";
+        pvzComment.innerHTML = "Выбрать ПВЗ можно будет после выбора доставки";
     }
     if (state === "pvz-choice") {
         checkoutState.selectedPvz = null;
 
+        deliveryOptionsComment.innerHTML = "";
+        pvzSearchInput.disabled = false;
         pvzSearchInput.value = "";
+        pvzComment.innerHTML = "";
         renderPvzSuggestions(checkoutState.selectedDeliveryOption.points);
-
-        return
     }
     if (state === "contacts") {
+        deliveryOptionsComment.innerHTML = "";
+        pvzComment.innerHTML = "";
         pvzSuggestions.innerHTML = "";
     }
+
+    validateCheckout();
 }
 
 // --- 1 City Step
@@ -114,11 +131,9 @@ function renderCitySuggestions(cities) {
 }
 
 cityInput.addEventListener('blur', () => {
-    setTimeout(() => {
-        if (!checkoutState.selectedCity) {
-            changeCheckoutState("city-choice");
-        }
-    }, 300);
+    if (!checkoutState.selectedCity) {
+        changeCheckoutState("city-choice");
+    }
 });
 
 // --- 2 Delivery Options step
@@ -193,14 +208,12 @@ pvzSearchInput.addEventListener('input', (e) => {
 });
 
 pvzSearchInput.addEventListener('blur', () => {
-    setTimeout(() => {
-        if (!checkoutState.selectedPvz) {
-            changeCheckoutState("pvz-choice");
-        }
-    }, 300);
+    if (!checkoutState.selectedPvz) {
+        changeCheckoutState("pvz-choice");
+    }
 });
 
-checkoutSection.addEventListener('click', (e) => {
+checkoutSection.addEventListener('mousedown', (e) => {
     const citySuggestion = e.target.closest('.city-suggestion');
     if (citySuggestion) {
         const index = parseInt(citySuggestion.dataset.index);
@@ -249,7 +262,55 @@ checkoutSection.addEventListener('click', (e) => {
 });
 
 // Contacts inputs
+const nameInput = document.querySelector('.name-input');
+const emailInput = document.querySelector('.email-input');
 const phoneInput = document.querySelector('.phone-input');
 const phoneMask = IMask(phoneInput, {
   mask: '+{7}(000)000-00-00'
 });
+
+// Обработчики контактов
+nameInput.addEventListener('input', (e) => {
+    // Разрешаем только буквы, пробелы и дефис
+    const value = e.target.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '');
+    e.target.value = value;
+    
+    checkoutState.contacts.name = value.trim();
+    
+    validateCheckout();
+});
+phoneInput.addEventListener('input', () => {
+    checkoutState.contacts.phone = phoneMask.unmaskedValue;
+    validateCheckout();
+});
+emailInput.addEventListener('input', (e) => {
+    checkoutState.contacts.email = e.target.value.trim();
+    validateCheckout();
+});
+
+// Validate Function
+function validateCheckout() {
+    const s = checkoutState;
+    const c = checkoutState.contacts;
+
+    console.log("Checkout: ", s);
+    console.log("Contacts: ", c);
+
+    const isLocationReady = !!s.selectedCity && !!s.selectedDeliveryOption && !!s.selectedPvz;
+
+    const nameValue = c?.name || "";
+    const nameParts = nameValue.trim().split(/\s+/);
+    const isNameValid = nameParts.length >= 2 && nameParts[0].length > 0 && nameParts[1].length > 0;
+
+    const phoneValue = c?.phone || "";
+    const isPhoneValid = phoneValue.length === 11;
+
+    const emailValue = c?.email || "";
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+
+    const isValid = isLocationReady && isNameValid && isPhoneValid && isEmailValid;
+
+    if (submitBtn) {
+        submitBtn.disabled = !isValid;
+    }
+}

@@ -12,26 +12,30 @@
 {% endblock %}
 
 {% block content %}
-    <section class="checkout" aria-label="Оформление заказа" data-step="city">
+    <section class="checkout" aria-label="Оформление заказа" data-step="city-choice">
         <div class="container">
             <div class="checkout__title">Оформление заказа</div>
             
             <div class="checkout__step">
-                <div class="checkout__label">Город / Населенный пункт</div>
-                <input type="text" class="checkout__input city-input" placeholder="Куда привезти?">
+                <div class="checkout__label">Куда привезти?</div>
+                <input type="text" class="checkout__input city-input" placeholder="Город / Населенный пункт">
                 <div class="checkout__suggestions city-suggestions"></div>
             </div>
 
             <div class="checkout__step">
                 <div class="checkout__label">Выбор службы доставки</div>
-                <div class="checkout__delivery-options">
-                    Доступные доставки появятся после ввода города.
+                <div class="checkout__comment delivery-options-comment">
+                    Варианты доставок появятся после выбора города
                 </div>
+                <div class="checkout__delivery-options"></div>
             </div>
 
             <div class="checkout__step">
-                <div class="checkout__label">Выберите пункт выдачи</div>
-                <input type="text" class="checkout__input pvz-input" placeholder="Поиск по адресу или улице...">
+                <div class="checkout__label">Пункт выдачи</div>
+                <div class="checkout__comment pvz-comment">
+                    Выбрать ПВЗ можно будет после выбора доставки
+                </div>
+                <input disabled type="text" class="checkout__input pvz-input" placeholder="Поиск по адресу или улице...">
                 <div class="checkout__suggestions pvz-suggestions"></div>
             </div>
 
@@ -43,6 +47,10 @@
                 <input type="email" class="checkout__input email-input" placeholder="example@gmail.com">
                 
             </div>
+
+            <button class="checkout__submit-btn" disabled>
+                Оформить заказ
+            </button>
 
         </div>
     </section>
