@@ -24,6 +24,9 @@
     border: 1px solid var(--bg-sub-color);
     color: var(--text-sub-color);
 }
+.checkout__input::placeholder {
+    opacity: 0.7;
+}
 .checkout__comment {
     margin-top: 20px;
     color: var(--accent-color);
