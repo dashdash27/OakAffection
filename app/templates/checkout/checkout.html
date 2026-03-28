@@ -15,6 +15,19 @@
     <section class="checkout" aria-label="Оформление заказа" data-step="city-choice">
         <div class="container">
             <div class="checkout__title">Оформление заказа</div>
+
+            <div class="checkout__summary">
+                <div class="checkout__label">Ваш заказ</div>
+                <div class="summary__items"></div>
+
+                <template class="summary__item-template">
+                    <div class="summary__item">
+                        <div class="summary__item-name"></div>
+                        <div class="summary__item-price"></div>
+                    </div>
+                </template>
+
+            </div>
             
             <div class="checkout__step">
                 <div class="checkout__label">Куда привезти?</div>

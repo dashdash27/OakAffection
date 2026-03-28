@@ -103,3 +103,20 @@
     background-color: transparent;
     color: var(--accent-color);
 }
+
+.checkout__summary {
+    margin-top: 30px;
+}
+.summary__items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid var(--bg-sub-color)
+}
+.summary__item {
+    display: flex;
+    gap: 40px;
+}

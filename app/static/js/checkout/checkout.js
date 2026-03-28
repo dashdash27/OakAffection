@@ -1,3 +1,4 @@
+const QUANTITY_MAX = 30;
 const checkoutState = {
     currentCitySuggestions: [],
     selectedCity: null,
@@ -314,3 +315,126 @@ function validateCheckout() {
         submitBtn.disabled = !isValid;
     }
 }
+
+// Helpers:
+function loadCartFromLS() {
+    try {
+        const data = localStorage.getItem('cart');
+        const cart = data ? JSON.parse(data) : {};
+        return (typeof cart === 'object' && cart !== null && !Array.isArray(cart)) ? cart : {};
+    }
+    catch (e) {
+        return {}
+    }
+}
+function cleanProductIdsInLS() {
+    // return cleanCart
+    const rawData = localStorage.getItem('cart');
+    const cart = loadCartFromLS();
+    let isDirty = false;
+
+    if (rawData && rawData !== '{}' && Object.keys(cart).length === 0) {
+        isDirty = true; 
+    }
+
+    const cleanCart = {};
+    
+    for (let id in cart) {
+        const count = Number(cart[id]);
+        const numericId = Number(id);
+
+        if (!isNaN(numericId) && !isNaN(count) && count > 0 && count <= QUANTITY_MAX) {
+            cleanCart[id] = count;
+        } else {
+            isDirty = true;
+        }
+    }
+
+    if (isDirty) {
+        localStorage.setItem('cart', JSON.stringify(cleanCart));
+        console.log("Корзина была очищена от некорректных данных");
+    }
+
+    return cleanCart
+}
+
+function renderSummary(products, cart) {
+    const summaryItemsContainer = document.querySelector('.summary__items');
+    const summaryItemTemplate = document.querySelector('.summary__item-template');
+
+    summaryItemsContainer.innerHTML = "";
+
+    const sortedProducts = [...products].sort((a, b) => Number(a.id) - Number(b.id));
+    sortedProducts.forEach(product => {
+        const clone = summaryItemTemplate.content.cloneNode(true);
+        const summaryItem = clone.querySelector('.summary__item');
+
+        if (!cart[product.id]) return;
+
+        summaryItem.querySelector('.summary__item-name').innerHTML = `${product.name} - ${cart[product.id]} шт`;
+        summaryItem.querySelector('.summary__item-price').innerHTML = `${Number(product.price) * cart[product.id]} руб`;
+        summaryItemsContainer.appendChild(summaryItem);
+    })
+}
+
+async function syncCartWithServer(ids) {
+    // Fetch to server to get info about products
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const response = await fetch('/checkout/api/cart/sync', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Accept': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ product_ids: ids })
+        })
+
+        if (response.ok) {
+            const data = await response.json();
+            return { success: true, data: data };
+        }
+        return { success: false, message: "Ошибка сервера при загрузке цен" };
+    } catch (error) {
+        return { success: false, message: "Проблема с сетью: " + error.message };
+    }
+}
+
+function syncLSWithServerIds(serverIds) {
+    // Delete missing products in cart after server responce (basic is productsIds)
+    // Если что-то добавили в LS за это время, оно очистится + очистятся ошибочные id (если товар удалился например)
+    // return uodated cart
+
+    let cart = loadCartFromLS();
+    let changed = false;
+    Object.keys(cart).forEach(id => {
+        if (!serverIds.includes(String(id))) {
+            delete cart[id];
+            changed = true;
+        }
+    });
+    if (changed) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    return cart
+}
+
+async function initCheckout() {
+    const cart = cleanProductIdsInLS();
+    // TODO: редирект если корзина пустая
+    
+    const ids = Object.keys(cart);
+    const result = await syncCartWithServer(ids);
+
+    if (result.success) {
+        const productsCache = result.data;
+        console.log(productsCache);
+        const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)));
+        renderSummary(productsCache, currentCart);
+    } else {
+        console.log(`Не удалось получить данные о товарах в корзине ${result.message}`)
+    }
+}
+initCheckout();
