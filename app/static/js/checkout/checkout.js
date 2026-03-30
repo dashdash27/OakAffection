@@ -5,6 +5,8 @@ const DISCOUNT_RULES = [
     { threshold: 30000, value: 0.25, label: '25%' }
 ].sort((a, b) => a.threshold - b.threshold);
 
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
 function getDiscountInfo(amount) {
     // Ищем подходящее правило
     const rule = DISCOUNT_RULES.reduce((acc, current) => {
@@ -77,6 +79,8 @@ function changeCheckoutState(state) {
         pvzSearchInput.disabled = true;
         pvzSuggestions.innerHTML = "";
         pvzComment.innerHTML = "Выбрать ПВЗ можно будет после выбора доставки";
+
+        loadDeliveryOptions(checkoutState.selectedCity);
     }
     if (state === "pvz-choice") {
         checkoutState.selectedPvz = null;
@@ -96,6 +100,41 @@ function changeCheckoutState(state) {
     validateCheckout();
 }
 
+async function fetchDeliveryOptions(cityData) {
+    try {
+        console.log("Отправляется fetch")
+        const response = await fetch('/checkout/api/delivery/options', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ 
+                city_data: cityData
+            })
+        })
+
+        if (response.ok) {
+            const data = await response.json();
+            return { success: true, data: data };
+        }
+        return { success: false, message: "Ошибка сервера при получении вариантов доставок" };
+    } catch (error) {
+        return { success: false, message: "Проблема с сетью: " + error.message };
+    }
+}
+
+async function loadDeliveryOptions(cityData) {
+    const result = await fetchDeliveryOptions(cityData);
+    if (result.success) {
+        console.log(result.data);
+        renderDeliveryOptions(result.data);
+    } else {
+        console.log(`Не удалось получить список доступных доставок: ${result.message}`)
+    }
+}
+
 // --- 1 City Step
 let debounceTimer;
 cityInput.addEventListener('input', (e) => {
@@ -111,7 +150,6 @@ cityInput.addEventListener('input', (e) => {
 
     debounceTimer = setTimeout(async () => {
         const result = await fetchCitySuggestions(query);
-
         if (result.success) {
             checkoutState.currentCitySuggestions = result.data;
             renderCitySuggestions(result.data);
@@ -164,29 +202,7 @@ cityInput.addEventListener('blur', () => {
 });
 
 // --- 2 Delivery Options step
-function renderDeliveryOptions() {
-    const options = {
-        "yandex": {
-            "name": "Яндекс Доставка",
-            "price": 350,
-            "days": "2-3 дня",
-            "points": [
-                {"id": "y1", "address": "ул. Ленина, 10", "coords": [45.0, 38.9]},
-                {"id": "y2", "address": "ул. Мира, 5", "coords": [45.1, 38.8]},
-                {"id": "y3", "address": "ул. Покрышкина, 7", "coords": [45.1, 38.8]}
-            ]
-        },
-        "russian_post": {
-            "name": "Почта России",
-            "price": 280,
-            "days": "5-7 дней",
-            "points": [
-                {"id": "y1", "address": "ул. Цветочная, 10", "coords": [45.0, 38.9]},
-                {"id": "y2", "address": "ул. Полевая, 5", "coords": [45.1, 38.8]},
-                {"id": "y3", "address": "ул. Покрышкина, 8", "coords": [45.1, 38.8]}
-            ]
-        }
-    }
+function renderDeliveryOptions(options) {
     checkoutState.deliveryOptions = options;
 
     deliveryOptions.innerHTML = Object.keys(options).map(key => {
@@ -419,7 +435,6 @@ function renderSummary(products, cart) {
 async function syncCartWithServer(ids) {
     // Fetch to server to get info about products
     try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
         const response = await fetch('/checkout/api/cart/sync', {
             method: 'POST',
             headers: { 
