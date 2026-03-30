@@ -16,57 +16,85 @@
         <div class="container">
             <div class="checkout__title">Оформление заказа</div>
 
-            <div class="checkout__summary">
-                <div class="checkout__label">Ваш заказ</div>
-                <div class="summary__items"></div>
-                <div class="summary__total">
+            <div class="checkout__inner">
+                <div class="checkout__form">
                     
-                </div>
+                    <div class="checkout__card">
+                        <div class="card-title">Доставка</div>
+                        <div class="card-content">
+                            <div class="checkout__step">
+                                <div class="checkout__label">Куда привезти?</div>
+                                <input type="text" class="checkout__input city-input" placeholder="Введите город/населенный пункт">
+                                <div class="checkout__suggestions city-suggestions"></div>
+                            </div>
 
-                <template class="summary__item-template">
-                    <div class="summary__item">
-                        <div class="summary__item-name"></div>
-                        <div class="summary__item-price"></div>
+                            <div class="checkout__step">
+                                <div class="checkout__label">Выбор службы доставки</div>
+                                <div class="checkout__comment delivery-options-comment">
+                                    Варианты доставок появятся после выбора города
+                                </div>
+                                <div class="checkout__delivery-options"></div>
+                            </div>
+
+                            <div class="checkout__step">
+                                <div class="checkout__label">Пункт выдачи</div>
+                                <div class="checkout__comment pvz-comment">
+                                    Выбрать ПВЗ можно будет после выбора доставки
+                                </div>
+                                <input disabled type="text" class="checkout__input pvz-input" placeholder="Поиск по адресу или улице...">
+                                <div class="checkout__suggestions pvz-suggestions"></div>
+                            </div>
+                        </div>
                     </div>
-                </template>
 
-            </div>
-            
-            <div class="checkout__step">
-                <div class="checkout__label">Куда привезти?</div>
-                <input type="text" class="checkout__input city-input" placeholder="Город / Населенный пункт">
-                <div class="checkout__suggestions city-suggestions"></div>
-            </div>
-
-            <div class="checkout__step">
-                <div class="checkout__label">Выбор службы доставки</div>
-                <div class="checkout__comment delivery-options-comment">
-                    Варианты доставок появятся после выбора города
+                        <div class="checkout__card">
+                            <div class="card-title">Контакты</div>
+                            <div class="card-content">
+                                <div class="checkout__step">
+                                    <label for="name" class="checkout__input-label checkout__label">ФИО</label>
+                                    <input type="text" id="name" class="checkout__input name-input" placeholder="Иванов Иван Иванович">
+                                </div>
+                                <div class="checkout__step">
+                                    <label for="phone" class="checkout__input-label checkout__label">Номер телефона</label>
+                                    <input type="tel" id="phone" class="checkout__input phone-input" placeholder="+7 (999)-999-99-99">
+                                </div>
+                                <div class="checkout__step">
+                                    <label for="email" class="checkout__input-label checkout__label">Email</label>
+                                    <input type="email" id="email" class="checkout__input email-input" placeholder="example@gmail.com">
+                                </div>
+                            </div>
+                        </div>
                 </div>
-                <div class="checkout__delivery-options"></div>
-            </div>
 
-            <div class="checkout__step">
-                <div class="checkout__label">Пункт выдачи</div>
-                <div class="checkout__comment pvz-comment">
-                    Выбрать ПВЗ можно будет после выбора доставки
+                <div class="checkout__summary">
+                    <div class="chekout__card">
+                        <div class="card-title">Ваш заказ</div>
+                        <div class="card-content">
+                            <div class="summary__items"></div>
+                            <div class="summary__total"></div>
+
+                            <template class="summary__item-template">
+                                <div class="summary__item">
+                                    <img src="" alt="" class="summary__item-img">
+                                    <div class="summary__item-info">
+                                        <div class="summary__item-name"></div>
+                                        <div class="summary__item-details">
+                                            <div class="summary__item-qty"></div>
+                                            <div class="summary__item-price"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <button class="checkout__submit-btn" disabled>
+                        Оформить заказ
+                    </button>
+
                 </div>
-                <input disabled type="text" class="checkout__input pvz-input" placeholder="Поиск по адресу или улице...">
-                <div class="checkout__suggestions pvz-suggestions"></div>
+     
             </div>
-
-            <div class="checkout__step">
-                <div class="checkout__label">Контакты</div>
-                
-                <input type="text" class="checkout__input name-input" placeholder="Иванов Иван Иванович">
-                <input type="tel" class="checkout__input phone-input" placeholder="+7 (999)-999-99-99">
-                <input type="email" class="checkout__input email-input" placeholder="example@gmail.com">
-                
-            </div>
-
-            <button class="checkout__submit-btn" disabled>
-                Оформить заказ
-            </button>
 
         </div>
     </section>
