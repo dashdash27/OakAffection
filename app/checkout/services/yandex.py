@@ -1,5 +1,6 @@
 import requests
-import random
+import re
+import math
 from config import Config
 
 YANDEX_API_KEY = Config.YANDEX_API_KEY;
@@ -28,12 +29,17 @@ def get_yandex_delivery_info(city_data):
         details = _get_delivery_details(source_point_id, points[0].get('id'))
         delivery_days = details.get('delivery_days')
         price = details.get('price')
+
+        # очищаем цену
+        clean_price = re.sub(r'[^\d.,]', '', str(price))
+        clean_price = clean_price.replace(',', '.')
+        clean_price = math.ceil(float(clean_price))
         
         return {
             "geo_id": geo_id,
             "points": points,
             "delivery_days": delivery_days,
-            "price": price
+            "price": clean_price
         }
     
     except:

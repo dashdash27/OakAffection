@@ -1,31 +1,9 @@
-// Constants:
+// --- 1.  Constants and Settings:
 const QUANTITY_MAX = 30;
 const DISCOUNT_RULES = [
     { threshold: 10000, value: 0.20, label: '20%' },
     { threshold: 30000, value: 0.25, label: '25%' }
 ].sort((a, b) => a.threshold - b.threshold);
-
-const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-function getDiscountInfo(amount) {
-    // Ищем подходящее правило
-    const rule = DISCOUNT_RULES.reduce((acc, current) => {
-        return amount >= current.threshold ? current : acc;
-    }, null); // Стартуем с null, если ничего не подошло
-
-    if (!rule) {
-        return {
-            applied: false,
-            amount: amount
-        };
-    }
-
-    return {
-        applied: true,
-        label: rule.label,
-        amount: amount - Math.round(amount * rule.value)
-    };
-}
 
 const checkoutState = {
     currentCitySuggestions: [],
@@ -33,14 +11,13 @@ const checkoutState = {
     deliveryOptions: null,
     selectedDeliveryOption: null,
     selectedPvz: null,
-    contacts: {
-        name: null,
-        phone: null,
-        email: null
-    }
-}
-// Elements
+    contacts: { name: null, phone: null, email: null }
+};
+
+// --- 3. Управление состоянием и UI
 const checkoutSection = document.querySelector('.checkout');
+const submitBtn = document.querySelector('.checkout__submit-btn');
+
 const cityInput = document.querySelector('.city-input');
 const citySuggestions = document.querySelector('.city-suggestions');
 const deliveryOptions = document.querySelector('.checkout__delivery-options');
@@ -48,61 +25,92 @@ const deliveryOptionsComment = document.querySelector('.delivery-options-comment
 const pvzSearchInput = document.querySelector('.pvz-input');
 const pvzComment = document.querySelector('.pvz-comment');
 const pvzSuggestions = document.querySelector('.pvz-suggestions');
-const submitBtn = document.querySelector('.checkout__submit-btn');
+
+// Конфиг для сбора данных при переключении шагов
+const STEPS_CONFIG = {
+    "city-choice": 
+        { 
+            reset: ['selectedCity', 'deliveryOptions', 'selectedDeliveryOption', 'selectedPvz'], 
+            clear: [cityInput, citySuggestions, pvzSearchInput, deliveryOptions, pvzSuggestions],
+            messages: [
+                { el: deliveryOptionsComment, text: "Выберите город для расчета доставки" },
+                { el: pvzComment, text: "Выберите службу доставки" }
+            ]
+        },
+    "delivery-choice": 
+        { 
+            reset: ['deliveryOptions', 'selectedDeliveryOption', 'selectedPvz'], 
+            clear: [citySuggestions, deliveryOptionsComment, pvzSearchInput, pvzSuggestions],
+            messages: [
+                { el: pvzComment, text: "Выберите службу доставки" }
+            ]
+        },
+    "pvz-choice":
+        { 
+            reset: ['selectedPvz'], 
+            clear: [citySuggestions, deliveryOptionsComment, pvzComment, pvzSearchInput, pvzSuggestions],
+            messages: []
+        },
+    "contacts": 
+        { 
+            reset: [], 
+            clear: [citySuggestions, deliveryOptionsComment, pvzComment, pvzSuggestions],
+            messages: []
+        },
+};
 
 // Обновление интерфейса при редактировании/сбрасывании данных
 function changeCheckoutState(state) {
     checkoutSection.dataset.step = state;
+    const config = STEPS_CONFIG[state];
 
-    if (state === "city-choice") {
-        checkoutState.currentCitySuggestions = [];
-        checkoutState.selectedCity = null;
-        checkoutState.deliveryOptions = null;
-        checkoutState.selectedDeliveryOption = null;
-        checkoutState.selectedPvz = null;
+    // 2. Сбрасываем данные в JS-объекте
+    config.reset.forEach(key => checkoutState[key] = null);
+    
+    // 3. Очищаем старые списки (чтобы не было "мерцания")
+    config.clear.forEach(el => { 
+        if (el.innerHTML) {
+            el.innerHTML = ""; 
+        }
+        if (el.value) {
+            el.value = ""
+        }
+    });
 
-        cityInput.value = "";
-        citySuggestions.innerHTML = "";
-        deliveryOptions.innerHTML = "";
-        deliveryOptionsComment.innerHTML = "Варианты доставок появятся после выбора города";
-        pvzSearchInput.value = null;
-        pvzSearchInput.disabled = true;
-        pvzSuggestions.innerHTML = "";
-        pvzComment.innerHTML = "Выбрать ПВЗ можно будет после выбора доставки";
+    // 4. Наполняем блоки сообщениями-подсказками
+    if (config.messages) {
+        config.messages.forEach(item => {
+            if (item.el) {
+                item.el.innerHTML = item.text;
+            }
+        });
     }
+
+    if (state === "city-choice") renderSummary(productsCache, syncLSWithServerIds(productsCache.map(p => String(p.id))));
     if (state === "delivery-choice") {
-        checkoutState.selectedDeliveryOption = null;
-        checkoutState.selectedPvz = null;
-
-        citySuggestions.innerHTML = "";
-        deliveryOptionsComment.innerHTML = "";
-        pvzSearchInput.disabled = true;
-        pvzSuggestions.innerHTML = "";
-        pvzComment.innerHTML = "Выбрать ПВЗ можно будет после выбора доставки";
-
+        renderSummary(productsCache, syncLSWithServerIds(productsCache.map(p => String(p.id))))
         loadDeliveryOptions(checkoutState.selectedCity);
     }
     if (state === "pvz-choice") {
-        checkoutState.selectedPvz = null;
-
-        deliveryOptionsComment.innerHTML = "";
-        pvzSearchInput.disabled = false;
-        pvzSearchInput.value = "";
-        pvzComment.innerHTML = "";
+        renderSummary(productsCache, syncLSWithServerIds(productsCache.map(p => String(p.id))))
         renderPvzSuggestions(checkoutState.selectedDeliveryOption.points);
     }
-    if (state === "contacts") {
-        deliveryOptionsComment.innerHTML = "";
-        pvzComment.innerHTML = "";
-        pvzSuggestions.innerHTML = "";
-    }
-
+    
     validateCheckout();
+}
+
+// 2. Утилиты и API
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+function getDiscountInfo(amount) {
+    const rule = DISCOUNT_RULES.reduce((acc, current) => amount >= current.threshold ? current : acc, null);
+    return rule 
+        ? { applied: true, label: rule.label, amount: amount - Math.round(amount * rule.value) }
+        : { applied: false, amount };
 }
 
 async function fetchDeliveryOptions(cityData) {
     try {
-        console.log("Отправляется fetch")
         const response = await fetch('/checkout/api/delivery/options', {
             method: 'POST',
             headers: { 
@@ -110,9 +118,7 @@ async function fetchDeliveryOptions(cityData) {
                 'Accept': 'application/json',
                 'X-CSRFToken': csrfToken
             },
-            body: JSON.stringify({ 
-                city_data: cityData
-            })
+            body: JSON.stringify({ city_data: cityData })
         })
 
         if (response.ok) {
@@ -128,7 +134,7 @@ async function fetchDeliveryOptions(cityData) {
 async function loadDeliveryOptions(cityData) {
     const result = await fetchDeliveryOptions(cityData);
     if (result.success) {
-        console.log(result.data);
+        checkoutState.deliveryOptions = result.data;
         renderDeliveryOptions(result.data);
     } else {
         console.log(`Не удалось получить список доступных доставок: ${result.message}`)
@@ -144,7 +150,6 @@ cityInput.addEventListener('input', (e) => {
     
     const query = e.target.value.trim();
     if (query.length < 3) {
-        renderCitySuggestions([]);
         return;
     }
 
@@ -201,10 +206,8 @@ cityInput.addEventListener('blur', () => {
     }
 });
 
-// --- 2 Delivery Options step
+// --- Render
 function renderDeliveryOptions(options) {
-    checkoutState.deliveryOptions = options;
-
     deliveryOptions.innerHTML = Object.keys(options).map(key => {
         const option = options[key];
         return `
@@ -229,10 +232,9 @@ function renderPvzSuggestions(points) {
         return;
     }
 
-    pvzSuggestions.innerHTML = points.map((point, index) => {
+    pvzSuggestions.innerHTML = points.map((point) => {
         return `
-            <div class="checkout__suggestion-item pvz-suggestion" 
-                 data-id="${point.id}">
+            <div class="checkout__suggestion-item pvz-suggestion" data-id="${point.id}">
                  ${point.address}
             </div>
         `;
@@ -262,48 +264,29 @@ pvzSearchInput.addEventListener('blur', () => {
 
 checkoutSection.addEventListener('mousedown', (e) => {
     const citySuggestion = e.target.closest('.city-suggestion');
+    const deliveryCard = e.target.closest('.delivery-card');
+    const pvzSuggestion = e.target.closest('.pvz-suggestion');
+
     if (citySuggestion) {
-        const index = parseInt(citySuggestion.dataset.index);
-        const cityObject = checkoutState.currentCitySuggestions[index];
-
-        checkoutState.selectedCity = cityObject;
-
+        checkoutState.selectedCity = checkoutState.currentCitySuggestions[citySuggestion.dataset.index];
         cityInput.value = checkoutState.selectedCity.value;
-
-        console.log("Список предложений городов:", checkoutState.currentCitySuggestions);
-        console.log("Выбранный город:", checkoutState.selectedCity);
-
-        // Переход на следующий этап
         changeCheckoutState("delivery-choice");
-        renderDeliveryOptions();
     }
 
-    const deliveryCard = e.target.closest('.delivery-card');
     if (deliveryCard) {
         document.querySelectorAll('.delivery-card').forEach(e => {
             e.classList.remove('chosen');
         })
         deliveryCard.classList.add('chosen');
         
-        console.log(deliveryCard.dataset.option);
         checkoutState.selectedDeliveryOption = checkoutState.deliveryOptions[deliveryCard.dataset.option];
-        console.log(checkoutState.selectedDeliveryOption);
-
-        // Переход 
         changeCheckoutState("pvz-choice");
     }
 
-    const pvzSuggestion = e.target.closest('.pvz-suggestion');
     if (pvzSuggestion) {
-        const index = pvzSuggestion.dataset.id;
-
-        const selectedPvz = checkoutState.selectedDeliveryOption.points.find(point => point.id === index)
-        console.log("Выбранный ПВЗ: ", selectedPvz)
-        
+        const selectedPvz = checkoutState.selectedDeliveryOption.points.find(p => String(p.id) === String(pvzSuggestion.dataset.id));
         checkoutState.selectedPvz = selectedPvz;
-        
         pvzSearchInput.value = selectedPvz.address;
-        
         changeCheckoutState("contacts");
     }
 });
@@ -318,7 +301,6 @@ const phoneMask = IMask(phoneInput, {
 
 // Обработчики контактов
 nameInput.addEventListener('input', (e) => {
-    // Разрешаем только буквы, пробелы и дефис
     const value = e.target.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '');
     e.target.value = value;
     
@@ -335,6 +317,7 @@ emailInput.addEventListener('input', (e) => {
     validateCheckout();
 });
 
+const validationMsg = document.querySelector('.checkout__validation-msg');
 // Validate Function
 function validateCheckout() {
     const s = checkoutState;
@@ -343,20 +326,35 @@ function validateCheckout() {
     console.log("Checkout: ", s);
     console.log("Contacts: ", c);
 
-    const isLocationReady = !!s.selectedCity && !!s.selectedDeliveryOption && !!s.selectedPvz;
+    let error = "";
 
-    const nameValue = c?.name || "";
-    const nameParts = nameValue.trim().split(/\s+/);
-    const isNameValid = nameParts.length >= 2 && nameParts[0].length > 0 && nameParts[1].length > 0;
+    if (!s.selectedCity) {
+        error = "Укажите город доставки";
+    } else if (!s.selectedDeliveryOption) {
+        error = "Выберите способ доставки";
+    } else if (s.selectedDeliveryOption.points && !s.selectedPvz) {
+        error = "Выберите пункт выдачи на карте или из списка";
+    } else {
+        // Проверка контактов
+        const nameParts = (c.name || "").trim().split(/\s+/);
+        const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email || "");
 
-    const phoneValue = c?.phone || "";
-    const isPhoneValid = phoneValue.length === 11;
+        if (nameParts.length < 2 || nameParts[0].length < 2) {
+            error = "Введите имя и фамилию для получения заказа";
+        } else if ((c.phone || "").length !== 11) {
+            error = "Введите корректный номер телефона";
+        } else if (!isEmailValid) {
+            error = "Проверьте формат почты (например, name@mail.ru)";
+        }
+    }
 
-    const emailValue = c?.email || "";
-    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+    // Вывод текста
+    if (validationMsg) {
+        validationMsg.textContent = error;
+    }
 
-    const isValid = isLocationReady && isNameValid && isPhoneValid && isEmailValid;
-
+    // Состояние кнопки
+    const isValid = error === "";
     if (submitBtn) {
         submitBtn.disabled = !isValid;
     }
@@ -374,7 +372,6 @@ function loadCartFromLS() {
     }
 }
 function cleanProductIdsInLS() {
-    // return cleanCart
     const rawData = localStorage.getItem('cart');
     const cart = loadCartFromLS();
     let isDirty = false;
@@ -398,7 +395,6 @@ function cleanProductIdsInLS() {
 
     if (isDirty) {
         localStorage.setItem('cart', JSON.stringify(cleanCart));
-        console.log("Корзина была очищена от некорректных данных");
     }
 
     return cleanCart
@@ -407,39 +403,57 @@ function cleanProductIdsInLS() {
 function renderSummary(products, cart) {
     const summaryItemsContainer = document.querySelector('.summary__items');
     const summaryItemTemplate = document.querySelector('.summary__item-template');
-    const summaryTotal = document.querySelector('.summary__total')
+    const summaryItemDeliveryTemplate = document.querySelector('.summary__item-delivery-template');
+    const summaryTotal = document.querySelector('.summary__total-value');
+    const summaryTotalComment = document.querySelector('.summary__total-comment');
     let totalSumm = 0;
 
     summaryItemsContainer.innerHTML = "";
 
     const sortedProducts = [...products].sort((a, b) => Number(a.id) - Number(b.id));
     sortedProducts.forEach(product => {
+        const quantity = cart[product.id];
+        if (!quantity) return;
+
+        const itemTotal = Number(product.price) * quantity;
+        totalSumm += itemTotal;
+
         const clone = summaryItemTemplate.content.cloneNode(true);
-        const summaryItem = clone.querySelector('.summary__item');
 
-        if (!cart[product.id]) return;
-
-        const price = Number(product.price) * cart[product.id];
-        totalSumm += price;
-
-        summaryItem.querySelector('.summary__item-img').src = product.photo_path;
-        summaryItem.querySelector('.summary__item-name').innerHTML = `${product.name}`;
-        summaryItem.querySelector('.summary__item-price').innerHTML = `${price.toLocaleString('ru-RU')} ₽`;
-        summaryItem.querySelector('.summary__item-qty').innerHTML = `${cart[product.id]} шт`;
-        summaryItemsContainer.appendChild(summaryItem);
+        clone.querySelector('.summary__item-img').src = product.photo_path;
+        clone.querySelector('.summary__item-name').textContent = `${product.name}`;
+        clone.querySelector('.summary__item-price').textContent = `${itemTotal.toLocaleString('ru-RU')} ₽`;
+        clone.querySelector('.summary__item-qty').textContent = `${quantity} шт`;
+        
+        summaryItemsContainer.appendChild(clone);
     })
 
-    const discount = getDiscountInfo(totalSumm);
+    // РАсчет скидки и доставки
+    const discountInfo = getDiscountInfo(totalSumm);
+    const deliveryPrice = checkoutState.selectedDeliveryOption ? Number(checkoutState.selectedDeliveryOption.price) : 0;
+    const finalTotal = discountInfo.amount + deliveryPrice;
 
-    if (discount.applied) {
-        summaryTotal.innerHTML = `Итого: ${discount.amount.toLocaleString('ru-RU')} ₽ (с учетом скидки ${discount.label})`
-    } else {
-        summaryTotal.innerHTML = `Итого: ${discount.amount.toLocaleString('ru-RU')} ₽`
+    summaryTotal.innerHTML = `${finalTotal.toLocaleString('ru-RU')} ₽`;
+
+    if (checkoutState.selectedDeliveryOption) {
+        // создаем новый элемент
+        const newItem = summaryItemDeliveryTemplate.content.cloneNode(true);
+        newItem.querySelector('.summary__item-name').textContent = `Доставка ${checkoutState.selectedDeliveryOption.name}`
+        newItem.querySelector('.summary__item-price').textContent = `${deliveryPrice} ₽`
+
+        summaryItemsContainer.appendChild(newItem);
+
+
+        summaryTotalComment.innerHTML = ` ${discountInfo.applied ? `Скидка ${discountInfo.label} применена` : ''}`
+    }
+    else {
+        summaryTotalComment.innerHTML = discountInfo.applied 
+                ? `Скидка ${discountInfo.label} применена. Выберите доставку для финального расчета.` 
+                : 'Выберите доставку для финального расчета'
     }
 }
 
 async function syncCartWithServer(ids) {
-    // Fetch to server to get info about products
     try {
         const response = await fetch('/checkout/api/cart/sync', {
             method: 'POST',
@@ -462,10 +476,6 @@ async function syncCartWithServer(ids) {
 }
 
 function syncLSWithServerIds(serverIds) {
-    // Delete missing products in cart after server responce (basic is productsIds)
-    // Если что-то добавили в LS за это время, оно очистится + очистятся ошибочные id (если товар удалился например)
-    // return uodated cart
-
     let cart = loadCartFromLS();
     let changed = false;
     Object.keys(cart).forEach(id => {
@@ -481,6 +491,7 @@ function syncLSWithServerIds(serverIds) {
     return cart
 }
 
+let productsCache;
 async function initCheckout() {
     const cart = cleanProductIdsInLS();
     // TODO: редирект если корзина пустая
@@ -489,12 +500,12 @@ async function initCheckout() {
     const result = await syncCartWithServer(ids);
 
     if (result.success) {
-        const productsCache = result.data;
-        console.log(productsCache);
+        productsCache = result.data;
         const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)));
         renderSummary(productsCache, currentCart);
     } else {
         console.log(`Не удалось получить данные о товарах в корзине ${result.message}`)
     }
 }
+
 initCheckout();

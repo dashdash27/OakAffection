@@ -42,13 +42,13 @@ def get_delivery_options():
 
     yandex_delivery_info = get_yandex_delivery_info(city_data)
 
-    if yandex_delivery_info is None:
-        return jsonify({"success": False, "error": "External service error"}), 502
+    #if yandex_delivery_info is None:
+        #return jsonify({"success": False, "error": "External service error"}), 502
     
 
     results = {}
 
-    if yandex_delivery_info.get('points'):
+    if yandex_delivery_info:
         results['yandex'] = {
         "name": "Яндекс Доставка",
         "price": yandex_delivery_info.get('price'),

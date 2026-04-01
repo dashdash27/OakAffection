@@ -159,8 +159,17 @@
     border-bottom: 1px solid var(--bg-sub-color);
     padding: 20px 0;
 }
+.summary__item-image-wrapper {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+}
 .summary__item-img {
-    width: 50px;
+    max-width: 100%;
+    max-height: 100%;
 }
 .summary__item-info {
     display: flex;
@@ -173,15 +182,27 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    gap: 10px;
     align-items: end;
     width: 130px;
 }
 .summary__item-qty {
+    font-size: 12px;
     color: var(--text-sub-color);
 }
 .summary__total {
-    margin-top: 20px;
+    margin-top: 10px;
     font-size: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 10px;
+}
+.summary__total-comment {
+    width: 100%;
+    font-size: 16px;
+    color: var(--accent-color)
 }
 
 /* Submin Btn */
@@ -193,9 +214,27 @@
     border: 1px solid var(--bg-sub-color);
     border-radius: 30px;
     color: white;
+    background-color: var(--accent-color);
     font-weight: 600;
 }
 .checkout__submit-btn:disabled {
     background: var(--checkout-card-bg);
     color: var(--accent-color);
+    cursor: not-allowed;
+}
+
+/* State*/
+.pvz-input, .pvz-suggestions {
+    display: none;
+}
+.checkout[data-step="pvz-choice"] .pvz-input,
+.checkout[data-step="contacts"] .pvz-input,
+.checkout[data-step="pvz-choice"] .pvz-suggestions {
+    display: block;
+}
+
+.checkout__validation-msg {
+    color: var(--text-sub-color);
+    margin-top: 40px;
+    font-size: 0.9em;
 }
