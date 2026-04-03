@@ -31,7 +31,7 @@
                             <div class="checkout__step">
                                 <div class="checkout__label">Выбор службы доставки</div>
                                 <div class="checkout__comment delivery-options-comment">
-                                    Варианты доставок появятся после выбора города
+                                    Выберите город для расчета доставки
                                 </div>
                                 <div class="checkout__delivery-options"></div>
                             </div>
@@ -39,7 +39,7 @@
                             <div class="checkout__step">
                                 <div class="checkout__label">Пункт выдачи</div>
                                 <div class="checkout__comment pvz-comment">
-                                    Выбрать ПВЗ можно будет после выбора доставки
+                                    Выберите службу доставки
                                 </div>
                                 <input type="text" class="checkout__input pvz-input" placeholder="Поиск по адресу или улице...">
                                 <div class="checkout__suggestions pvz-suggestions"></div>
@@ -114,6 +114,9 @@
                     <button class="checkout__submit-btn" disabled>
                         Оформить заказ
                     </button>
+                    <a href="{{ url_for('checkout.cart') }}" class="checkout__link-to-cart">
+                        Вернуться в корзину
+                    </a>
 
                 </div>
      
