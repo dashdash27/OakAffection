@@ -213,7 +213,9 @@ function renderDeliveryOptions(options) {
         return `
             <label class="delivery-card" data-option="${key}">
                 <div class="delivery-card__content">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF_%D0%AF%D0%BD%D0%B4%D0%B5%D0%BA%D1%81_%D0%94%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B0.svg/1280px-%D0%9B%D0%BE%D0%B3%D0%BE%D1%82%D0%B8%D0%BF_%D0%AF%D0%BD%D0%B4%D0%B5%D0%BA%D1%81_%D0%94%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B0.svg.png">
+                    <div class="delivery-card__brand-icon" style="background-color: ${DELIVERY_STYLES[key].color}">
+                        ${DELIVERY_STYLES[key].label}
+                    </div>
                     <div class="delivery-card__title">${option.name}</div>
                     <div class="delivery-card__additional">
                         <span class="delivery-card__price">${option.price} ₽</span>
