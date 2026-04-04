@@ -1,19 +1,23 @@
 import requests
 import re
 import math
-from config import Config
+from flask import current_app
 
-YANDEX_API_KEY = Config.YANDEX_API_KEY;
+yandex_session = requests.Session()
 
-session = requests.Session()
-session.headers.update({
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-    "Authorization": f"Bearer {YANDEX_API_KEY}"
-})
+def get_yandex_delivery_session():
+    if 'Authorization' not in yandex_session.headers:
+        api_token = current_app.config.get('YANDEX_DELIVERY', {}).get('API_TOKEN')
+        yandex_session.headers.update({
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": f"Bearer {api_token}"
+        })
+    return yandex_session
+
 
 def get_yandex_delivery_info(city_data):
-    source_point_id = "e1139f6d-e34f-47a9-a55f-31f032a861a6"
+    source_point_id = current_app.config.get('YANDEX_DELIVERY', {}).get('SOURCE_PVZ_ID')
 
     try:
         geo_id = _detect_geo_id(city_data)
@@ -46,36 +50,13 @@ def get_yandex_delivery_info(city_data):
         print("Ошибка при запросе к Yandex")
         return None
 
-def _get_delivery_details(source_point_id, destination_point_id):
-    url = "https://b2b.taxi.tst.yandex.net/api/b2b/platform/pricing-calculator"
-    payload = {
-        "destination": {
-            "platform_station_id": destination_point_id
-        },
-        "source": {
-            "platform_station_id": source_point_id
-        },
-        "tariff": "self_pickup" ,
-        "total_weight": 4000
-    }
-
-    response = session.post(url, json=payload, timeout=5)
-    response.raise_for_status()
-    data = response.json()
-
-    delivery_days = data.get('delivery_days')
-    price = data.get('pricing_total')
-
-    return {
-        "delivery_days": delivery_days,
-        "price": price
-    }
-
 def _detect_geo_id(city_data):
-    url = "https://b2b.taxi.tst.yandex.net/api/b2b/platform/location/detect"
+    url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_GEO_ID')
     payload = {
         "location": city_data.get('value')
     }
+
+    session = get_yandex_delivery_session()
     response = session.post(url, json=payload, timeout=5)
     response.raise_for_status()
     data = response.json()
@@ -88,11 +69,12 @@ def _detect_geo_id(city_data):
     return first_variant.get('geo_id')
     
 def _get_pickup_points(geo_id):
-    url = "https://b2b.taxi.tst.yandex.net/api/b2b/platform/pickup-points/list"
+    url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_POINTS_LIST')
     payload = {
         "geo_id": geo_id
     }
 
+    session = get_yandex_delivery_session()
     response = session.post(url, json=payload, timeout=5)
     response.raise_for_status()
     data = response.json()
@@ -110,3 +92,32 @@ def _get_pickup_points(geo_id):
         })
         
     return formatted_points
+
+
+def _get_delivery_details(source_point_id, destination_point_id):
+    url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_PRICING_CALCULATOR')
+    payload = {
+        "destination": {
+            "platform_station_id": destination_point_id
+        },
+        "source": {
+            "platform_station_id": source_point_id
+        },
+        "tariff": "self_pickup" ,
+        "total_weight": 4000
+    }
+
+    session = get_yandex_delivery_session()
+    response = session.post(url, json=payload, timeout=5)
+    response.raise_for_status()
+    data = response.json()
+
+    delivery_days = data.get('delivery_days')
+    price = data.get('pricing_total')
+
+    print(delivery_days, price)
+
+    return {
+        "delivery_days": delivery_days,
+        "price": price
+    }

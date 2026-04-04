@@ -1,15 +1,18 @@
 import requests
 import random
-from config import Config
+from flask import current_app
 
-DADATA_API_KEY = Config.DADATA_API_KEY
+dadata_session = requests.Session()
 
-session = requests.Session()
-session.headers.update({
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-    "Authorization": f"Token {DADATA_API_KEY}"
-})
+def get_dadata_session():
+    if 'Authorization' not in dadata_session.headers:
+        api_key = current_app.config.get('DADATA', {}).get('API_KEY')
+        dadata_session.headers.update({
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": f"Token {api_key}"
+        })
+    return dadata_session
 
 def format_suggestion(s):
     data = s.get('data', {})
@@ -20,7 +23,7 @@ def format_suggestion(s):
     }
 
 def get_city_suggestions(query): 
-    url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address"
+    url = current_app.config.get('DADATA', {}).get('URL_ADDRESS_SUGGESTIONS')
 
     data = {
         "query": query, 
@@ -29,6 +32,7 @@ def get_city_suggestions(query):
     }
     
     try:
+        session = get_dadata_session()
         response = session.post(url, json=data, timeout=5)
         response.raise_for_status() 
 
