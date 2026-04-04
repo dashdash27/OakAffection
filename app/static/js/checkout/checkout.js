@@ -219,7 +219,7 @@ function renderDeliveryOptions(options) {
                     <div class="delivery-card__title">${option.name}</div>
                     <div class="delivery-card__additional">
                         <span class="delivery-card__price">${option.price} ₽</span>
-                        <span class="delivery-card__days">${option.days} дней</span>
+                        <span class="delivery-card__days">${option.days}</span>
                     </div>
                 </div>
             </label>

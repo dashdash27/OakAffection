@@ -3,6 +3,8 @@ import re
 import math
 from flask import current_app
 
+from ..utils import format_delivery_days
+
 yandex_session = requests.Session()
 
 def get_yandex_delivery_session():
@@ -14,7 +16,6 @@ def get_yandex_delivery_session():
             "Authorization": f"Bearer {api_token}"
         })
     return yandex_session
-
 
 def get_yandex_delivery_info(city_data):
     source_point_id = current_app.config.get('YANDEX_DELIVERY', {}).get('SOURCE_PVZ_ID')
@@ -31,7 +32,7 @@ def get_yandex_delivery_info(city_data):
             return None
 
         details = _get_delivery_details(source_point_id, points[0].get('id'))
-        delivery_days = details.get('delivery_days')
+        delivery_days = format_delivery_days(details.get('delivery_days'))
         price = details.get('price')
 
         # очищаем цену
