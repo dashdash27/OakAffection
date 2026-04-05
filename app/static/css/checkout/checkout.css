@@ -228,6 +228,9 @@
     margin-top: 20px;
     color: var(--accent-color)
 }
+.summary__item-delivery .summary__item-details {
+    justify-content: end;
+}
 
 /* Submin Btn */
 .checkout__submit-btn{

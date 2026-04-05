@@ -137,6 +137,7 @@ async function loadDeliveryOptions(cityData) {
         checkoutState.deliveryOptions = result.data;
         renderDeliveryOptions(result.data);
     } else {
+        renderDeliveryOptions({});
         console.log(`Не удалось получить список доступных доставок: ${result.message}`)
     }
 }
@@ -208,6 +209,10 @@ cityInput.addEventListener('blur', () => {
 
 // --- Render
 function renderDeliveryOptions(options) {
+    if (Object.keys(options).length == 0) {
+        deliveryOptionsComment.textContent = "К сожалению, для этого населенного пункта не нашлось доступных доставко. Попробуйте его изменить."
+        return
+    }
     deliveryOptions.innerHTML = Object.keys(options).map(key => {
         const option = options[key];
         return `
