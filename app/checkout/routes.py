@@ -1,11 +1,12 @@
 from app.logger import logger
 from app.models import Product
-from app.extensions import STATIC_DIR
 
 from .services.dadata import get_city_suggestions
-from .services.yandex import get_yandex_delivery_info
+from .services.yandex import get_yandex_delivery_info, get_fake_delivery_info
 
 import os
+import asyncio
+import httpx
 from flask import Blueprint, render_template, request, jsonify
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
@@ -33,14 +34,23 @@ def suggest_cities():
     return jsonify(city_suggestions), 200
 
 @checkout_bp.route('/api/delivery/options', methods=['POST'])
-def get_delivery_options():
+async def get_delivery_options():
     req_data = request.get_json()
     if not req_data or 'city_data' not in req_data:
         return jsonify({"success": False, "error": "Missing city data"}), 400
     
     city_data = req_data.get('city_data')
 
-    yandex_delivery_info = get_yandex_delivery_info(city_data)
+    # Create 1 client for all requests of this user
+    async with httpx.AsyncClient(http2=True, timeout=10.0) as client:
+        tasks = [
+            get_yandex_delivery_info(city_data, client)
+        ]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+    valid_options = [res for res in results if res and not isinstance(res, Exception)]
+
+    yandex_delivery_info = valid_options[0]
 
     if yandex_delivery_info is None:
         return jsonify({"success": False, "error": "External service error"}), 502

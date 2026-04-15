@@ -1,39 +1,48 @@
-import requests
 import re
+import asyncio
 import math
 from flask import current_app
 
 from ..utils import format_delivery_days
 
-yandex_session = requests.Session()
+async def get_fake_delivery_info(city_data, client):
+    """Имитация долгого запроса к Доставке"""
+    print("Начинаю запрос к Доставке...")
+    
+    await asyncio.sleep(5) 
+    
+    print("Доставка ответила через 5 секунд!")
+    
+    return {
+        "service": "yandex",
+        "price": 500,
+        "days": "2-3 дня",
+        "status": "success"
+    }
 
-def get_yandex_delivery_session():
-    if 'Authorization' not in yandex_session.headers:
-        api_token = current_app.config.get('YANDEX_DELIVERY', {}).get('API_TOKEN')
-        yandex_session.headers.update({
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Authorization": f"Bearer {api_token}"
-        })
-    return yandex_session
 
-def get_yandex_delivery_info(city_data):
+async def get_yandex_delivery_info(city_data, client):
+    api_token = current_app.config.get('YANDEX_DELIVERY', {}).get('API_TOKEN')
     source_point_id = current_app.config.get('YANDEX_DELIVERY', {}).get('SOURCE_PVZ_ID')
+    auth_headers = {"Authorization": f"Bearer {api_token}"}
 
     try:
-        geo_id = _detect_geo_id(city_data)
+        geo_id = await _detect_geo_id(city_data, client, auth_headers)
         
         if not geo_id:
             return None
         
-        points = _get_pickup_points(geo_id)
+        points =await  _get_pickup_points(geo_id, client, auth_headers)
 
         if not points:
             return None
 
-        details = _get_delivery_details(source_point_id, points[0].get('id'))
+        details = await  _get_delivery_details(source_point_id, points[0].get('id'), client, auth_headers)
         delivery_days = format_delivery_days(details.get('delivery_days'))
         price = details.get('price')
+
+        if not price:
+            return None
 
         # очищаем цену
         clean_price = re.sub(r'[^\d.,]', '', str(price))
@@ -51,14 +60,13 @@ def get_yandex_delivery_info(city_data):
         print("Ошибка при запросе к Yandex")
         return None
 
-def _detect_geo_id(city_data):
+async def _detect_geo_id(city_data, client, headers):
     url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_GEO_ID')
     payload = {
         "location": city_data.get('value')
     }
 
-    session = get_yandex_delivery_session()
-    response = session.post(url, json=payload, timeout=5)
+    response = await client.post(url, json=payload, headers=headers, timeout=5)
     response.raise_for_status()
     data = response.json()
     variants = data.get('variants', [])
@@ -69,14 +77,13 @@ def _detect_geo_id(city_data):
     first_variant = variants[0]
     return first_variant.get('geo_id')
     
-def _get_pickup_points(geo_id):
+async def _get_pickup_points(geo_id, client, headers):
     url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_POINTS_LIST')
     payload = {
         "geo_id": geo_id
     }
 
-    session = get_yandex_delivery_session()
-    response = session.post(url, json=payload, timeout=5)
+    response = await client.post(url, json=payload, headers=headers, timeout=5)
     response.raise_for_status()
     data = response.json()
 
@@ -95,7 +102,7 @@ def _get_pickup_points(geo_id):
     return formatted_points
 
 
-def _get_delivery_details(source_point_id, destination_point_id):
+async def _get_delivery_details(source_point_id, destination_point_id, client, headers):
     url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_PRICING_CALCULATOR')
     payload = {
         "destination": {
@@ -107,9 +114,8 @@ def _get_delivery_details(source_point_id, destination_point_id):
         "tariff": "self_pickup" ,
         "total_weight": 4000
     }
-
-    session = get_yandex_delivery_session()
-    response = session.post(url, json=payload, timeout=5)
+    
+    response = await client.post(url, json=payload, headers=headers, timeout=5)
     response.raise_for_status()
     data = response.json()
 
