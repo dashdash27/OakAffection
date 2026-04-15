@@ -1,22 +1,5 @@
-// --- 1.  Constants and Settings:
-const QUANTITY_MAX = 30;
-const DISCOUNT_RULES = [
-    { threshold: 10000, value: 0.20, label: '20%' },
-    { threshold: 30000, value: 0.25, label: '25%' }
-].sort((a, b) => a.threshold - b.threshold);
-
-const checkoutState = {
-    currentCitySuggestions: [],
-    selectedCity: null,
-    deliveryOptions: null,
-    selectedDeliveryOption: null,
-    selectedPvz: null,
-    contacts: { name: null, phone: null, email: null }
-};
-
-// --- 3. Управление состоянием и UI
+// --- UI compnents
 const checkoutSection = document.querySelector('.checkout');
-const submitBtn = document.querySelector('.checkout__submit-btn');
 
 const cityInput = document.querySelector('.city-input');
 const citySuggestions = document.querySelector('.city-suggestions');
@@ -25,8 +8,11 @@ const deliveryOptionsComment = document.querySelector('.delivery-options-comment
 const pvzSearchInput = document.querySelector('.pvz-input');
 const pvzComment = document.querySelector('.pvz-comment');
 const pvzSuggestions = document.querySelector('.pvz-suggestions');
+const validationMsg = document.querySelector('.checkout__validation-msg');
 
-// Конфиг для сбора данных при переключении шагов
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+// Config to change state
 const STEPS_CONFIG = {
     "city-choice": 
         { 
@@ -57,56 +43,50 @@ const STEPS_CONFIG = {
             clear: [citySuggestions, deliveryOptionsComment, pvzComment, pvzSuggestions],
             messages: []
         },
+    "ready": { reset: [], clear: [], messages: [] }
 };
 
-// Обновление интерфейса при редактировании/сбрасывании данных
+function updateTotalPrice() {
+    const itemsWithDiscount = Math.round(checkoutState.itemsTotal * (1 - checkoutState.discountMultiplier));
+    const delivery = checkoutState.selectedDeliveryOption?.price || 0;
+    checkoutState.totalPrice = itemsWithDiscount + delivery;
+}
+
 function changeCheckoutState(state) {
     checkoutSection.dataset.step = state;
+    checkoutState.step = state;
     const config = STEPS_CONFIG[state];
 
-    // 2. Сбрасываем данные в JS-объекте
+    // 1. Сбрасываем данные в JS-объекте
     config.reset.forEach(key => checkoutState[key] = null);
     
-    // 3. Очищаем старые списки (чтобы не было "мерцания")
+    // 2. Очищаем элементы
     config.clear.forEach(el => { 
-        if (el.innerHTML) {
-            el.innerHTML = ""; 
-        }
-        if (el.value) {
-            el.value = ""
-        }
+        if (el.innerHTML) el.innerHTML = "";
+        if (el.value) el.value = "";
     });
 
-    // 4. Наполняем блоки сообщениями-подсказками
+    // 3. Text messages
     if (config.messages) {
         config.messages.forEach(item => {
-            if (item.el) {
-                item.el.innerHTML = item.text;
-            }
+            if (item.el) item.el.innerHTML = item.text;
         });
     }
 
-    if (state === "city-choice") renderSummary(productsCache, syncLSWithServerIds(productsCache.map(p => String(p.id))));
+    updateTotalPrice();
+    renderSummary();
+
     if (state === "delivery-choice") {
-        renderSummary(productsCache, syncLSWithServerIds(productsCache.map(p => String(p.id))))
         loadDeliveryOptions(checkoutState.selectedCity);
     }
     if (state === "pvz-choice") {
-        renderSummary(productsCache, syncLSWithServerIds(productsCache.map(p => String(p.id))))
         renderPvzSuggestions(checkoutState.selectedDeliveryOption.points);
+    }
+    if (state === "ready") {
+        return
     }
     
     validateCheckout();
-}
-
-// 2. Утилиты и API
-const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-
-function getDiscountInfo(amount) {
-    const rule = DISCOUNT_RULES.reduce((acc, current) => amount >= current.threshold ? current : acc, null);
-    return rule 
-        ? { applied: true, label: rule.label, amount: amount - Math.round(amount * rule.value) }
-        : { applied: false, amount };
 }
 
 async function fetchDeliveryOptions(cityData) {
@@ -142,7 +122,7 @@ async function loadDeliveryOptions(cityData) {
     }
 }
 
-// --- 1 City Step
+// --- City Step
 let debounceTimer;
 cityInput.addEventListener('input', (e) => {
     checkoutState.selectedCity = null;
@@ -185,6 +165,13 @@ async function fetchCitySuggestions(query) {
     }
 }
 
+cityInput.addEventListener('blur', () => {
+    if (!checkoutState.selectedCity) {
+        changeCheckoutState("city-choice");
+    }
+});
+
+// --- Rendering
 function renderCitySuggestions(cities) {
     if (!cities || cities.length === 0) {
         citySuggestions.innerHTML = "";
@@ -200,17 +187,9 @@ function renderCitySuggestions(cities) {
         `;
     }).join('');
 }
-
-cityInput.addEventListener('blur', () => {
-    if (!checkoutState.selectedCity) {
-        changeCheckoutState("city-choice");
-    }
-});
-
-// --- Render
 function renderDeliveryOptions(options) {
     if (Object.keys(options).length == 0) {
-        deliveryOptionsComment.textContent = "К сожалению, для этого населенного пункта не нашлось доступных доставко. Попробуйте его изменить."
+        deliveryOptionsComment.textContent = "К сожалению, для этого населенного пункта не нашлось доступных доставок. Попробуйте его изменить."
         return
     }
     deliveryOptions.innerHTML = Object.keys(options).map(key => {
@@ -231,8 +210,6 @@ function renderDeliveryOptions(options) {
         `;
     }).join('');
 }
-
-// --- Pvz step
 function renderPvzSuggestions(points) {
     if (!points || points.length === 0) {
         pvzSuggestions.innerHTML = 'Ничего не найдено';
@@ -247,14 +224,56 @@ function renderPvzSuggestions(points) {
         `;
     }).join('');
 }
+function renderSummary() {
+    const summaryItemsContainer = document.querySelector('.summary__items');
+    const summaryItemTemplate = document.querySelector('.summary__item-template');
+    const summaryItemDeliveryTemplate = document.querySelector('.summary__item-delivery-template');
+    const summaryTotal = document.querySelector('.summary__total-value');
+    const summaryTotalComment = document.querySelector('.summary__total-comment');
 
-// Поиск среди пвз
+    summaryItemsContainer.innerHTML = "";
+
+    const sortedProducts = [...checkoutState.productsCache].sort((a, b) => Number(a.id) - Number(b.id));
+    sortedProducts.forEach(product => {
+        const quantity = checkoutState.cart[product.id];
+        if (!quantity) return;
+
+        const itemTotal = Number(product.price) * quantity;
+
+        const clone = summaryItemTemplate.content.cloneNode(true);
+
+        clone.querySelector('.summary__item-img').src = product.photo_path;
+        clone.querySelector('.summary__item-name').textContent = `${product.name}`;
+        clone.querySelector('.summary__item-price').textContent = `${itemTotal.toLocaleString('ru-RU')} ₽`;
+        clone.querySelector('.summary__item-qty').textContent = `${quantity} шт`;
+        
+        summaryItemsContainer.appendChild(clone);
+    })
+
+    summaryTotal.innerHTML = `${checkoutState.totalPrice.toLocaleString('ru-RU')} ₽`;
+
+    if (checkoutState.selectedDeliveryOption) {
+        const newItem = summaryItemDeliveryTemplate.content.cloneNode(true);
+        newItem.querySelector('.summary__item-name').textContent = `Доставка ${checkoutState.selectedDeliveryOption.name}`
+        newItem.querySelector('.summary__item-price').textContent = `${checkoutState.selectedDeliveryOption.price} ₽`
+
+        summaryItemsContainer.appendChild(newItem);
+
+        summaryTotalComment.innerHTML = ` ${checkoutState.discountLabel ? `Скидка ${checkoutState.discountLabel} применена` : ''}`
+    }
+    else {
+        summaryTotalComment.innerHTML = checkoutState.discountLabel
+                ? `Скидка ${checkoutState.discountLabel} применена. Выберите доставку для финального расчета.` 
+                : 'Выберите доставку для финального расчета'
+    }
+}
+
+// --- PVZ Search
 pvzSearchInput.addEventListener('input', (e) => {
     checkoutState.selectedPvz = null;
 
     const query = e.target.value.toLowerCase().trim();
     
-    // Фильтруем массив из памяти
     const allPoints = checkoutState.selectedDeliveryOption.points;
     const filteredPoints = allPoints.filter(p => 
         p.address.toLowerCase().includes(query)
@@ -298,7 +317,7 @@ checkoutSection.addEventListener('mousedown', (e) => {
     }
 });
 
-// Contacts inputs
+// --- Contacts
 const nameInput = document.querySelector('.name-input');
 const emailInput = document.querySelector('.email-input');
 const phoneInput = document.querySelector('.phone-input');
@@ -306,13 +325,10 @@ const phoneMask = IMask(phoneInput, {
   mask: '+{7}(000)000-00-00'
 });
 
-// Обработчики контактов
 nameInput.addEventListener('input', (e) => {
     const value = e.target.value.replace(/[^a-zA-Zа-яА-ЯёЁ\s-]/g, '');
     e.target.value = value;
-    
     checkoutState.contacts.name = value.trim();
-    
     validateCheckout();
 });
 phoneInput.addEventListener('input', () => {
@@ -324,14 +340,9 @@ emailInput.addEventListener('input', (e) => {
     validateCheckout();
 });
 
-const validationMsg = document.querySelector('.checkout__validation-msg');
-// Validate Function
 function validateCheckout() {
     const s = checkoutState;
     const c = checkoutState.contacts;
-
-    console.log("Checkout: ", s);
-    console.log("Contacts: ", c);
 
     let error = "";
 
@@ -342,9 +353,11 @@ function validateCheckout() {
     } else if (s.selectedDeliveryOption.points && !s.selectedPvz) {
         error = "Выберите пункт выдачи на карте или из списка";
     } else {
-        // Проверка контактов
         const nameParts = (c.name || "").trim().split(/\s+/);
         const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email || "");
+
+        checkoutSection.dataset.step = "contacts";
+        checkoutState.step = "contacts";
 
         if (nameParts.length < 2 || nameParts[0].length < 2) {
             error = "Введите имя и фамилию для получения заказа";
@@ -353,14 +366,15 @@ function validateCheckout() {
         } else if (!isEmailValid) {
             error = "Проверьте формат почты (например, name@mail.ru)";
         }
+        else {
+            changeCheckoutState("ready");
+        }
     }
 
-    // Вывод текста
     if (validationMsg) {
         validationMsg.textContent = error;
     }
 
-    // Состояние кнопки
     const isValid = error === "";
     if (submitBtn) {
         submitBtn.disabled = !isValid;
@@ -400,64 +414,9 @@ function cleanProductIdsInLS() {
         }
     }
 
-    if (isDirty) {
-        localStorage.setItem('cart', JSON.stringify(cleanCart));
-    }
+    if (isDirty) localStorage.setItem('cart', JSON.stringify(cleanCart));
 
     return cleanCart
-}
-
-function renderSummary(products, cart) {
-    const summaryItemsContainer = document.querySelector('.summary__items');
-    const summaryItemTemplate = document.querySelector('.summary__item-template');
-    const summaryItemDeliveryTemplate = document.querySelector('.summary__item-delivery-template');
-    const summaryTotal = document.querySelector('.summary__total-value');
-    const summaryTotalComment = document.querySelector('.summary__total-comment');
-    let totalSumm = 0;
-
-    summaryItemsContainer.innerHTML = "";
-
-    const sortedProducts = [...products].sort((a, b) => Number(a.id) - Number(b.id));
-    sortedProducts.forEach(product => {
-        const quantity = cart[product.id];
-        if (!quantity) return;
-
-        const itemTotal = Number(product.price) * quantity;
-        totalSumm += itemTotal;
-
-        const clone = summaryItemTemplate.content.cloneNode(true);
-
-        clone.querySelector('.summary__item-img').src = product.photo_path;
-        clone.querySelector('.summary__item-name').textContent = `${product.name}`;
-        clone.querySelector('.summary__item-price').textContent = `${itemTotal.toLocaleString('ru-RU')} ₽`;
-        clone.querySelector('.summary__item-qty').textContent = `${quantity} шт`;
-        
-        summaryItemsContainer.appendChild(clone);
-    })
-
-    // РАсчет скидки и доставки
-    const discountInfo = getDiscountInfo(totalSumm);
-    const deliveryPrice = checkoutState.selectedDeliveryOption ? Number(checkoutState.selectedDeliveryOption.price) : 0;
-    const finalTotal = discountInfo.amount + deliveryPrice;
-
-    summaryTotal.innerHTML = `${finalTotal.toLocaleString('ru-RU')} ₽`;
-
-    if (checkoutState.selectedDeliveryOption) {
-        // создаем новый элемент
-        const newItem = summaryItemDeliveryTemplate.content.cloneNode(true);
-        newItem.querySelector('.summary__item-name').textContent = `Доставка ${checkoutState.selectedDeliveryOption.name}`
-        newItem.querySelector('.summary__item-price').textContent = `${deliveryPrice} ₽`
-
-        summaryItemsContainer.appendChild(newItem);
-
-
-        summaryTotalComment.innerHTML = ` ${discountInfo.applied ? `Скидка ${discountInfo.label} применена` : ''}`
-    }
-    else {
-        summaryTotalComment.innerHTML = discountInfo.applied 
-                ? `Скидка ${discountInfo.label} применена. Выберите доставку для финального расчета.` 
-                : 'Выберите доставку для финального расчета'
-    }
 }
 
 async function syncCartWithServer(ids) {
@@ -498,7 +457,33 @@ function syncLSWithServerIds(serverIds) {
     return cart
 }
 
-let productsCache;
+function initCheckoutState(productsCache, cart) {
+    checkoutState.cart = cart;
+    checkoutState.productsCache = productsCache;
+
+    let itemsTotal = 0;
+
+    // считаем общую сумму
+    productsCache.forEach(product => {
+        const quantity = cart[product.id];
+        if (!quantity) return;
+
+        const itemTotal = Number(product.price) * quantity;
+        itemsTotal += itemTotal;
+    });
+    checkoutState.itemsTotal = itemsTotal;
+
+    // расчет скидки
+    const discountInfo = getDiscountInfo(itemsTotal);
+    const finalTotal = discountInfo.amount;
+    if (discountInfo.applied) {
+       checkoutState.discountMultiplier = discountInfo.multiplier;
+       checkoutState.discountLabel = discountInfo.label;
+    }
+    
+    checkoutState.totalPrice = finalTotal;
+}
+
 async function initCheckout() {
     const cart = cleanProductIdsInLS();
     // TODO: редирект если корзина пустая
@@ -507,8 +492,10 @@ async function initCheckout() {
     const result = await syncCartWithServer(ids);
 
     if (result.success) {
-        productsCache = result.data;
+        const productsCache = result.data;
         const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)));
+        
+        initCheckoutState(productsCache, currentCart)
         renderSummary(productsCache, currentCart);
     } else {
         console.log(`Не удалось получить данные о товарах в корзине ${result.message}`)
