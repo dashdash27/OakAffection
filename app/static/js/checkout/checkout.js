@@ -164,6 +164,7 @@
     // --- API functions
     async function fetchDeliveryOptions(cityData) {
         try {
+            console.log("Получение вариантов доставки...", checkoutState.cart, cityData);
             const response = await fetch('/checkout/api/delivery/options', {
                 method: 'POST',
                 headers: { 
@@ -171,7 +172,7 @@
                     'Accept': 'application/json',
                     'X-CSRFToken': csrfToken
                 },
-                body: JSON.stringify({ city_data: cityData })
+                body: JSON.stringify({ city_data: cityData, cart: checkoutState.cart })
             })
 
             if (response.ok) {

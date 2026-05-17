@@ -1,3 +1,10 @@
+import math
+
+TOTAL_WEIGHT_SAFETY_FACTOR = 1.08
+MAX_ITEM_WEIGHT_SAFETY_FACTOR = 1.05
+MAX_ITEM_SIDE_SAFETY_FACTOR = 1.05
+CUBIC_SUM_SAFETY_FACTOR = 1.2
+
 def pluralize(number, titles):
     cases = [2, 0, 1, 1, 1, 2]
     if 4 < number % 100 < 20:
@@ -24,3 +31,37 @@ def format_delivery_days(api_days):
         
     except (ValueError, TypeError):
         return "срок уточняется"
+    
+def calculate_order_dimensions(cart_items):
+    """Approximately order params"""
+    total_weight = 0
+    total_volume = 0
+    max_item_side = 0
+    max_item_weight = 0
+    cubic_sum_of_sides = 0
+
+    for item in cart_items:
+        q = item['quantity']
+        w, l, h, d = item['weight'], item['length'], item['height'], item['depth']
+
+        total_weight += w * q
+        total_volume += (l * h * d) * q
+
+        # find the biggest item-side and the biggest item-wrapper weight
+        max_item_side = max(max_item_side, l, h, d)
+        max_item_weight = max(max_item_weight, w)
+
+    if total_volume > 0:
+        side = math.pow(total_volume, 1/3)
+        cubic_sum_of_sides = math.ceil(side * 3 * CUBIC_SUM_SAFETY_FACTOR)
+
+    total_weight = math.ceil(total_weight * TOTAL_WEIGHT_SAFETY_FACTOR)
+    max_item_side = math.ceil(max_item_side * MAX_ITEM_SIDE_SAFETY_FACTOR)
+    max_item_weight = math.ceil(max_item_weight * MAX_ITEM_WEIGHT_SAFETY_FACTOR)
+
+    return {
+            "total_weight": total_weight,
+            "cubic_sum_of_sides": cubic_sum_of_sides,
+            "max_item_side": max_item_side,
+            "max_item_weight": max_item_weight
+        }
