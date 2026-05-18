@@ -85,37 +85,40 @@ async def get_delivery_options():
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
-    valid_options = [res for res in results if res and not isinstance(res, Exception)]
-
-
-    if not valid_options:
-        return jsonify({"success": False, "error": "External service error"}), 502
+    yandex_result = results[0]
     
-    yandex_delivery_info = valid_options[0]
-    
-    results = {}
+    if isinstance(yandex_result, Exception):
+        print(f"Критическое системное исключение в asyncio.gather для Яндекса: {yandex_result}")
+        yandex_delivery_info = {
+            "status": "tech_error",
+            "error_code": "YANDEX_API_DOWN",
+            "message": "Служба доставки Яндекса временно недоступна.",
+            "points": []
+        }
+    else:
+        yandex_delivery_info = yandex_result
+        print(yandex_delivery_info["status"])
 
-    if yandex_delivery_info:
-        results['yandex'] = {
-        "name": "Яндекс Доставка",
-        "price": yandex_delivery_info.get('price'),
-        "days": yandex_delivery_info.get('delivery_days'),
-        "geo_id": yandex_delivery_info.get('geo_id'), 
-        "points": yandex_delivery_info.get('points') 
-    }
-
-    results['post'] = {
-        "name": "Почта России",
-        "price": 350,
-        "days": "1-2 дня",
-        "points": [
-            {"id": "y1", "address": "ул. Персиковая, 10", "coords": [45.0, 38.9]},
-            {"id": "y2", "address": "ул. Пальмовая, 120", "coords": [45.0, 38.9]}
-        ]
-    }
-    
-    return jsonify(results), 200
-
+    return jsonify({
+        "status": "success",
+        "cart_metrics": {
+            "total_weight": order_dimensions["total_weight"],
+            "cubic_sum_of_sides": order_dimensions["cubic_sum_of_sides"]
+        },
+        "deliveries": {
+            "yandex": yandex_delivery_info,
+            "post": {
+                "status": "success",
+                "name": "Почта России",
+                "price": 350,
+                "delivery_days": "1-2 дня",
+                "points": [
+                    {"id": "y1", "address": "ул. Персиковая, 10", "coords": [45.0, 38.9]},
+                    {"id": "y2", "address": "ул. Пальмовая, 120", "coords": [45.0, 38.9]}
+                ]
+            }
+        }
+    }), 200
 
 @checkout_bp.route('/api/cart/sync', methods=['POST'])
 def sync_cart():

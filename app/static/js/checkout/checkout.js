@@ -188,8 +188,8 @@
     async function loadDeliveryOptions(cityData) {
         const result = await fetchDeliveryOptions(cityData);
         if (result.success) {
-            checkoutState.deliveryOptions = result.data;
-            renderDeliveryOptions(result.data);
+            checkoutState.deliveryOptions = result.data["deliveries"];
+            renderDeliveryOptions(result.data["deliveries"]);
         } else {
             renderDeliveryOptions({});
             console.log(`Не удалось получить список доступных доставок: ${result.message}`)
@@ -314,6 +314,9 @@
         }
 
         if (deliveryCard) {
+            if (deliveryCard.classList.contains('delivery-card--disabled')) {
+                return; 
+            }
             document.querySelectorAll('.delivery-card').forEach(e => {
                 e.classList.remove('chosen');
             })
@@ -365,27 +368,73 @@
     }
 
     function renderDeliveryOptions(options) {
-        if (Object.keys(options).length == 0) {
-            deliveryOptionsComment.textContent = "К сожалению, для этого населенного пункта не нашлось доступных доставок. Попробуйте его изменить."
-            return
+       if (Object.keys(options).length == 0) {
+            deliveryOptionsComment.textContent = "К сожалению, не удалось загрузить службы доставки. Попробуйте снова.";
+            deliveryOptions.innerHTML = '';
+            return;
         }
+        deliveryOptionsComment.textContent = "";
+        deliveryOptions.innerHTML = '';
+
+        let hasAnySuccessDelivery = false;
+
         deliveryOptions.innerHTML = Object.keys(options).map(key => {
             const option = options[key];
-            return `
-                <label class="delivery-card" data-option="${key}">
-                    <div class="delivery-card__content">
-                        <div class="delivery-card__brand-icon" style="background-color: ${DELIVERY_STYLES[key].color}">
-                            ${DELIVERY_STYLES[key].label}
+            const style = DELIVERY_STYLES[key] || { color: '#ccc', label: '?' };
+
+            if (option.status === "success") {
+                hasAnySuccessDelivery = true;
+                return `
+                    <label class="delivery-card" data-option="${key}">
+                        <div class="delivery-card__content">
+                            <div class="delivery-card__brand-icon" style="background-color: ${DELIVERY_STYLES[key].color}">
+                                ${DELIVERY_STYLES[key].label}
+                            </div>
+                            <div class="delivery-card__title">${option.name}</div>
+                            <div class="delivery-card__additional">
+                                <span class="delivery-card__price">${option.price} ₽</span>
+                                <span class="delivery-card__days">${option.delivery_days}</span>
+                            </div>
                         </div>
-                        <div class="delivery-card__title">${option.name}</div>
+                    </label>
+                `;
+            }
+            let errorText = "Временно недоступно";
+        
+            if (option.status === "business_error" && option.error_code === "OVERSIZE_OR_OVERWEIGHT") {
+                errorText = "Превышен лимит веса ПВЗ";
+            } else if (option.status === "business_error" && option.error_code === "NO_POINTS_IN_REGION") {
+                errorText = "Нет пунктов в городе";
+            }
+
+            return `
+                <div class="delivery-card delivery-card--disabled" data-option="${key}">
+                    <div class="delivery-card__content">
+                        <div class="delivery-card__brand-icon" style="background-color: #555; color: #aaa;">
+                            ${style.label}
+                        </div>
+                        <div class="delivery-card__title" style="color: #777;">${key === 'yandex' ? 'Яндекс Доставка' : 'Почта России'}</div>
                         <div class="delivery-card__additional">
-                            <span class="delivery-card__price">${option.price} ₽</span>
-                            <span class="delivery-card__days">${option.days}</span>
+                            <span class="delivery-card__error-text" style="color: #ff9800; font-size: 13px;">${errorText}</span>
                         </div>
                     </div>
-                </label>
+                </div>
             `;
         }).join('');
+
+        // --- ФИНАЛЬНЫЙ UX ШАГ: Если ВООБЩЕ НИ ОДНА доставка не подошла ---
+        if (!hasAnySuccessDelivery) {
+            deliveryOptionsComment.innerHTML = `
+                <div class="delivery-alert" style="border: 1px solid #ff9800; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <strong>📦 Этот заказ не проходит в пункты выдачи по весу/объему.</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #aaa;">
+                        Пожалуйста, уменьшите количество товаров в корзине или 
+                        <a href="tel:+79991234567" style="color: #4caf50; text-decoration: underline;"><strong>оформите заказ по телефону</strong></a>, 
+                        и мы подберем для вас курьерскую доставку!
+                    </p>
+                </div>
+            `;
+        }
     }
 
     function renderPvzSuggestions(points) {

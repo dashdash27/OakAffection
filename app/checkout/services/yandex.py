@@ -31,35 +31,64 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
         geo_id = await _detect_geo_id(city_data, client, auth_headers)
         
         if not geo_id:
-            return None
+            return {
+                "status": "business_error",
+                "error_code": "NO_REGION_ID",
+                "message": "Не удалось определить geo_id для данного города."
+            }
         
         points = await  _get_pickup_points(geo_id, client, auth_headers)
 
         if not points:
-            return None
+            return {
+                "status": "business_error",
+                "error_code": "NO_POINTS_IN_REGION",
+                "message": "В данном городе нет ПВЗ Яндекса"
+            }
         
-        
-        # TODO: Need to filter points:
         # 1 - get allowed profiles to order
         allowed_profiles = get_allowed_yandex_profiles(order_dimensions, city_data.get('region_fias_id'))
         print("Allowed profiles:", allowed_profiles)
 
         # 2 - filter points by allowed profiles
         filtered_points = get_filtered_yandex_points(points, allowed_profiles)
-        
-        if not filtered_points:
-            return None
-        
+
         print("Points (qty):", len(points))
         print("Filtered points (qty):", len(filtered_points))
+        
+        if not filtered_points:
+            return {
+                "status": "business_error",
+                "error_code": "OVERSIZE_OR_OVERWEIGHT",
+                "message": "Заказ слишком тяжелый или объемный для ПВЗ в вашем регионе."
+            }
+        
+        details = None
+        
+        for test_point in filtered_points[:3]: # берем первые 3 точки для подстраховки
+            try:
+                details = await _get_delivery_details(
+                    source_point_id, 
+                    test_point.get('id'),
+                    order_dimensions, 
+                    client, 
+                    auth_headers
+                )
+                if details and details.get('price'):
+                    break
+            except Exception as calc_error:
+                print(f"Точка ID {test_point.get('id')} не подошла для расчета цены: {calc_error}")
+                continue
 
-        # must use allowed point (filtered array)!!
-        details = await  _get_delivery_details(source_point_id, filtered_points[0].get('id'), order_dimensions, client, auth_headers)
+        if not details or not details.get('price'):
+            return {
+                "status": "tech_error",
+                "error_code": "PRICE_CALCULATION_FAILED",
+                "message": "Не удалось рассчитать стоимость доставки у Яндекса."
+            }
+        
         delivery_days = format_delivery_days(details.get('delivery_days'))
         price = details.get('price')
-
-        if not price:
-            return None
 
         # clear price
         clean_price = re.sub(r'[^\d.,]', '', str(price))
@@ -69,15 +98,23 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
         print("Delivery details:", details)
         
         return {
-            "geo_id": geo_id,
-            "points": points,
+            "status": "success",
+            "error_code": None,
+            "name": "Яндекс Доставка",
+            "points": filtered_points,
             "delivery_days": delivery_days,
             "price": clean_price
         }
     
     except Exception as e:
-        print(f"Ошибка при запросе к Yandex: {e}")
-        return None
+        # ИСПРАВЛЕНО: Защита от полного падения API Яндекса
+        print(f"Критическая ошибка при запросе к Yandex: {e}")
+        return {
+            "status": "tech_error",
+            "error_code": "YANDEX_API_DOWN",
+            "message": "Сервер службы доставки Яндекса временно недоступен.",
+            "points": []
+        }
 
 async def _detect_geo_id(city_data, client, headers):
     url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_GEO_ID')

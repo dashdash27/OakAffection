@@ -119,6 +119,10 @@
     border: 1.5px solid var(--bg-sub-color);
     border-radius: 10px;
 }
+.delivery-card--disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+}
 .delivery-card.chosen {
     background-color: var(--input-bg);
     border: 1.5px solid var(--accent-color)
