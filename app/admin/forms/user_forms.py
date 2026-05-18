@@ -103,6 +103,7 @@ class ProductForm(FlaskForm):
     ozon_link = StringField('Ссылка Ozon', validators=[Optional()])
     wb_link = StringField('Ссылка Wildberries', validators=[Optional()])
     description_tag = TextAreaField('Описание', validators=[DataRequired()])
+    weight = IntegerField('Вес (в граммах)', validators=[Optional()])
 
     characteristics = FieldList(FormField(ProductCharacteristicForm))
     categories = SelectMultipleField('Категории', coerce=int, validators=[DataRequired()])
@@ -130,14 +131,6 @@ class ProductForm(FlaskForm):
         # загрузка таргетов
         targets_choices = [(target.id, target.name) for target in Target.query.all()]
         self.targets.choices = targets_choices
-
-    # Validators
-    # def validate_price(self, field):
-    #     data = str(field.data) or ''
-    #     if not data.isdigit():
-    #         raise ValidationError('Только цифры разрешены')
-    #     if data.startswith('0'):
-    #         raise ValidationError('Число не должно начинаться с нуля')
         
     def validate_characteristics(self, field):
         seen = set()

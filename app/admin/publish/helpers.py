@@ -32,6 +32,7 @@ def fill_product_by_draft(product, draft):
     product.description_tag = draft.description_tag
     product.group_id = draft.group_id
     product.color_id = draft.color_id
+    product.weight = draft.weight
 
     product.last_updated = datetime.now()
     

@@ -26,10 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
         inputPrice.value = value;
     })
 
+    // Input weight
+    const inputWeight = document.querySelector(".input-weight");
+    inputWeight.addEventListener('input', () => {
+        let value = inputWeight.value;
+        value = value.replace(/\D/g, '');
+        value = value.replace(/^0+/, '');
+
+        inputWeight.value = value;
+    })
+
     form.addEventListener('submit', function(event) {
         let valid = true;
 
-        // Название
+        // Name
         const inputName = document.querySelector(".input-name");
         const nameError = document.querySelector(".name-error");
         if (inputName.value.trim() === '') {
