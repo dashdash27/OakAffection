@@ -18,6 +18,13 @@ class ProductGroupForm(FlaskForm):
         # загружаем список характеристик
         self.characteristic_id.choices = [(c.id, c.name) for c in Characteristic.query.all()]
 
+class ProductWrapperForm(FlaskForm):
+    name = StringField('Название', validators=[DataRequired()])
+    length = IntegerField('Длина', validators=[Optional()])
+    width = IntegerField('Ширина', validators=[Optional()])
+    height = IntegerField('Высота', validators=[Optional()])
+    submit = SubmitField('Создать')
+
 class ColorForm(FlaskForm):
     name = StringField('Название', validators=[DataRequired()])
     icon = FileField('Иконка')

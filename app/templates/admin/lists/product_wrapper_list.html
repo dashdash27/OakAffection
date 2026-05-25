@@ -1,0 +1,42 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка - Коробки-обертки
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        
+        <div class="title-wrapper">
+            <h1>Список коробок-оберток</h1>
+            <a href="{{ url_for('.create_product_wrapper') }}" class="create-btn">Добавить обертку + </a>
+        </div>
+        <div class="group table">
+            <div class="table-header table-row">
+                <div class="table-cell table-cell-index wrapper-index">
+                    №
+                </div>
+                <div class="table-cell wrapper-name">
+                    Название
+                </div>
+                <div class="table-cell char-btns table-btns">
+                    Действия
+                </div>
+            </div>
+            {% for wraapper in wraappers %}
+                <div class="wrapper table-row">
+                    <div class="wrapper-index table-cell table-cell-index">
+                        {{loop.index}}
+                    </div>
+                    <div class="wrapper-name table-cell">
+                        {{wrapper.name}}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

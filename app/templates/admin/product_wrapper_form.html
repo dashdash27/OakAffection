@@ -1,0 +1,56 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    {{page_title}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/form.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-title">
+                {{page_title}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-text">Название коробки-обертки <span>*</span></div>
+                {{ form.name(class="form-input input-name")}}
+            </div>
+
+            <div class="form-section">
+                <div class="form-subtitle">
+                    Размеры
+                </div>
+
+                <div class="form-item">
+                    <div class="form-text">Длина (см)</div>
+                    {{ form.length(class="form-input input-length", required=false, type="text") }}
+                    <div class="price-error error-message"></div>
+
+                    <div class="form-text">Ширина (см)</div>
+                    {{ form.width(class="form-input input-width", required=false, type="text") }}
+                    <div class="price-error error-message"></div>
+
+                    <div class="form-text">Высота (см)</div>
+                    {{ form.height(class="form-input input-height", required=false, type="text") }}
+                    <div class="price-error error-message"></div>
+                </div>
+                
+            </div>
+
+            <div class="form-section">
+
+            <div class="btns">
+                <a class="btn close-btn" href="{{ url_for('admin.index') }}">Отменить</a>
+                <input class="btn submit-btn" id="submit" name="submit" type="submit" value="{{button_name}}">
+            </div>
+
+        </form>   
+    </div>
+{% endblock %}
