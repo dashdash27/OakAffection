@@ -5,6 +5,7 @@
 
 {% block css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/hero.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/discount.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/new.css') }}">
@@ -41,11 +42,33 @@
                 <source media="(max-width: 768px)" srcset="{{ url_for('static', filename='img/hero-image-mobile.png') }}">
                 <img fetchpriority="high" class="hero__image" src="{{ url_for('static', filename='img/hero-image-desktop.png') }}" alt="Деревянный дом под большим зеленым дубом">
             </picture>
-
-            <div id="wood-oils"></div>
         </div>
     </section>
-    <section class="wood-oils" id="wood-oils">
+    <section class="discount">
+        <div class="container">
+            <div class="discount__title">Ваша выгода</div>
+            <p class="discount__subtitle">
+                Скидка рассчитывается автоматически в корзине. 
+                <a href="{{ url_for('main.how_to_order') }}" class="subtitle-link">Условия заказа и доставки →</a>
+            </p>
+            <div class="discount__inner">
+                <div class="discount-card">
+                    <div class="discount-meta">
+                        <div class="discount-value">20%</div>
+                        <div class="discount-text">при заказе от <span class="no-wrap">10 000 ₽</span></div>
+                    </div>
+                </div>
+                <div class="discount-card">
+                    <div class="discount-meta">
+                        <div class="discount-value">25%</div>
+                        <div class="discount-text">при заказе от <span class="no-wrap">30 000 ₽</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="wood-oils"></div>
+    </section>
+    <section class="wood-oils">
         <div class="container">
 
             <a href="{{ url_for('main.show_oils', category_key='oils') }}" class="category__title category__title-h2">
