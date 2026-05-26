@@ -7,7 +7,7 @@
     background-color: var(--bg-sub-color);
 }
 .about__title {
-    font-size: 28px;
+    font-size: 27px;
     font-weight: 600;
     background-color: var(--bg-sub-color);
 }
@@ -51,6 +51,9 @@
 }
 
 @media (min-width: 768px) {
+    .about__title {
+        font-size: 35px;
+    }
     .about__inner {
         row-gap: 50px;
     }
