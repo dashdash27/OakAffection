@@ -2,7 +2,7 @@
     padding: 50px 0 100px 0;
 }
 .new__title {
-    font-size: 28px;
+    font-size: 27px;
     font-weight: 600;
 }
 .new .new__inner {
@@ -145,6 +145,11 @@ a.card__cart-view {
 @media (min-width: 650px) {
     .new .card__media-wrapper {
         height: 290px;
+    }
+}
+@media (min-width: 768px) {
+    .new__title {
+        font-size: 35px;
     }
 }
 @media (min-width: 1024px) {
