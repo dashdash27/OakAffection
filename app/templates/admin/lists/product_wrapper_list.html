@@ -41,8 +41,14 @@
                     <div class="wrapper-dimensions table-cell">
                         {{wrapper.length}} x {{wrapper.depth}} x {{wrapper.height}}
                     </div>
-                    <div class="table-cell table-btns group-btns">
+                    <div class="table-cell table-btns wrapper-btns">
                         <a href="{{ url_for('admin.edit_product_wrapper', wrapper_id=wrapper.id) }}" class="edit-btn btn">Редактировать</a>
+                        <form method="POST" action="{{ url_for('admin.delete_product_wrapper') }}" 
+                            onsubmit="return confirm('Вы уверены, что хотите удалить коробку-обертку {{wrapper.name}}? В таком случае она открепится от всех товаров, которые ей принадлежат');">
+                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                            <input type="hidden" name="wrapper_id" value="{{wrapper.id}}">
+                            <button type="submit" class="delete-btn btn">Удалить</button>
+                        </form>
                     </div>
                 </div>
             {% endfor %}

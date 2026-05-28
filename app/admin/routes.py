@@ -20,6 +20,7 @@ from app.admin.forms import (
     delete_category_handler,
     delete_characteristic_handler,
     delete_product_group_handler,
+    delete_product_wrapper_handler,
     delete_product_draft_handler, 
     edit_product_orphan_draft_handler, 
     create_color_handler,
@@ -303,6 +304,11 @@ def edit_product_wrapper(wrapper_id):
     else:
         form = ProductWrapperForm()
     return edit_product_wrapper_handler(form, request.method, wrapper_id)
+
+@admin_bp.route('/delete_product_wrapper', methods=['POST'])
+def delete_product_wrapper():
+    wrapper_id = request.form.get('wrapper_id')
+    return delete_product_wrapper_handler(wrapper_id)
 
 @admin_bp.route('/product_wrapper_list', methods=['GET'])
 def product_wrapper_list():

@@ -42,6 +42,24 @@ def update_product_wrapper(wrapper_id, new_data):
         logger.error(f"Ошибка при обновлении коробки-обертки '{old_name}': {str(e)}")
         return False, str(e), old_name
     
+def delete_product_wrapper(wrapper_id):
+    name = ''
+    try:
+        wrapper = ProductWrapper.query.get(wrapper_id)
+        if not wrapper: 
+            logger.error(f"Ошибка при удалении коробки-обертки: коробка-обертка не найдена")
+            return False, "Коробка-обертка не найдена", ''
+        
+        name = wrapper.name
+        db.session.delete(wrapper)
+        db.session.commit()
+        logger.info(f"Коробка-обертка успешно удалена: '{name}'")
+        return True, None, name
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Ошибка при удалении коробки-обертки '{name}': {str(e)}")
+        return False, str(e), name
+    
 def create_product_wrapper_handler(form, method):
     page_title = "Добавление новой группы товаров"
     button_name = "Создать"
@@ -102,3 +120,11 @@ def edit_product_wrapper_handler(form, method, wrapper_id):
                     page_title=page_title,
                     button_name=button_name,
                     wrapper=wrapper)
+
+def delete_product_wrapper_handler(wrapper_id):
+    success, error, name = delete_product_wrapper(wrapper_id)
+    if success:
+        flash(f"Коробка-обертка товаров успешно удалена: '{name}'", 'success')
+        return redirect(url_for('admin.product_wrapper_list'))
+    else:
+        flash(f"Ошибка при удалении коробки-обертки товаров '{name}': {error}", 'error')
