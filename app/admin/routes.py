@@ -14,6 +14,7 @@ from app.admin.forms import (
     create_product_group_handler, 
     edit_product_group_handler,
     create_product_wrapper_handler,
+    edit_product_wrapper_handler,
     mark_product_for_delete_handler, 
     delete_target_handler,
     delete_category_handler,
@@ -294,6 +295,15 @@ def create_product_wrapper():
     form = ProductWrapperForm()
     return create_product_wrapper_handler(form, request.method)
 
+@admin_bp.route('/edit_product_wrapper/<int:wrapper_id>', methods=['GET', 'POST'])
+def edit_product_wrapper(wrapper_id):
+    wrapper = ProductWrapper.query.get_or_404(wrapper_id)
+    if request.method == 'GET':
+        form = ProductWrapperForm(obj=wrapper)
+    else:
+        form = ProductWrapperForm()
+    return edit_product_wrapper_handler(form, request.method, wrapper_id)
+
 @admin_bp.route('/product_wrapper_list', methods=['GET'])
 def product_wrapper_list():
     wrappers = ProductWrapper.query.all()
@@ -302,6 +312,7 @@ def product_wrapper_list():
 # Colors
 @admin_bp.route('/color_list', methods=['GET'])
 def color_list():
+    
     colors = Color.query.all()
     return render_template('admin/lists/color_list.html', colors=colors)
 

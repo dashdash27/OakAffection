@@ -17,6 +17,6 @@ from .product_draft_handlers import delete_product_draft_handler, edit_product_o
 from .category_handlers import create_category_handler, edit_category_handler, delete_category_handler
 from .target_handlers import create_target_handler, edit_target_handler, delete_target_handler
 from .product_group_handlers import create_product_group_handler, edit_product_group_handler, delete_product_group_handler
-from .product_wrapper_handlers import create_product_wrapper_handler
+from .product_wrapper_handlers import create_product_wrapper_handler, edit_product_wrapper_handler
 from .color_handlers import create_color_handler, edit_color_handler, delete_color_handler
 from .color_category_handlers import create_color_category_handler, edit_color_category_handler, delete_color_category_handler

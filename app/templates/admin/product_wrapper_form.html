@@ -30,15 +30,15 @@
 
                 <div class="form-item">
                     <div class="form-text">Длина (см)</div>
-                    {{ form.length(class="form-input input-length", required=false, type="text") }}
+                    {{ form.length(class="form-input input-length", type="text") }}
                     <div class="price-error error-message"></div>
 
-                    <div class="form-text">Ширина (см)</div>
-                    {{ form.width(class="form-input input-width", required=false, type="text") }}
+                    <div class="form-text">Глубина (см)</div>
+                    {{ form.depth(class="form-input input-depth", type="text") }}
                     <div class="price-error error-message"></div>
 
                     <div class="form-text">Высота (см)</div>
-                    {{ form.height(class="form-input input-height", required=false, type="text") }}
+                    {{ form.height(class="form-input input-height", type="text") }}
                     <div class="price-error error-message"></div>
                 </div>
                 
@@ -53,4 +53,7 @@
 
         </form>   
     </div>
+
+    <!-- Validation -->
+    <script src="{{ url_for('static', filename='js/admin/product_wrapper_validation.js') }}"></script>
 {% endblock %}

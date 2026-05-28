@@ -23,17 +23,26 @@
                 <div class="table-cell wrapper-name">
                     Название
                 </div>
+                <div class="table-cell wrapper-dimensions">
+                    Размеры (Длина x Глубина x Высота (см))
+                </div>
                 <div class="table-cell char-btns table-btns">
                     Действия
                 </div>
             </div>
-            {% for wraapper in wraappers %}
+            {% for wrapper in wrappers %}
                 <div class="wrapper table-row">
                     <div class="wrapper-index table-cell table-cell-index">
                         {{loop.index}}
                     </div>
                     <div class="wrapper-name table-cell">
                         {{wrapper.name}}
+                    </div>
+                    <div class="wrapper-dimensions table-cell">
+                        {{wrapper.length}} x {{wrapper.depth}} x {{wrapper.height}}
+                    </div>
+                    <div class="table-cell table-btns group-btns">
+                        <a href="{{ url_for('admin.edit_product_wrapper', wrapper_id=wrapper.id) }}" class="edit-btn btn">Редактировать</a>
                     </div>
                 </div>
             {% endfor %}

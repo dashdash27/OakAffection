@@ -21,7 +21,7 @@ class ProductGroupForm(FlaskForm):
 class ProductWrapperForm(FlaskForm):
     name = StringField('Название', validators=[DataRequired()])
     length = IntegerField('Длина', validators=[Optional()])
-    width = IntegerField('Ширина', validators=[Optional()])
+    depth = IntegerField('Глубина', validators=[Optional()])
     height = IntegerField('Высота', validators=[Optional()])
     submit = SubmitField('Создать')
 
