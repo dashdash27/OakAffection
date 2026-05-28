@@ -48,11 +48,31 @@
 
             <div class="form-section">
                 <div class="form-subtitle">Габариты</div>
+
                 <div class="form-item">
                     <div class="form-text">Вес (в граммах)</div>
                     {{ form.weight(class="form-input input-weight", required=false) }}
                     <div class="weight-error error-message"></div>
                 </div>
+
+                <div class="form-text">
+                    Коробка-обертка
+                </div>
+
+
+                <select name="{{ form.wrapper_id.name }}" id="{{ form.wrapper_id.id }}" class="wrapper-select form-input">
+                    {% for value, label in form.wrapper_id.choices %}
+                        {% set wrapper_dim = wrapper_map[value] if value in wrapper_map else '' %}
+                        <option class="wrapper-item-option" value="{{ value }}"
+                            {% if value == form.wrapper_id.data %}selected{% endif %}>
+                            <div class="option-wrapper">{{ label }}</div>
+                            <div class="option-category">({{ wrapper_dim }})</div>
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <div class="group-error error-message"></div>
+
             </div>
 
             <div class="form-section">

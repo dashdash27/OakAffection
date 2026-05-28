@@ -120,6 +120,7 @@ class ProductForm(FlaskForm):
 
     group_id = SelectField('Группа товара', coerce=int, validators=[Optional()])
     color_id = SelectField('Цвет', coerce=int, validators=[Optional()])
+    wrapper_id = SelectField('Коробка-обертка', coerce=int, validators=[Optional()])
 
     submit = SubmitField('Создать товар')
 

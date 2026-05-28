@@ -24,6 +24,7 @@ def fill_draft_by_form(draft, form):
     draft.description_tag = form.description_tag.data
     draft.group_id = form.group_id.data if form.group_id.data != 0 else None
     draft.color_id = form.color_id.data if form.color_id.data != 0 else None
+    draft.wrapper_id = form.wrapper_id.data if form.wrapper_id.data != 0 else None
     draft.categories = Category.query.filter(Category.id.in_(form.categories.data)).all()
     draft.targets = Target.query.filter(Target.id.in_(form.targets.data)).all()
     draft.weight = form.weight.data

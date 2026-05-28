@@ -4,7 +4,7 @@ from app.logger import logger
 from app.admin.forms.helpers import fill_form_by_product
 from app.admin.forms.product_draft_handlers import add_product_draft, update_product_draft
 from app.models import (
-    Product, ProductGroup, Color, Characteristic, 
+    Product, ProductGroup, Color, Characteristic, ProductWrapper,
     ProductDraft, ProductDraftPhoto, ProductDraftVideo
 )
 
@@ -19,10 +19,12 @@ def edit_product_handler(form, method, product_id):
     
     form.group_id.choices = [(0, 'Выберите группу')] + [(g.id, g.name) for g in ProductGroup.query.all()]
     form.color_id.choices = [(0, 'Выберите цвет')] + [(g.id, g.name) for g in Color.query.all()]
+    form.wrapper_id.choices = [(0, 'Выберите коробку-обертку')] + [(g.id, g.name) for g in ProductWrapper.query.all()]
     empty_char = ProductCharacteristicForm()
     empty_char.characteristic_id.choices = [(c.id, c.name) for c in Characteristic.query.all()]
     color_group_map = {c.id: (c.category.name or '') for c in Color.query.all()}
     group_char_map = {g.id: (g.characteristic_id or '') for g in ProductGroup.query.all()}
+    wrapper_map = {c.id: (c.length or '') for c in ProductWrapper.query.all()}
 
     photo_urls = [photo.photo_url for photo in product.photos]
     video_urls = [video.video_url for video in product.videos]
@@ -62,6 +64,7 @@ def edit_product_handler(form, method, product_id):
                            form=form,
                            group_char_map=group_char_map,
                            color_group_map=color_group_map,
+                           wrapper_map=wrapper_map,
                            empty_char=empty_char,
                            page_title=page_title,
                            button_name=button_name,
