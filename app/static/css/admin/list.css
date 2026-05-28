@@ -264,3 +264,11 @@ h1 {
     height: 20px;
     border-radius: 50%;
 }
+
+/* Wrappers */
+.wrapper-name {
+    width: 200px;
+}
+.wrapper-dimensions {
+    width: 350px;
+}

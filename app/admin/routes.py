@@ -123,8 +123,8 @@ def mark_product_for_delete():
 # Product Lists
 @admin_bp.route('/product_list', methods=['GET'])
 def product_list():
-    products = Product.query.all()
-    orphan_drafts = ProductDraft.query.filter(ProductDraft.product_id.is_(None)).all()
+    products = Product.query.order_by(Product.name).all()
+    orphan_drafts = ProductDraft.query.filter(ProductDraft.product_id.is_(None)).order_by(ProductDraft.name).all()
     return render_template('admin/lists/product_list.html', 
                             products=products,
                             orphan_drafts=orphan_drafts)
