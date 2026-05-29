@@ -14,7 +14,7 @@
 
 ### 🛠 Tech Stack
 - **Backend:** `Python (Flask)`, `PostgreSQL`, `SQLAlchemy`, `Alembic`, `Pytest`.
-- **Infrastructure:** `Nginx`, `Gunicorn`, `Linux (VPS)`, `SSL`, `Docker`.
+- **Infrastructure:** `Nginx`, `Gunicorn`, `Linux (VPS)`, `SSL`.
 - **Frontend:** `Vanilla JS (ES6+)`, `HTML5/CSS3`, `Mobile First Design`.
 
 **Deployment Workflow:** Established a protected **Staging environment** on a subdomain to test database migrations and new features before the final release.
@@ -43,7 +43,7 @@ Implemented a unique manual order placement system to minimize user friction.
 ---
 
 ### 🚀 Roadmap 
-Currently integrating external Logistics and Payment Gateway APIs to automate the full order lifecycle.
+Currently integrating external Logistics and Payment Gateway APIs. Migrating to an asynchronous architecture (Asyncio, HTTPX) for parallel API orchestration to improve system throughput.
 
 ---
 
