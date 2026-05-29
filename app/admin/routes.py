@@ -35,6 +35,7 @@ from app.admin.forms import (
 from flask import Blueprint, flash, request, render_template, url_for, redirect
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.datastructures import CombinedMultiDict
+from sqlalchemy import or_
 
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -87,6 +88,13 @@ def index():
     updated_products = []
     delete_marked_products = []
     orphan_drafts = ProductDraft.query.filter(ProductDraft.product_id.is_(None)).all()
+
+    incomplete_dims_products = Product.query.filter(
+        or_(
+            Product.weight.is_(None),
+            Product.wrapper_id.is_(None)
+        )
+    ).all()
     
     for product in products:
         if product.draft and not product.delete_mark:
@@ -103,7 +111,8 @@ def index():
                         targets=targets,
                         characteristics=characteristics,
                         colors=colors,
-                        product_groups=product_groups
+                        product_groups=product_groups,
+                        incomplete_dims_products=incomplete_dims_products
                         )
 
 # Product
