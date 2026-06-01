@@ -124,7 +124,7 @@ async def get_delivery_options():
     }), 200
 
 @checkout_bp.route('/api/cart/sync', methods=['POST'])
-@limiter.limit("10 request per second; 150 per minute")
+@limiter.limit("10 per second; 150 per minute")
 def sync_cart():
     data = request.get_json()
     if not data or 'product_ids' not in data:
