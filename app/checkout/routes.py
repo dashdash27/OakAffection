@@ -1,5 +1,6 @@
 from app.logger import logger
 from app.models import Product
+from app.extensions import limiter
 from .utils import calculate_order_dimensions
 
 from .services.dadata import get_city_suggestions
@@ -20,6 +21,7 @@ def checkout():
     return render_template('checkout/checkout.html')
 
 @checkout_bp.route('/api/suggestions/cities', methods=['GET'])
+@limiter.limit("30 per minute")
 def suggest_cities():
     query = request.args.get('q', '').strip()
     
@@ -63,6 +65,7 @@ def process_cart(cart):
     return order_items
 
 @checkout_bp.route('/api/delivery/options', methods=['POST'])
+@limiter.limit("20 per minute")
 async def get_delivery_options():
     req_data = request.get_json()
     if not req_data or 'city_data' not in req_data or 'cart' not in req_data:
@@ -121,6 +124,7 @@ async def get_delivery_options():
     }), 200
 
 @checkout_bp.route('/api/cart/sync', methods=['POST'])
+@limiter.limit("10 request per second; 150 per minute")
 def sync_cart():
     data = request.get_json()
     if not data or 'product_ids' not in data:
