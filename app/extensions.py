@@ -21,10 +21,10 @@ db = SQLAlchemy(metadata=metadata)
 migrate = Migrate()
 
 limiter = Limiter(
-    key_func=get_remote_address,  # ← Без app!
-    storage_uri="memory://"
+    key_func=get_remote_address,
+    storage_uri="memory://",
+    default_limits=["2 request per second", "100 per minute", "5000 per day"]
 )
 
 def init_limiter(app):
     limiter.init_app(app)
-    limiter.default_limits = ["100 per day"]
