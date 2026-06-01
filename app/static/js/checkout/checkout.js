@@ -477,7 +477,7 @@
         if (checkoutState.selectedDeliveryOption) {
             const newItem = summaryItemDeliveryTemplate.content.cloneNode(true);
             newItem.querySelector('.summary__item-name').textContent = `Доставка ${checkoutState.selectedDeliveryOption.name}`
-            newItem.querySelector('.summary__item-price').textContent = `${checkoutState.selectedDeliveryOption.price} ₽`
+            newItem.querySelector('.summary__item-price').textContent = `${checkoutState.selectedDeliveryOption.price.toLocaleString('ru-RU')} ₽`
 
             summaryItemsContainer.appendChild(newItem);
 
