@@ -8,8 +8,8 @@ YANDEX_DELIVERY_CONFIG = {
         },
         # ПВЗ Пятерочки (5Post)
         "five_post_postamat": {
-            "order": {"weight": 200000, "sum": 500, "side": 300},
-            "box":   {"weight": 15000,  "sum": 136, "side": 64}
+            "order": {"weight": 11000,  "sum": 136, "side": 64},
+            "box":   {"weight": 11000,  "sum": 136, "side": 64}
         },
         # Постаматы Яндекса
         "postamat": {

@@ -161,6 +161,35 @@ async def _get_pickup_points(geo_id, client, headers):
 
 async def _get_delivery_details(source_point_id, destination_point_id, order_dimensions, client, headers):
     url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_PRICING_CALCULATOR')
+
+    SAFE_BOX_WEIGHT = 15000 
+    total_weight = order_dimensions['total_weight']
+    number_of_places = math.ceil(total_weight / SAFE_BOX_WEIGHT)
+    places = []
+    remaining_weight = total_weight
+    big_cube_side = order_dimensions['cubic_sum_of_sides'] / 3
+
+    if number_of_places > 1:
+        avg_side = max(1, int(big_cube_side / math.pow(number_of_places, 1/3)))
+    else:
+        avg_side = max(1, int(big_cube_side))
+
+    for i in range(number_of_places):
+        if i == number_of_places - 1:
+            place_weight = remaining_weight
+        else:
+            place_weight = int(total_weight / number_of_places)
+            remaining_weight -= place_weight
+            
+        places.append({
+            "physical_dims": {
+                "weight_gross": place_weight,
+                "dx": avg_side,
+                "dy": avg_side,
+                "dz": avg_side
+            }
+        })
+
     payload = {
         "destination": {
             "platform_station_id": destination_point_id
@@ -168,8 +197,9 @@ async def _get_delivery_details(source_point_id, destination_point_id, order_dim
         "source": {
             "platform_station_id": source_point_id
         },
-        "tariff": "self_pickup" ,
-        "total_weight": order_dimensions['total_weight']
+        "tariff": "self_pickup",
+        "total_weight": total_weight,
+        "places": places
     }
     
     response = await client.post(url, json=payload, headers=headers, timeout=5)
