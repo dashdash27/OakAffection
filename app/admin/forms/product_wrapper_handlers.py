@@ -61,7 +61,7 @@ def delete_product_wrapper(wrapper_id):
         return False, str(e), name
     
 def create_product_wrapper_handler(form, method):
-    page_title = "Добавление новой группы товаров"
+    page_title = "Добавление новой коробки-обертки"
     button_name = "Создать"
 
     if method == "POST":

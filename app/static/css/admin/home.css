@@ -4,23 +4,25 @@
     margin-top: 30px
 }
 .warnings {
-    margin-top: 30px;
+    margin-top: 40px;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 .warning {
     padding: 30px 40px;
-    background-color: var(--warning-color);
-    border: 1px solid rgb(201, 201, 201);
+    background-color: #fff9e6;
+    border: 1px solid rgb(218, 218, 218);
     border-radius: 10px;
     font-size: 18px;
-    -webkit-box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
-    -moz-box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
-    box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
+    box-shadow: 
+        0px 2px 4px rgba(230, 81, 0, 0.02),
+        0px 4px 12px rgba(230, 81, 0, 0.02);
+    border: 1px solid rgba(255, 152, 0, 0.15);
 }  
 .warning-title {
     font-weight: 600;
+    color: #b78103;
 }
 .cards-wrapper {
     margin-top: 40px;
@@ -33,9 +35,11 @@
     border-radius: 7px;
     width: max-content;
     padding: 30px 35px;
-    -webkit-box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
-    -moz-box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
-    box-shadow: 0px 0px 8px -2px rgba(34, 60, 80, 0.2);
+    box-shadow: 
+        0px 1px 3px rgba(0, 0, 0, 0.04), 
+        0px 6px 16px rgba(0, 0, 0, 0.03),
+        0px 16px 32px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.02);
 }
 .changes-card {
     width: 450px;

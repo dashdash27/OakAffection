@@ -12,7 +12,7 @@
     <div class="container">
         
         <div class="title-wrapper">
-            <h1>Список коробок-оберток</h1>
+            <h1>📦Список коробок-оберток</h1>
             <a href="{{ url_for('.create_product_wrapper') }}" class="create-btn">Добавить обертку + </a>
         </div>
         <div class="group table">
@@ -24,7 +24,7 @@
                     Название
                 </div>
                 <div class="table-cell wrapper-dimensions">
-                    Размеры (Длина x Глубина x Высота (см))
+                    Размеры в см (длина × глубина × высота)
                 </div>
                 <div class="table-cell char-btns table-btns">
                     Действия
@@ -39,7 +39,7 @@
                         {{wrapper.name}}
                     </div>
                     <div class="wrapper-dimensions table-cell">
-                        {{wrapper.length}} x {{wrapper.depth}} x {{wrapper.height}}
+                        {{wrapper.length}} × {{wrapper.depth}} × {{wrapper.height}}
                     </div>
                     <div class="table-cell table-btns wrapper-btns">
                         <a href="{{ url_for('admin.edit_product_wrapper', wrapper_id=wrapper.id) }}" class="edit-btn btn">Редактировать</a>
