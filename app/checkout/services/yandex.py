@@ -2,6 +2,7 @@ import re
 import asyncio
 import math
 from flask import current_app
+import json
 
 from ..utils import format_delivery_days
 from .yandex_delivery_utils import get_allowed_yandex_profiles, get_filtered_yandex_points
@@ -27,6 +28,8 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
     source_point_id = current_app.config.get('YANDEX_DELIVERY', {}).get('SOURCE_PVZ_ID')
     auth_headers = {"Authorization": f"Bearer {api_token}"}
 
+    print("Yandex delivery info request...")
+
     try:
         geo_id = await _detect_geo_id(city_data, client, auth_headers)
         
@@ -36,6 +39,8 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
                 "error_code": "NO_REGION_ID",
                 "message": "Не удалось определить geo_id для данного города."
             }
+        
+        print("-- Geo id:", geo_id)
         
         points = await  _get_pickup_points(geo_id, client, auth_headers)
 
@@ -48,13 +53,13 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
         
         # 1 - get allowed profiles to order
         allowed_profiles = get_allowed_yandex_profiles(order_dimensions, city_data.get('region_fias_id'))
-        print("Allowed profiles:", allowed_profiles)
+        print("-- Allowed profiles:", allowed_profiles)
 
         # 2 - filter points by allowed profiles
         filtered_points = get_filtered_yandex_points(points, allowed_profiles)
 
-        print("Points (qty):", len(points))
-        print("Filtered points (qty):", len(filtered_points))
+        print("-- All yandex points (qty):", len(points))
+        print("-- Filtered yandex points (qty):", len(filtered_points))
         
         if not filtered_points:
             return {
@@ -65,7 +70,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
         
         details = None
         
-        for test_point in filtered_points[:3]: # берем первые 3 точки для подстраховки
+        for test_point in filtered_points[:3]:
             try:
                 details = await _get_delivery_details(
                     source_point_id, 
@@ -95,7 +100,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
         clean_price = clean_price.replace(',', '.')
         clean_price = math.ceil(float(clean_price))
 
-        print("Delivery details:", details)
+        print("-- Yandex delivery details:", json.dumps(details, indent=4))
         
         return {
             "status": "success",
@@ -107,7 +112,6 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
         }
     
     except Exception as e:
-        # ИСПРАВЛЕНО: Защита от полного падения API Яндекса
         print(f"Критическая ошибка при запросе к Yandex: {e}")
         return {
             "status": "tech_error",
@@ -170,9 +174,9 @@ async def _get_delivery_details(source_point_id, destination_point_id, order_dim
     big_cube_side = order_dimensions['cubic_sum_of_sides'] / 3
 
     if number_of_places > 1:
-        avg_side = max(1, int(big_cube_side / math.pow(number_of_places, 1/3)))
+        avg_side = max(1, math.ceil(big_cube_side / math.pow(number_of_places, 1/3)))
     else:
-        avg_side = max(1, int(big_cube_side))
+        avg_side = max(1, math.ceil(big_cube_side))
 
     for i in range(number_of_places):
         if i == number_of_places - 1:

@@ -5,6 +5,11 @@ MAX_ITEM_WEIGHT_SAFETY_FACTOR = 1.05
 MAX_ITEM_SIDE_SAFETY_FACTOR = 1.05
 CUBIC_SUM_SAFETY_FACTOR = 1.2
 
+DISCOUNT_THRESHOLDS = [
+        (30000, 25),
+        (10000, 20),
+]
+
 def pluralize(number, titles):
     cases = [2, 0, 1, 1, 1, 2]
     if 4 < number % 100 < 20:
@@ -65,3 +70,17 @@ def calculate_order_dimensions(cart_items):
             "max_item_side": max_item_side,
             "max_item_weight": max_item_weight
         }
+
+def calculate_discounted_price(total_price):
+    for threshold, discount_percent in DISCOUNT_THRESHOLDS:
+        if total_price >= threshold:
+            discount_amount = (total_price * discount_percent) / 100
+            return math.ceil(total_price - discount_amount)
+    return total_price
+
+def calculate_order_price(cart_items):
+    total_price = 0
+    for item in cart_items:
+        total_price += item['price'] * item['quantity']
+
+    return calculate_discounted_price(total_price)

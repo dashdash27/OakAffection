@@ -42,7 +42,7 @@ def get_allowed_yandex_profiles(order_dimensions: dict, dadata_region_fias_id: s
     is_remote = dadata_region_fias_id in YANDEX_DELIVERY_CONFIG["remote_regions_dadata_fias_ids"]
     allowed_profiles = []
 
-    print("Remote:", is_remote)
+    print("-- Remote:", is_remote)
 
     total_weight = order_dimensions["total_weight"]
     cubic_sum_of_sides = order_dimensions["cubic_sum_of_sides"]

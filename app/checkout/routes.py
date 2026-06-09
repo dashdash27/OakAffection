@@ -1,13 +1,15 @@
 from app.logger import logger
 from app.models import Product
 from app.extensions import limiter
-from .utils import calculate_order_dimensions
+from .utils import calculate_order_dimensions, calculate_order_price
 
 from .services.dadata import get_city_suggestions
 from .services.yandex import get_yandex_delivery_info, get_fake_delivery_info
+from .services.russian_post import get_russian_post_delivery_info
 
 import asyncio
 import httpx
+import json
 from flask import Blueprint, render_template, request, jsonify
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
@@ -36,12 +38,8 @@ def suggest_cities():
     return jsonify(city_suggestions), 200
 
 def process_cart(cart):
-    product_ids = list(cart.keys())
-
-    # валидация ids
-    # TODO: create outer function to clean
     clean_ids = []
-    for pid in product_ids:
+    for pid in cart.keys():
         try:
             clean_ids.append(int(pid))
         except (ValueError, TypeError):
@@ -55,10 +53,11 @@ def process_cart(cart):
         order_items.append({
             "id": p.id,
             "name": p.name,
-            "quantity": cart[str(p.id)],
+            "quantity": cart.get(str(p.id)) or cart.get(p.id),
+            "price": p.price,
             "weight": 500,
-            "length": 20,
-            "height": 20,
+            "length": 10,
+            "height": 10,
             "depth": 10
         })
 
@@ -71,24 +70,31 @@ async def get_delivery_options():
     if not req_data or 'city_data' not in req_data or 'cart' not in req_data:
         return jsonify({"success": False, "error": "Missing city data"}), 400
     
+    print(("Delivery options request..."))
+    
     city_data = req_data.get('city_data')
-    print("City_data", city_data)
     cart = req_data.get('cart')
 
     order_items = process_cart(cart)
-    print("Order_items", order_items)
-
     order_dimensions = calculate_order_dimensions(order_items)
-    print("Order_dimensions", order_dimensions)
+    order_price = calculate_order_price(order_items)
+
+    print("--- ORDER INPUT DATA ---")
+    print("City:\n", json.dumps(city_data, indent=4, ensure_ascii=False))
+    print("Order dims:\n", json.dumps(order_dimensions, indent=4, ensure_ascii=False))
+    print("Order price:", order_price)
+    print("--------------------------------------")
 
     # Create 1 client for all requests of this user
     async with httpx.AsyncClient(http2=True, timeout=10.0) as client:
         tasks = [
-            get_yandex_delivery_info(city_data, order_dimensions, client)
+            get_yandex_delivery_info(city_data, order_dimensions, client),
+            get_russian_post_delivery_info(city_data, order_dimensions, order_price, client)
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
     yandex_result = results[0]
+    russian_post_result = results[1]
     
     if isinstance(yandex_result, Exception):
         print(f"Критическое системное исключение в asyncio.gather для Яндекса: {yandex_result}")
@@ -100,7 +106,17 @@ async def get_delivery_options():
         }
     else:
         yandex_delivery_info = yandex_result
-        print(yandex_delivery_info["status"])
+
+    if isinstance(russian_post_result, Exception):
+        print(f"Критическое системное исключение в asyncio.gather для Почты России: {russian_post_result}")
+        russian_post_delivery_info = {
+            "status": "tech_error",
+            "error_code": "RUSSIAN_POST_API_DOWN",
+            "message": "Служба доставки Почты России временно недоступна.",
+            "points": []
+        }
+    else:
+        russian_post_delivery_info = russian_post_result
 
     return jsonify({
         "status": "success",
@@ -110,16 +126,7 @@ async def get_delivery_options():
         },
         "deliveries": {
             "yandex": yandex_delivery_info,
-            "post": {
-                "status": "success",
-                "name": "Почта России",
-                "price": 350,
-                "delivery_days": "1-2 дня",
-                "points": [
-                    {"id": "y1", "address": "ул. Персиковая, 10", "coords": [45.0, 38.9]},
-                    {"id": "y2", "address": "ул. Пальмовая, 120", "coords": [45.0, 38.9]}
-                ]
-            }
+            "post": russian_post_delivery_info
         }
     }), 200
 
@@ -132,7 +139,6 @@ def sync_cart():
     
     raw_ids = data.get('product_ids', [])
 
-    # валидация ids
     clean_ids = []
     for pid in raw_ids:
         try:
