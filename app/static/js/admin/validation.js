@@ -59,15 +59,26 @@ document.addEventListener('DOMContentLoaded', () => {
             descriptionTagError.innerHTML = "";
         }
 
-        // Цена (потом откроем)
-        // const inputPrice = document.querySelector(".input-price");
-        // const priceError = document.querySelector(".price-error");
-        // if (inputPrice.value.trim() === '') {
-        //     valid = false;
-        //     priceError.innerHTML = "Поле не должно быть пустым";
-        // } else {
-        //     priceError.innerHTML = "";
-        // }
+        // Price
+        const inputPrice = document.querySelector(".input-price");
+        const priceError = document.querySelector(".price-error");
+        if (inputPrice.value.trim() === '') {
+            valid = false;
+            priceError.innerHTML = "Поле не должно быть пустым";
+        } else {
+            priceError.innerHTML = "";
+        }
+
+        // Wrapper Select
+        const wrapperSelect = document.querySelector(".wrapper-select");
+        const wrapperError = document.querySelector(".wrapper-error");
+        if (wrapperSelect.value === "0") {
+            valid = false;
+            wrapperError.innerHTML = "Поле не должно быть пустым";
+        } else {
+            wrapperError.innerHTML = "";
+        }
+
 
         // Characteristics
         const charsError = document.querySelector(".characteristics-error");

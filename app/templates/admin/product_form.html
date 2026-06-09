@@ -50,14 +50,14 @@
                 <div class="form-subtitle">Габариты</div>
 
                 <div class="form-item">
-                    <div class="form-text">Вес (в граммах)</div>
-                    {{ form.weight(class="form-input input-weight", required=false) }}
+                    <div class="form-text">Вес (в граммах) <span>*</span></div>
+                    {{ form.weight(class="form-input input-weight", required=true) }}
                     <div class="weight-error error-message"></div>
                 </div>
 
                 <div class="form-item">
                     <div class="form-text">
-                        Коробка-обертка
+                        Коробка-обертка <span>*</span>
                     </div>
                     <select name="{{ form.wrapper_id.name }}" id="{{ form.wrapper_id.id }}" class="wrapper-select form-input">
                         {% for value, label in form.wrapper_id.choices %}
@@ -69,6 +69,7 @@
                             </option>
                         {% endfor %}
                     </select>
+                    <div class="wrapper-error error-message"></div>
                 </div>
 
 
