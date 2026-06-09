@@ -134,6 +134,7 @@
 .delivery-card__additional {
     margin-top: 20px;
     display: flex;
+    align-items: center;
     gap: 50px;
 }
 .delivery-card__price {
@@ -237,7 +238,7 @@
 }
 
 /* Submin Btn */
-.checkout__submit-btn{
+.checkout__submit-btn {
     display: block;
     padding: 16px 30px;
     width: 100%;
@@ -264,6 +265,10 @@ a.checkout__link-to-cart:hover {
     background: var(--checkout-card-bg);
     color: var(--accent-color);
     cursor: not-allowed;
+}
+.checkout__submit-btn:not(:disabled):hover {
+    filter: brightness(1.2);
+    transition: 0.2s;
 }
 
 /* State*/

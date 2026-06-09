@@ -392,7 +392,7 @@
                             </div>
                             <div class="delivery-card__title">${option.name}</div>
                             <div class="delivery-card__additional">
-                                <span class="delivery-card__price">${option.price} ₽</span>
+                                <span class="delivery-card__price">${option.price.toLocaleString('ru-RU')} ₽</span>
                                 <span class="delivery-card__days">${option.delivery_days}</span>
                             </div>
                         </div>
@@ -426,11 +426,11 @@
         if (!hasAnySuccessDelivery) {
             deliveryOptionsComment.innerHTML = `
                 <div class="delivery-alert" style="border: 1px solid #ff9800; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                    <strong>📦 Этот заказ не проходит в пункты выдачи по весу/объему.</strong>
-                    <p style="margin: 5px 0 0 0; font-size: 14px; color: #aaa;">
-                        Пожалуйста, уменьшите количество товаров в корзине или 
-                        <a href="tel:+79991234567" style="color: #4caf50; text-decoration: underline;"><strong>оформите заказ по телефону</strong></a>, 
-                        и мы подберем для вас курьерскую доставку!
+                    <strong>📦 К сожалению, для этого заказа не нашлось доступных доставок.</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; color: var(--text-color);">
+                        Пожалуйста,
+                        <a href="tel:+79604870478" style="color: #4caf50; text-decoration: underline;"><strong>оформите заказ по телефону</strong></a>, 
+                        и мы подберем для вас подходящий тип доставки!
                     </p>
                 </div>
             `;
@@ -481,11 +481,11 @@
 
             summaryItemsContainer.appendChild(newItem);
 
-            summaryTotalComment.innerHTML = ` ${checkoutState.discountLabel ? `Скидка ${checkoutState.discountLabel} применена` : ''}`
+            summaryTotalComment.innerHTML = ` ${checkoutState.discountLabel ? `Скидка ${checkoutState.discountLabel} на товары применена` : ''}`
         }
         else {
             summaryTotalComment.innerHTML = checkoutState.discountLabel
-                    ? `Скидка ${checkoutState.discountLabel} применена. Выберите доставку для финального расчета.` 
+                    ? `Скидка ${checkoutState.discountLabel} на товары применена. Выберите доставку для финального расчета.` 
                     : 'Выберите доставку для финального расчета'
         }
     }
