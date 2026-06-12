@@ -47,18 +47,23 @@ def process_cart(cart):
     
     products = Product.query.filter(Product.id.in_(clean_ids)).all()
 
-    # TODO: add actual weights and params after migrations
+    DEFAULT_PRODUCT_WEIGHT = 500
+    DEFAULT_WRAPPER_LENGTH = 10
+    DEFAULT_WRAPPER_HEIGHT = 10
+    DEFAULT_WRAPPER_DEPTH = 10
+
     order_items = []
     for p in products:
+        w = p.wrapper
         order_items.append({
             "id": p.id,
             "name": p.name,
             "quantity": cart.get(str(p.id)) or cart.get(p.id),
             "price": p.price,
-            "weight": 500,
-            "length": 10,
-            "height": 10,
-            "depth": 10
+            "weight": p.weight if getattr(p, "weight", None) else DEFAULT_PRODUCT_WEIGHT,
+            "length": w.length if w else DEFAULT_WRAPPER_LENGTH,
+            "height": w.height if w else DEFAULT_WRAPPER_HEIGHT,
+            "depth": w.depth if w else DEFAULT_WRAPPER_DEPTH
         })
 
     return order_items
