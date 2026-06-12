@@ -18,7 +18,7 @@ checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 def cart():
     return render_template('checkout/cart.html')
 
-@checkout_bp.route('/checkout')
+@checkout_bp.route('/details')
 def checkout():
     return render_template('checkout/checkout.html')
 
