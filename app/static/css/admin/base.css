@@ -1,6 +1,6 @@
 body {
-    background-color: #f7f7f8;
-    --accent-color: #3f50b1;
+    background-color: #f6f8fa;;
+    --accent-color: #4169E1;
     --error-color: rgb(234, 68, 104);
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -31,8 +31,9 @@ body {
 }
 .menu a:hover {
     text-decoration: underline;
+    color: white;
 }
-.menu a:visited, .menu a:active {
+.menu a:visited, .menu a:active, .menu a:link {
     color: white;
 }
 .container {
