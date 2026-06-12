@@ -248,6 +248,7 @@
     color: white;
     background-color: var(--accent-color);
     font-weight: 600;
+    box-shadow: var(--shadow);
 }
 a.checkout__link-to-cart {
     display: block;
