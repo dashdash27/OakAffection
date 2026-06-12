@@ -107,7 +107,7 @@ def create_product_draft_handler(form, method):
     form.group_id.choices = [(0, 'Выберите группу')] + [(g.id, g.name) for g in ProductGroup.query.all()]
     color_group_map = {c.id: (c.category.name or '') for c in Color.query.all()}
     form.color_id.choices = [(0, 'Выберите цвет')] + [(g.id, g.name) for g in Color.query.all()]
-    wrapper_map = {c.id: (f"{c.length} x {c.depth} x {c.height} (см)" or '') for c in ProductWrapper.query.all()}
+    wrapper_map = {c.id: (f"{c.length} x {c.depth} x {c.height} см" or '') for c in ProductWrapper.query.all()}
     form.wrapper_id.choices = [(0, 'Выберите коробку-обертку')] + [(g.id, g.name) for g in ProductWrapper.query.all()]
     empty_char = ProductCharacteristicForm()
     empty_char.characteristic_id.choices = [(c.id, c.name) for c in Characteristic.query.all()]
@@ -150,7 +150,7 @@ def edit_product_draft_handler(form, method, draft_id):
     empty_char.characteristic_id.choices = [(c.id, c.name) for c in Characteristic.query.all()]
     color_group_map = {c.id: (c.category.name or '') for c in Color.query.all()}
     group_char_map = {g.id: (g.characteristic_id or '') for g in ProductGroup.query.all()}
-    wrapper_map = {c.id: (f"{c.length} x {c.depth} x {c.height} (см)" or '') for c in ProductWrapper.query.all()}
+    wrapper_map = {c.id: (f"{c.length} x {c.depth} x {c.height} см" or '') for c in ProductWrapper.query.all()}
 
     photo_urls = [photo.photo_url for photo in draft.photos]
     video_urls = [video.video_url for video in draft.videos]
@@ -200,7 +200,7 @@ def edit_product_orphan_draft_handler(form, method, draft_id):
     empty_char = ProductCharacteristicForm()
     empty_char.characteristic_id.choices = [(c.id, c.name) for c in Characteristic.query.all()]
     color_group_map = {c.id: (c.category.name or '') for c in Color.query.all()}
-    wrapper_map = {c.id: (f"{c.length} x {c.depth} x {c.height} (см)" or '') for c in ProductWrapper.query.all()}
+    wrapper_map = {c.id: (f"{c.length} x {c.depth} x {c.height} см" or '') for c in ProductWrapper.query.all()}
     group_char_map = {g.id: (g.characteristic_id or '') for g in ProductGroup.query.all()}
 
     photo_urls = [photo.photo_url for photo in draft.photos]

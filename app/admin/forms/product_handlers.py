@@ -24,7 +24,7 @@ def edit_product_handler(form, method, product_id):
     empty_char.characteristic_id.choices = [(c.id, c.name) for c in Characteristic.query.all()]
     color_group_map = {c.id: (c.category.name or '') for c in Color.query.all()}
     group_char_map = {g.id: (g.characteristic_id or '') for g in ProductGroup.query.all()}
-    wrapper_map = {c.id: (c.length or '') for c in ProductWrapper.query.all()}
+    wrapper_map = {c.id: (f"{c.length} x {c.depth} x {c.height} см" or '') for c in ProductWrapper.query.all()}
 
     photo_urls = [photo.photo_url for photo in product.photos]
     video_urls = [video.video_url for video in product.videos]
