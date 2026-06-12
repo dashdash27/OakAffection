@@ -20,6 +20,11 @@ class Product(db.Model):
     description_tag = db.Column(db.Text)
     delete_mark = db.Column(db.Boolean, default=False)
     last_updated = db.Column(db.DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    weight = db.Column(db.Integer, nullable=True)
+
+    # wrapper
+    wrapper_id = db.Column(db.Integer, db.ForeignKey('product_wrappers.id'), nullable=True)
+    wrapper = db.relationship('ProductWrapper', backref='products')
 
     # draft
     draft = db.relationship('ProductDraft', back_populates='product', uselist=False)
@@ -53,6 +58,11 @@ class ProductDraft(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('product_groups.id'))
     color_id = db.Column(db.Integer, db.ForeignKey('colors.id'))
     description_tag = db.Column(db.Text)
+    weight = db.Column(db.Integer, nullable=True)
+
+    # wrapper
+    wrapper_id = db.Column(db.Integer, db.ForeignKey('product_wrappers.id'), nullable=True)
+    wrapper = db.relationship('ProductWrapper', backref='product_drafts')
 
     product = db.relationship('Product', back_populates='draft')
 

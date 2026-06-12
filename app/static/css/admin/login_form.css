@@ -1,5 +1,5 @@
 body {
-    --accent-color: #3f50b1;
+    --accent-color: #4169E1;
     --error-color: rgb(234, 68, 104);
     background-color: var(--accent-color);
     font-family: 'Arial', sans-serif;

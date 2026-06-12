@@ -18,6 +18,13 @@ class ProductGroupForm(FlaskForm):
         # загружаем список характеристик
         self.characteristic_id.choices = [(c.id, c.name) for c in Characteristic.query.all()]
 
+class ProductWrapperForm(FlaskForm):
+    name = StringField('Название', validators=[DataRequired()])
+    length = IntegerField('Длина', validators=[Optional()])
+    depth = IntegerField('Глубина', validators=[Optional()])
+    height = IntegerField('Высота', validators=[Optional()])
+    submit = SubmitField('Создать')
+
 class ColorForm(FlaskForm):
     name = StringField('Название', validators=[DataRequired()])
     icon = FileField('Иконка')
@@ -103,6 +110,7 @@ class ProductForm(FlaskForm):
     ozon_link = StringField('Ссылка Ozon', validators=[Optional()])
     wb_link = StringField('Ссылка Wildberries', validators=[Optional()])
     description_tag = TextAreaField('Описание', validators=[DataRequired()])
+    weight = IntegerField('Вес (в граммах)', validators=[Optional()])
 
     characteristics = FieldList(FormField(ProductCharacteristicForm))
     categories = SelectMultipleField('Категории', coerce=int, validators=[DataRequired()])
@@ -112,6 +120,7 @@ class ProductForm(FlaskForm):
 
     group_id = SelectField('Группа товара', coerce=int, validators=[Optional()])
     color_id = SelectField('Цвет', coerce=int, validators=[Optional()])
+    wrapper_id = SelectField('Коробка-обертка', coerce=int, validators=[Optional()])
 
     submit = SubmitField('Создать товар')
 
@@ -130,14 +139,6 @@ class ProductForm(FlaskForm):
         # загрузка таргетов
         targets_choices = [(target.id, target.name) for target in Target.query.all()]
         self.targets.choices = targets_choices
-
-    # Validators
-    # def validate_price(self, field):
-    #     data = str(field.data) or ''
-    #     if not data.isdigit():
-    #         raise ValidationError('Только цифры разрешены')
-    #     if data.startswith('0'):
-    #         raise ValidationError('Число не должно начинаться с нуля')
         
     def validate_characteristics(self, field):
         seen = set()

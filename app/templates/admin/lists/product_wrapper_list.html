@@ -1,0 +1,57 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Админка - Коробки-обертки
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/list.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        
+        <div class="title-wrapper">
+            <h1>📐Список коробок-оберток</h1>
+            <a href="{{ url_for('.create_product_wrapper') }}" class="create-btn">Добавить обертку + </a>
+        </div>
+        <div class="group table">
+            <div class="table-header table-row">
+                <div class="table-cell table-cell-index wrapper-index">
+                    №
+                </div>
+                <div class="table-cell wrapper-name">
+                    Название
+                </div>
+                <div class="table-cell wrapper-dimensions">
+                    Размеры в см (длина × глубина × высота)
+                </div>
+                <div class="table-cell char-btns table-btns">
+                    Действия
+                </div>
+            </div>
+            {% for wrapper in wrappers %}
+                <div class="wrapper table-row">
+                    <div class="wrapper-index table-cell table-cell-index">
+                        {{loop.index}}
+                    </div>
+                    <div class="wrapper-name table-cell">
+                        {{wrapper.name}}
+                    </div>
+                    <div class="wrapper-dimensions table-cell">
+                        {{wrapper.length}} × {{wrapper.depth}} × {{wrapper.height}}
+                    </div>
+                    <div class="table-cell table-btns wrapper-btns">
+                        <a href="{{ url_for('admin.edit_product_wrapper', wrapper_id=wrapper.id) }}" class="edit-btn btn">Редактировать</a>
+                        <form method="POST" action="{{ url_for('admin.delete_product_wrapper') }}" 
+                            onsubmit="return confirm('Вы уверены, что хотите удалить коробку-обертку {{wrapper.name}}? В таком случае она открепится от всех товаров, которые ей принадлежат');">
+                            <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                            <input type="hidden" name="wrapper_id" value="{{wrapper.id}}">
+                            <button type="submit" class="delete-btn btn">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

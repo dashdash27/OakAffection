@@ -15,13 +15,14 @@
 <body>
     <header class="menu">
         <div class="container">
-            <a href="{{ url_for('admin.index') }}">Главная</a>
-            <a href="{{ url_for('admin.product_list') }}">Товары</a>
+            <a href="{{ url_for('admin.index') }}">🏠Главная</a>
+            <a href="{{ url_for('admin.product_list') }}">📦Товары</a>
             <a href="{{ url_for('admin.product_group_list') }}">Группы товаров</a>
-            <a href="{{ url_for('admin.category_list') }}">Категории товаров</a>
+            <a href="{{ url_for('admin.category_list') }}">Категории</a>
             <a href="{{ url_for('admin.characteristic_list') }}">Характеристики</a>
             <a href="{{ url_for('admin.target_list') }}">Предметы обработки</a>
             <a href="{{ url_for('admin.color_list') }}">Цвета</a>
+            <a href="{{ url_for('admin.product_wrapper_list') }}">📐Коробки-обертки</a>
         </div>
     </header>
     <div class="container">
