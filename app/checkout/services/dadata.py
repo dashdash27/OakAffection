@@ -28,16 +28,6 @@ def format_suggestion(s):
     }
 
 def get_city_suggestions(query): 
-    if False:
-        mock_data = [
-            {"value": "г Москва", "region_fias_id": "29251dcf-00a1-4e34-98d4-5c47484a36d4"},
-            {"value": "г Краснодар", "region_fias_id": "d00e1013-16bd-4c09-b3d5-3cb09fc54bd8"},
-            {"value": "г Мурманск", "region_fias_id": "1c727518-c96a-4f34-9ae6-fd510da3be03"}
-        ]
-        mock_data = [format_suggestion(s) for s in mock_data]
-        random.shuffle(mock_data)
-        return mock_data
-    
     url = current_app.config.get('DADATA', {}).get('URL_ADDRESS_SUGGESTIONS')
 
     data = {

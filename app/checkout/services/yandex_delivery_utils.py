@@ -1,45 +1,6 @@
-
-YANDEX_DELIVERY_CONFIG = {
-    "points_profiles": {
-        # Обычные ПВЗ Яндекса
-        "point": {
-            "order": {"weight": 200000, "sum": 500, "side": 300},
-            "box":   {"weight": 30000,  "sum": 300, "side": 150}
-        },
-        # ПВЗ Пятерочки (5Post)
-        "five_post_postamat": {
-            "order": {"weight": 11000,  "sum": 136, "side": 64},
-            "box":   {"weight": 11000,  "sum": 136, "side": 64}
-        },
-        # Постаматы Яндекса
-        "postamat": {
-            "order": {"weight": 20000,  "sum": 118, "side": 40},
-            "box":   {"weight": 20000,  "sum": 118, "side": 40}
-        }
-    },
-    "remote_region_limits": {
-        "weight": 15000,  # 15 кг
-        "sum": 180,       # 180 см
-        "side": 60        # 60 см
-    },
-    # Remote regions
-    "remote_regions_dadata_fias_ids": {
-        "844a80d6-5e31-4017-b422-4d9c01e9942c", # Амурская область
-        "6466c988-7ce3-45e5-8b97-90ae16cb1249", # Иркутская область
-        "43909681-d6e1-432d-b61f-ddac393cb5da", # Приморский край
-        "7d468b39-1afa-41ec-8c4f-97a8603cb3d4", # Хабаровский край
-        "294277aa-e25d-428c-95ad-46719c4ddb44", # Архангельская область
-        "1c727518-c96a-4f34-9ae6-fd510da3be03", # Мурманская область
-        "248d8071-06e1-425e-a1cf-d1ff4c4a14a8", # Республика Карелия
-        "c20180d9-ad9c-46d1-9eff-d60bc424592a", # Республика Коми
-        "8d3f1d35-f0f4-41b5-b5b7-e7cadf3e7bd7", # Республика Хакасия
-    }
-}
-
-
-def get_allowed_yandex_profiles(order_dimensions: dict, dadata_region_fias_id: str) -> list:
+def get_allowed_yandex_profiles(order_dimensions: dict, dadata_region_fias_id: str, yandex_cfg: dict) -> list:
     """Pre-filtering types of yandex pickup points types"""
-    is_remote = dadata_region_fias_id in YANDEX_DELIVERY_CONFIG["remote_regions_dadata_fias_ids"]
+    is_remote = dadata_region_fias_id in yandex_cfg.get("REMOTE_REGIONS_DADATA_FIAS_IDS", {})
     allowed_profiles = []
 
     print("-- Remote:", is_remote)
@@ -52,12 +13,12 @@ def get_allowed_yandex_profiles(order_dimensions: dict, dadata_region_fias_id: s
     if total_weight == 0:
         return allowed_profiles
 
-    for profile_name, limit in YANDEX_DELIVERY_CONFIG["points_profiles"].items():
+    for profile_name, limit in yandex_cfg.get("POINTS_PROFILES", {}).items():
         order_lim = limit["order"]
         box_lim = limit["box"]
 
         if is_remote:
-            remote_lim = YANDEX_DELIVERY_CONFIG["remote_region_limits"]
+            remote_lim = yandex_cfg.get("REMOTE_REGION_LIMITS", {})
             # Выбираем самое жесткое ограничение
             max_allowed_order_weight = min(order_lim["weight"], remote_lim["weight"])
             max_allowed_order_sum = min(order_lim["sum"], remote_lim["sum"])

@@ -1,16 +1,16 @@
 from app.logger import logger
 from app.models import Product
 from app.extensions import limiter
-from .utils import calculate_order_dimensions, calculate_order_price
+from .utils import process_cart, calculate_order_dimensions, calculate_order_price
 
 from .services.dadata import get_city_suggestions
-from .services.yandex import get_yandex_delivery_info, get_fake_delivery_info
+from .services.yandex import get_yandex_delivery_info
 from .services.russian_post import get_russian_post_delivery_info
 
 import asyncio
 import httpx
 import json
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, current_app
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 
@@ -21,6 +21,44 @@ def cart():
 @checkout_bp.route('/details')
 def checkout():
     return render_template('checkout/checkout.html')
+
+@checkout_bp.route('/api/cart/sync', methods=['POST'])
+@limiter.limit("10 per second; 150 per minute")
+def sync_cart():
+    data = request.get_json()
+    if not data or 'product_ids' not in data:
+        return jsonify({"success": False, "error": "No data"}), 400
+    
+    raw_ids = data.get('product_ids', [])
+
+    clean_ids = []
+    for pid in raw_ids:
+        try:
+            clean_ids.append(int(pid))
+        except (ValueError, TypeError):
+            continue
+    
+    if not clean_ids:
+        return jsonify([]), 200
+    
+    products = Product.query.filter(Product.id.in_(clean_ids)).all()
+
+    result = []
+    for p in products:
+        if not p.price:
+            continue
+        
+        photo_path = p.photos[0].photo_url if p.photos else "img/icons/nophoto.png"
+
+        result.append({
+            "id": p.id,
+            "name": p.name,
+            "price": int(p.price),
+            "photo_path": f"/static/{photo_path}",
+            "slug": p.slug
+        })
+    
+    return jsonify(result), 200
 
 @checkout_bp.route('/api/suggestions/cities', methods=['GET'])
 @limiter.limit("30 per minute")
@@ -37,49 +75,17 @@ def suggest_cities():
     
     return jsonify(city_suggestions), 200
 
-def process_cart(cart):
-    clean_ids = []
-    for pid in cart.keys():
-        try:
-            clean_ids.append(int(pid))
-        except (ValueError, TypeError):
-            continue
-    
-    products = Product.query.filter(Product.id.in_(clean_ids)).all()
-
-    DEFAULT_PRODUCT_WEIGHT = 500
-    DEFAULT_WRAPPER_LENGTH = 10
-    DEFAULT_WRAPPER_HEIGHT = 10
-    DEFAULT_WRAPPER_DEPTH = 10
-
-    order_items = []
-    for p in products:
-        w = p.wrapper
-        order_items.append({
-            "id": p.id,
-            "name": p.name,
-            "quantity": cart.get(str(p.id)) or cart.get(p.id),
-            "price": p.price,
-            "weight": p.weight if getattr(p, "weight", None) else DEFAULT_PRODUCT_WEIGHT,
-            "length": w.length if w else DEFAULT_WRAPPER_LENGTH,
-            "height": w.height if w else DEFAULT_WRAPPER_HEIGHT,
-            "depth": w.depth if w else DEFAULT_WRAPPER_DEPTH
-        })
-
-    return order_items
 
 @checkout_bp.route('/api/delivery/options', methods=['POST'])
 @limiter.limit("20 per minute")
 async def get_delivery_options():
     req_data = request.get_json()
-    if not req_data or 'city_data' not in req_data or 'cart' not in req_data:
-        return jsonify({"success": False, "error": "Missing city data"}), 400
-    
-    print(("Delivery options request..."))
-    
     city_data = req_data.get('city_data')
     cart = req_data.get('cart')
 
+    if not req_data or 'city_data' not in req_data or 'cart' not in req_data:
+        return jsonify({"success": False, "error": "Missing city data"}), 400
+    
     order_items = process_cart(cart)
     order_dimensions = calculate_order_dimensions(order_items)
     order_price = calculate_order_price(order_items)
@@ -90,11 +96,14 @@ async def get_delivery_options():
     print("Order price:", order_price)
     print("--------------------------------------")
 
+    yandex_config = current_app.config.get("YANDEX_DELIVERY", {})
+    post_config = current_app.config.get("RUSSIAN_POST", {})
+
     # Create 1 client for all requests of this user
     async with httpx.AsyncClient(http2=True, timeout=10.0) as client:
         tasks = [
-            get_yandex_delivery_info(city_data, order_dimensions, client),
-            get_russian_post_delivery_info(city_data, order_dimensions, order_price, client)
+            get_yandex_delivery_info(city_data, order_dimensions, client, yandex_config),
+            get_russian_post_delivery_info(city_data, order_dimensions, order_price, client, post_config)
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
@@ -134,41 +143,3 @@ async def get_delivery_options():
             "post": russian_post_delivery_info
         }
     }), 200
-
-@checkout_bp.route('/api/cart/sync', methods=['POST'])
-@limiter.limit("10 per second; 150 per minute")
-def sync_cart():
-    data = request.get_json()
-    if not data or 'product_ids' not in data:
-        return jsonify({"success": False, "error": "No data"}), 400
-    
-    raw_ids = data.get('product_ids', [])
-
-    clean_ids = []
-    for pid in raw_ids:
-        try:
-            clean_ids.append(int(pid))
-        except (ValueError, TypeError):
-            continue
-    
-    if not clean_ids:
-        return jsonify([]), 200
-    
-    products = Product.query.filter(Product.id.in_(clean_ids)).all()
-
-    result = []
-    for p in products:
-        if not p.price:
-            continue
-        
-        photo_path = p.photos[0].photo_url if p.photos else "img/icons/nophoto.png"
-
-        result.append({
-            "id": p.id,
-            "name": p.name,
-            "price": int(p.price),
-            "photo_path": f"/static/{photo_path}",
-            "slug": p.slug
-        })
-    
-    return jsonify(result), 200

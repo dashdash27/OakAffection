@@ -1,24 +1,9 @@
+from flask import current_app
 from flask import Blueprint, render_template, abort
 from app.models import Product, Category, ProductCharacteristic
 from app.helpers import get_products_by_category
 
 main_bp = Blueprint('main', __name__)
-
-categories_dict = {
-    'oils': 'Масла для обработки дерева',
-    'indoor_oils': 'Масла для внутренних работ',
-    'outdoor_oils': 'Масла для наружных работ',
-    'other_oils': 'Другие масла',
-    'kitchen_oils': 'Масла для кухонной утвари',
-    'furniture_oils': 'Масла для мебели',
-    'toy_oils': 'Масла для игрушек',
-    'bath_oils': 'Масла для бань и саун',
-    'terrace_oils': 'Масла для террас',
-    'garden_furniture_oils': 'Масла для садовой мебели',
-    'facade_oils': 'Масла для фасадов',
-    'tinted_oils': 'Колерованные масла',
-    'liquids': 'Грунтовочные масла и растворители'
-}
 
 
 @main_bp.route('/')
@@ -69,9 +54,9 @@ def product_detail(slug):
         sorted_group_products=sorted_group_products
     )
 
-
 @main_bp.route('/<category_key>')
 def show_oils(category_key):
+    categories_dict = current_app.config.get('CATEGORIES_DICT', {})
     category_name = categories_dict.get(category_key)
     category = Category.query.filter_by(name=category_name).first()
     if not category:

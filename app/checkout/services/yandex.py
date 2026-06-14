@@ -1,37 +1,21 @@
 import re
-import asyncio
-import math
-from flask import current_app
 import json
+import math
 
 from ..utils import format_delivery_days
 from .yandex_delivery_utils import get_allowed_yandex_profiles, get_filtered_yandex_points
 
-async def get_fake_delivery_info(city_data, client):
-    """Имитация долгого запроса к Доставке"""
-    print("Начинаю запрос к Доставке...")
-    
-    await asyncio.sleep(5) 
-    
-    print("Доставка ответила через 5 секунд!")
-    
-    return {
-        "service": "yandex",
-        "price": 500,
-        "days": "2-3 дня",
-        "status": "success"
-    }
 
-
-async def get_yandex_delivery_info(city_data, order_dimensions, client):
-    api_token = current_app.config.get('YANDEX_DELIVERY', {}).get('API_TOKEN')
-    source_point_id = current_app.config.get('YANDEX_DELIVERY', {}).get('SOURCE_PVZ_ID')
+async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_cfg: dict):
+    
+    api_token = yandex_cfg.get('API_TOKEN')
+    source_point_id = yandex_cfg.get('SOURCE_PVZ_ID')
     auth_headers = {"Authorization": f"Bearer {api_token}"}
 
     print("Yandex delivery info request...")
 
     try:
-        geo_id = await _detect_geo_id(city_data, client, auth_headers)
+        geo_id = await _detect_geo_id(city_data, client, auth_headers, yandex_cfg)
         
         if not geo_id:
             return {
@@ -42,7 +26,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
         
         print("-- Geo id:", geo_id)
         
-        points = await  _get_pickup_points(geo_id, client, auth_headers)
+        points = await  _get_pickup_points(geo_id, client, auth_headers, yandex_cfg)
 
         if not points:
             return {
@@ -52,7 +36,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
             }
         
         # 1 - get allowed profiles to order
-        allowed_profiles = get_allowed_yandex_profiles(order_dimensions, city_data.get('region_fias_id'))
+        allowed_profiles = get_allowed_yandex_profiles(order_dimensions, city_data.get('region_fias_id'), yandex_cfg)
         print("-- Allowed profiles:", allowed_profiles)
 
         # 2 - filter points by allowed profiles
@@ -77,7 +61,8 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
                     test_point.get('id'),
                     order_dimensions, 
                     client, 
-                    auth_headers
+                    auth_headers,
+                    yandex_cfg
                 )
                 if details and details.get('price'):
                     break
@@ -120,8 +105,8 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client):
             "points": []
         }
 
-async def _detect_geo_id(city_data, client, headers):
-    url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_GEO_ID')
+async def _detect_geo_id(city_data, client, headers, yandex_cfg: dict):
+    url = yandex_cfg.get('URL_GEO_ID')
     payload = {
         "location": city_data.get('value')
     }
@@ -137,8 +122,8 @@ async def _detect_geo_id(city_data, client, headers):
     first_variant = variants[0]
     return first_variant.get('geo_id')
     
-async def _get_pickup_points(geo_id, client, headers):
-    url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_POINTS_LIST')
+async def _get_pickup_points(geo_id, client, headers, yandex_cfg: dict):
+    url = yandex_cfg.get('URL_POINTS_LIST')
     payload = {
         "geo_id": geo_id
     }
@@ -163,8 +148,8 @@ async def _get_pickup_points(geo_id, client, headers):
     return formatted_points
 
 
-async def _get_delivery_details(source_point_id, destination_point_id, order_dimensions, client, headers):
-    url = current_app.config.get('YANDEX_DELIVERY', {}).get('URL_PRICING_CALCULATOR')
+async def _get_delivery_details(source_point_id, destination_point_id, order_dimensions, client, headers, yandex_cfg: dict):
+    url = yandex_cfg.get('URL_PRICING_CALCULATOR')
 
     SAFE_BOX_WEIGHT = 15000 
     total_weight = order_dimensions['total_weight']

@@ -1,3 +1,7 @@
+from config.delivery import DeliveryConfig
+from config.geo import GeoConfig
+from config.business import BusinessConfig
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -5,9 +9,9 @@ from datetime import timedelta
 
 
 env_path = Path(__file__).parent / '.env'
-load_dotenv(dotenv_path=env_path)
+load_dotenv()
 
-class Config:
+class Config(DeliveryConfig, GeoConfig, BusinessConfig):
     DEBUG = False
     WTF_CSRF_ENABLED = True
 
@@ -25,7 +29,9 @@ class Config:
     BASE_DIR = Path(__file__).resolve().parent
     STATIC_DIR = BASE_DIR / 'static'
     
-    SESSION_COOKIE_SECURE = True      # Только HTTPS (потом включить!!)
+    SESSION_COOKIE_SECURE = False     # Только HTTPS (потом включить!!)
     SESSION_COOKIE_HTTPONLY = True      # Защита от XSS
-    SESSION_COOKIE_SAMESITE = 'Strict'  # Максимальная защита CSRF
+    SESSION_COOKIE_SAMESITE = 'Lax'  # Максимальная защита CSRF - было Strict
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=30) # длительность сессии
+
+    WTF_CSRF_SSL_STRICT = False  # этого не было вообще

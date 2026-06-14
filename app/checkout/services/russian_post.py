@@ -1,17 +1,13 @@
 import math
-from flask import current_app
 
 from ..utils import format_delivery_days
 from .russian_post_utils import get_search_radius_by_fias_level, get_filtered_russian_post_points_by_exact_city
 
-GLOBAL_WEIGHT_LIMIT = 200000
-ORDER_WEIGHT_LIMIT = 20000
-MAX_SIDE_SUM = 300
 
-async def get_russian_post_delivery_info(city_data, order_dimensions, order_price, client):
-    api_token = current_app.config.get('RUSSIAN_POST', {}).get('API_TOKEN')
-    api_key = current_app.config.get('RUSSIAN_POST', {}).get('API_KEY')
-    index_from = current_app.config.get('RUSSIAN_POST', {}).get('INDEX_FROM')
+async def get_russian_post_delivery_info(city_data, order_dimensions, order_price, client, post_cfg: dict):
+    api_token = post_cfg.get('API_TOKEN')
+    api_key = post_cfg.get('API_KEY')
+    index_from = post_cfg.get('INDEX_FROM')
     auth_headers = {
         "Authorization": f"AccessToken {api_token}",
         "X-User-Authorization": f"Basic {api_key}"
@@ -21,6 +17,8 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
 
     try:
         total_weight = order_dimensions['total_weight']
+        GLOBAL_WEIGHT_LIMIT = post_cfg.get('GLOBAL_WEIGHT_LIMIT')
+        ORDER_WEIGHT_LIMIT = post_cfg.get('ORDER_WEIGHT_LIMIT')
 
         if total_weight > GLOBAL_WEIGHT_LIMIT or order_dimensions['max_item_weight'] > ORDER_WEIGHT_LIMIT:
             return {
@@ -30,11 +28,11 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
             }
 
         # 1 - get points
-        search_radius = get_search_radius_by_fias_level(city_data.get('fias_level'))
+        search_radius = get_search_radius_by_fias_level(city_data.get('fias_level'), post_cfg)
         latitude = city_data.get('latitude')
         longitude = city_data.get('longitude')
 
-        points = await  _get_pickup_points(latitude, longitude, search_radius, client, auth_headers)
+        points = await  _get_pickup_points(latitude, longitude, search_radius, client, auth_headers, post_cfg)
         filtered_points = get_filtered_russian_post_points_by_exact_city(points, city_data)
         
         print("-- All post points (qty):", len(points))
@@ -49,7 +47,7 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         
         # 2 - get delivery details
         index_to = city_data.get('postal_code')
-        details = await _get_delivery_details(index_from, index_to, order_dimensions, order_price, client, auth_headers)
+        details = await _get_delivery_details(index_from, index_to, order_dimensions, order_price, client, auth_headers, post_cfg)
         
         print("-- Post delivery details:", details)
 
@@ -81,8 +79,8 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
             "points": []
         }
     
-async def _get_pickup_points(latitude, longitude, search_radius, client, headers):
-    url = current_app.config.get('RUSSIAN_POST', {}).get('URL_POINTS_LIST')
+async def _get_pickup_points(latitude, longitude, search_radius, client, headers, post_cfg: dict):
+    url = post_cfg.get('URL_POINTS_LIST')
     query_params = {
         "latitude": latitude,
         "longitude": longitude,
@@ -118,8 +116,9 @@ async def _get_pickup_points(latitude, longitude, search_radius, client, headers
 
     return formatted_points
 
-async def _get_delivery_details(index_from, index_to, order_dimensions, order_price, client, headers):
-    url = current_app.config.get('RUSSIAN_POST', {}).get('URL_PRICING_CALCULATOR')
+async def _get_delivery_details(index_from, index_to, order_dimensions, order_price, client, headers, post_cfg):
+    url = post_cfg.get('URL_PRICING_CALCULATOR')
+    ORDER_WEIGHT_LIMIT = post_cfg.get('ORDER_WEIGHT_LIMIT')
 
     # 1 - Divide into mini-boxes (20 kg)
     total_weight = order_dimensions.get('total_weight')
