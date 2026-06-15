@@ -15,6 +15,11 @@ class BusinessConfig:
         "CUBIC_SUM": 1.2
     }
 
+    DISCOUNT_THRESHOLDS = [
+        {"min_amount_rub": 30000, "discount_percent": 25},
+        {"min_amount_rub": 10000, "discount_percent": 20},
+    ]
+
     CATEGORIES_DICT = {
         'oils': 'Масла для обработки дерева',
         'indoor_oils': 'Масла для внутренних работ',

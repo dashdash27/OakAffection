@@ -12,7 +12,7 @@ env_path = Path(__file__).parent / '.env'
 load_dotenv()
 
 class Config(DeliveryConfig, GeoConfig, BusinessConfig):
-    DEBUG = False
+    DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1')
     WTF_CSRF_ENABLED = True
 
     # Secret Key
@@ -20,7 +20,7 @@ class Config(DeliveryConfig, GeoConfig, BusinessConfig):
     if not SECRET_KEY:
         raise ValueError("SECRET_KEY is not set")
 
-    # База данных
+    # Data Base
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     if not SQLALCHEMY_DATABASE_URI:
         raise ValueError("SQLALCHEMY_DATABASE_URI is not set in .env file")
@@ -29,9 +29,9 @@ class Config(DeliveryConfig, GeoConfig, BusinessConfig):
     BASE_DIR = Path(__file__).resolve().parent
     STATIC_DIR = BASE_DIR / 'static'
     
-    SESSION_COOKIE_SECURE = False     # Только HTTPS (потом включить!!)
-    SESSION_COOKIE_HTTPONLY = True      # Защита от XSS
-    SESSION_COOKIE_SAMESITE = 'Lax'  # Максимальная защита CSRF - было Strict
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=30) # длительность сессии
-
-    WTF_CSRF_SSL_STRICT = False  # этого не было вообще
+    # Security and sessions settings
+    SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False').lower() in ('true', '1') # local - False, prod - True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax') # local - Lax, prod - Strict
+    WTF_CSRF_SSL_STRICT = os.getenv('WTF_CSRF_SSL_STRICT', 'False').lower() in ('true', '1') # local - False, prod - True
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)

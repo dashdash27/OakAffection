@@ -100,12 +100,18 @@ def calculate_order_dimensions(cart_items):
             "max_item_weight": max_item_weight
         }
 
-def calculate_discounted_price(total_price):
-    for threshold, discount_percent in DISCOUNT_THRESHOLDS:
+def calculate_discounted_price(total_price) -> int:
+    thresholds = current_app.config.get("DISCOUNT_THRESHOLDS", [])
+    
+    for step in thresholds:
+        threshold = step.get("min_amount_rub", 0)
+        discount_percent = step.get("discount_percent", 0)
+        
         if total_price >= threshold:
             discount_amount = (total_price * discount_percent) / 100
             return math.ceil(total_price - discount_amount)
-    return total_price
+            
+    return math.ceil(total_price)
 
 def calculate_order_price(cart_items):
     total_price = 0
