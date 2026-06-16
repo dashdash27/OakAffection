@@ -29,7 +29,7 @@
     const checkoutState = window.Checkout.state;
     const DELIVERY_STYLES = window.Checkout.config.DELIVERY_STYLES;
     const QUANTITY_MAX = window.Checkout.config.QUANTITY_MAX;
-    const DISCOUNT_RULES = window.Checkout.config.DISCOUNT_RULES;
+    let DISCOUNT_RULES;
 
     // --- Small Utilities
     let debounceTimer;
@@ -177,7 +177,6 @@
     // --- API functions
     async function fetchDeliveryOptions(cityData) {
         try {
-            console.log("Получение вариантов доставки...", checkoutState.cart, cityData);
             const response = await fetch('/checkout/api/delivery/options', {
                 method: 'POST',
                 headers: { 
@@ -581,9 +580,12 @@
         const result = await syncCartWithServer(ids);
 
         if (result.success) {
-            const productsCache = result.data;
+            const productsCache = result.data.products;
+            if (result.data.discount_rules && result.data.discount_rules.length > 0) {
+                DISCOUNT_RULES = result.data.discount_rules.sort((a, b) => b.threshold - a.threshold);
+            }
+
             const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)));
-            
             initCheckoutState(productsCache, currentCart)
             renderSummary(productsCache, currentCart);
         } else {

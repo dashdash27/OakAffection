@@ -57,8 +57,20 @@ def sync_cart():
             "photo_path": f"/static/{photo_path}",
             "slug": p.slug
         })
+
+    discount_thresholds = current_app.config.get("DISCOUNT_THRESHOLDS", [])
+    discount_rules = []
+    for step in discount_thresholds:
+        discount_rules.append({
+            "threshold": step.get("min_amount_rub"),
+            "value": step.get("discount_percent") / 100,
+            "label": f"{step.get('discount_percent')}%"
+        })
     
-    return jsonify(result), 200
+    return jsonify({
+        "products": result,
+        "discount_rules": discount_rules
+    }), 200
 
 @checkout_bp.route('/api/suggestions/cities', methods=['GET'])
 @limiter.limit("30 per minute")
