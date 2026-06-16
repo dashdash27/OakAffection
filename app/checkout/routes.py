@@ -80,11 +80,16 @@ def suggest_cities():
 @limiter.limit("20 per minute")
 async def get_delivery_options():
     req_data = request.get_json()
-    city_data = req_data.get('city_data')
-    cart = req_data.get('cart')
 
     if not req_data or 'city_data' not in req_data or 'cart' not in req_data:
+        logger.warning("get_delivery_options: Ошибка запроса. Отсутствуют city_data или cart")
         return jsonify({"success": False, "error": "Missing city data"}), 400
+    
+    city_data = req_data.get('city_data')
+    cart = req_data.get('cart')
+    
+    city_name = city_data.get('value', 'Неизвестный город')
+    logger.info(f"Начало расчета вариантов доставки для города: {city_name}")
     
     order_items = process_cart(cart)
     order_dimensions = calculate_order_dimensions(order_items)
@@ -92,18 +97,19 @@ async def get_delivery_options():
 
     print("--- ORDER INPUT DATA ---")
     print("City:\n", json.dumps(city_data, indent=4, ensure_ascii=False))
+    print("Order items:\n", json.dumps(order_items, indent=4, ensure_ascii=False))
     print("Order dims:\n", json.dumps(order_dimensions, indent=4, ensure_ascii=False))
     print("Order price:", order_price)
     print("--------------------------------------")
 
     yandex_config = current_app.config.get("YANDEX_DELIVERY", {})
-    post_config = current_app.config.get("RUSSIAN_POST", {})
+    russian_post_config = current_app.config.get("RUSSIAN_POST", {})
 
     # Create 1 client for all requests of this user
     async with httpx.AsyncClient(http2=True, timeout=10.0) as client:
         tasks = [
             get_yandex_delivery_info(city_data, order_dimensions, client, yandex_config),
-            get_russian_post_delivery_info(city_data, order_dimensions, order_price, client, post_config)
+            get_russian_post_delivery_info(city_data, order_dimensions, order_price, client, russian_post_config)
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
@@ -111,7 +117,8 @@ async def get_delivery_options():
     russian_post_result = results[1]
     
     if isinstance(yandex_result, Exception):
-        print(f"Критическое системное исключение в asyncio.gather для Яндекса: {yandex_result}")
+        print(f"Глобальный сбой asyncio для Яндекса (city: {city_name}): {yandex_result}")
+        logger.error(f"Глобальный сбой asyncio для Яндекса (city: {city_name}): {yandex_result}", exc_info=True)
         yandex_delivery_info = {
             "status": "tech_error",
             "error_code": "YANDEX_API_DOWN",
@@ -122,7 +129,8 @@ async def get_delivery_options():
         yandex_delivery_info = yandex_result
 
     if isinstance(russian_post_result, Exception):
-        print(f"Критическое системное исключение в asyncio.gather для Почты России: {russian_post_result}")
+        print(f"Глобальный сбой asyncio для Почты России (city: {city_name}): {russian_post_result}")
+        logger.error(f"Глобальный сбой asyncio для Почты России (city: {city_name}): {russian_post_result}", exc_info=True)
         russian_post_delivery_info = {
             "status": "tech_error",
             "error_code": "RUSSIAN_POST_API_DOWN",

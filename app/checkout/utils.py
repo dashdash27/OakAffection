@@ -1,6 +1,7 @@
 from app.models import Product
 
 import math
+import re
 from flask import current_app
 
 DISCOUNT_THRESHOLDS = [
@@ -119,3 +120,21 @@ def calculate_order_price(cart_items):
         total_price += item['price'] * item['quantity']
 
     return calculate_discounted_price(total_price)
+
+def normalize_and_ceil_price(raw_price) -> int:
+    if raw_price is None:
+        return None
+    
+    try:
+        price_str = str(raw_price)
+        
+        clean_str = re.sub(r'[^\d.,]', '', price_str)
+        clean_str = clean_str.replace(',', '.')
+        
+        if not clean_str:
+            return None
+            
+        return math.ceil(float(clean_str))
+        
+    except (ValueError, TypeError):
+        return None

@@ -77,14 +77,27 @@
     }
 
     function getDiscountInfo(amount) {
-        const rule = DISCOUNT_RULES.reduce((acc, current) => amount >= current.threshold ? current : acc, null);
-        return rule 
-            ? { applied: true, label: rule.label, multiplier: rule.value, amount: amount - Math.round(amount * rule.value) }
-            : { applied: false, amount };
+        const rule = DISCOUNT_RULES.find(current => amount >= current.threshold);
+        
+        if (rule) {
+            const discountAmount = amount * rule.value;
+            const finalAmount = Math.ceil(amount - discountAmount);
+            
+            return { 
+                applied: true, 
+                label: rule.label, 
+                multiplier: rule.value, 
+                amount: finalAmount 
+            };
+        }
+        return { 
+            applied: false, 
+            amount: Math.ceil(amount) 
+        };
     }
 
     function updateTotalPrice() {
-        const itemsWithDiscount = Math.round(checkoutState.itemsTotal * (1 - checkoutState.discountMultiplier));
+        const itemsWithDiscount = Math.ceil(checkoutState.itemsTotal * (1 - checkoutState.discountMultiplier));
         const delivery = checkoutState.selectedDeliveryOption?.price || 0;
         checkoutState.totalPrice = itemsWithDiscount + delivery;
     }
@@ -543,16 +556,18 @@
             const quantity = cart[product.id];
             if (!quantity) return;
 
-            const itemTotal = Number(product.price) * quantity;
+            const price = Number(product.price);
+
+            const itemTotal = price * quantity;
             itemsTotal += itemTotal;
         });
-        checkoutState.itemsTotal = itemsTotal;
+        checkoutState.itemsTotal = Number(itemsTotal.toFixed(2));
 
         const discountInfo = getDiscountInfo(itemsTotal);
         const finalTotal = discountInfo.amount;
         if (discountInfo.applied) {
-        checkoutState.discountMultiplier = discountInfo.multiplier;
-        checkoutState.discountLabel = discountInfo.label;
+            checkoutState.discountMultiplier = discountInfo.multiplier;
+            checkoutState.discountLabel = discountInfo.label;
         }
         
         checkoutState.totalPrice = finalTotal;
