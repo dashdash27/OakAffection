@@ -8,6 +8,9 @@ class DeliveryConfig:
         "API_TOKEN": os.getenv("YANDEX_DELIVERY_TOKEN"),
         "SOURCE_PVZ_ID": os.getenv("YANDEX_SOURCE_ID"),
 
+        "MARGIN_MULTIPLIER": 1.1,
+        "SAFE_BOX_WEIGHT": 15000,
+
         "POINTS_PROFILES": {
             # Обычные ПВЗ Яндекса
             "point": {
@@ -51,6 +54,8 @@ class DeliveryConfig:
         "INDEX_FROM": os.getenv("RUSSIAN_POST_INDEX_FROM"),
         "URL_POINTS_LIST": "https://otpravka-api.pochta.ru//postoffice/1.0/nearby?",
         "URL_PRICING_CALCULATOR": "https://otpravka-api.pochta.ru/1.0/tariff",
+
+        "MARGIN_MULTIPLIER": 1.1,
 
         "GLOBAL_WEIGHT_LIMIT": 200000,
         "ORDER_WEIGHT_LIMIT": 20000,

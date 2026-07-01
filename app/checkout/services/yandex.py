@@ -81,6 +81,8 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
         
         delivery_days = format_delivery_days(details.get('delivery_days'))
         clean_price = normalize_and_ceil_price(details.get('price'))
+        multiplier = yandex_cfg.get('MARGIN_MULTIPLIER', 1.0)
+        clean_price_with_margin = math.ceil(multiplier* clean_price)
 
         if clean_price is None:
             print("Яндекс: Ошибка парсинга цены. details.price равен None или некорректен.")
@@ -98,7 +100,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
             "name": "Яндекс Доставка",
             "points": filtered_points,
             "delivery_days": delivery_days,
-            "price": clean_price
+            "price": clean_price_with_margin
         }
     
     except Exception as e:
@@ -156,7 +158,7 @@ async def _get_pickup_points(geo_id, client, headers, yandex_cfg: dict):
 async def _get_delivery_details(source_point_id, destination_point_id, order_dimensions, client, headers, yandex_cfg: dict):
     url = yandex_cfg.get('URL_PRICING_CALCULATOR')
 
-    SAFE_BOX_WEIGHT = 15000 
+    SAFE_BOX_WEIGHT = yandex_cfg.get('SAFE_BOX_WEIGHT', 20)
     total_weight = order_dimensions['total_weight']
     number_of_places = math.ceil(total_weight / SAFE_BOX_WEIGHT)
     places = []

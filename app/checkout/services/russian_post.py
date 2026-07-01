@@ -63,6 +63,8 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         
         delivery_days = format_delivery_days(details.get('delivery_days'))
         clean_price = normalize_and_ceil_price(details.get('price'))
+        multiplier = post_cfg.get('MARGIN_MULTIPLIER', 1.0)
+        clean_price_with_margin = math.ceil(multiplier* clean_price)
 
         if clean_price is None:
             print("Почта России: Ошибка парсинга цены. details.price равен None или некорректен.")
@@ -80,7 +82,7 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
             "name": "Почта России",
             "points": filtered_points,
             "delivery_days": delivery_days,
-            "price": clean_price
+            "price": clean_price_with_margin
         }
     
     except Exception as e:
