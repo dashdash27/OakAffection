@@ -37,6 +37,8 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
         allowed_profiles = get_allowed_yandex_profiles(order_dimensions, city_data.get('region_fias_id'), yandex_cfg)
         # 2 - filter points by allowed profiles
         filtered_points = get_filtered_yandex_points(points, allowed_profiles)
+        # sort points by priority: 5Post -> end
+        filtered_points.sort(key=lambda x: x.get("_matched_profile") == "five_post_postamat")
 
         print("-- Yandex Allowed profiles:", allowed_profiles)
         print("-- Yandex all points (qty):", len(points))
@@ -181,6 +183,7 @@ async def _get_delivery_details(source_point_id, destination_point_id, order_dim
                 "dz": avg_side
             }
         })
+
 
     payload = {
         "destination": {

@@ -51,23 +51,24 @@ def get_filtered_yandex_points(api_points: list, allowed_profiles: list) -> list
     for point in api_points:
         point_name = point.get("name", "").lower()
         
-        is_point_allowed = False
+        matched_profile = None
 
         # Проверяем совпадение по ключевым словам
         if "point" in allowed_profiles:
             if "пункт выдачи" in point_name or "пвз" in point_name:
-                is_point_allowed = True
+                matched_profile = "point"
                 
         if "five_post_postamat" in allowed_profiles:
             if "5 post" in point_name or "5post" in point_name or "пятерочк" in point_name:
-                is_point_allowed = True
+                matched_profile = "five_post_postamat"
                 
         if "postamat" in allowed_profiles:
             if "постамат" in point_name and "маркет" in point_name:
                 if "5 post" not in point_name and "5post" not in point_name:
-                    is_point_allowed = True
+                    matched_profile = "postamat"
 
-        if is_point_allowed:
+        if matched_profile:
+            point["_matched_profile"] = matched_profile
             filtered_points.append(point)
     
     return filtered_points

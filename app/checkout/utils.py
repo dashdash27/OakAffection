@@ -4,11 +4,6 @@ import math
 import re
 from flask import current_app
 
-DISCOUNT_THRESHOLDS = [
-    (30000, 25),
-    (10000, 20),
-]
-
 def pluralize(number, titles):
     cases = [2, 0, 1, 1, 1, 2]
     if 4 < number % 100 < 20:
