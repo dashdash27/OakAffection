@@ -11,8 +11,6 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
     source_point_id = yandex_cfg.get('SOURCE_PVZ_ID')
     auth_headers = {"Authorization": f"Bearer {api_token}"}
 
-    print("Yandex delivery info request...")
-
     try:
         geo_id = await _detect_geo_id(city_data, client, auth_headers, yandex_cfg)
         
@@ -23,7 +21,6 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
                 "message": "Не удалось определить geo_id для данного города."
             }
         
-        print("-- Yandex Geo id:", geo_id)
         
         points = await  _get_pickup_points(geo_id, client, auth_headers, yandex_cfg)
         if not points:
@@ -39,10 +36,6 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
         filtered_points = get_filtered_yandex_points(points, allowed_profiles)
         # sort points by priority: 5Post -> end
         filtered_points.sort(key=lambda x: x.get("_matched_profile") == "five_post_postamat")
-
-        print("-- Yandex Allowed profiles:", allowed_profiles)
-        print("-- Yandex all points (qty):", len(points))
-        print("-- Yandex filtered points (qty):", len(filtered_points))
         
         if not filtered_points:
             return {
@@ -69,7 +62,6 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
                 continue
 
         if not details or not details.get('price'):
-            print("Яндекс: Не удалось рассчитать цену для региона", city_data.get('value'))
             logger.warning(f"Яндекс: Не удалось рассчитать цену для региона {city_data.get('value')}")
             return {
                 "status": "tech_error",
@@ -77,15 +69,12 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
                 "message": "Не удалось рассчитать стоимость доставки у Яндекса."
             }
         
-        print("-- Yandex delivery details:", json.dumps(details, indent=4))
-        
         delivery_days = format_delivery_days(details.get('delivery_days'))
         clean_price = normalize_and_ceil_price(details.get('price'))
         multiplier = yandex_cfg.get('MARGIN_MULTIPLIER', 1.0)
         clean_price_with_margin = math.ceil(multiplier* clean_price)
 
         if clean_price is None:
-            print("Яндекс: Ошибка парсинга цены. details.price равен None или некорректен.")
             logger.error("Яндекс: Ошибка парсинга цены. details.price равен None или некорректен.")
             return {
                 "status": "tech_error",
@@ -104,7 +93,6 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
         }
     
     except Exception as e:
-        print(f"Критическая ошибка во время интеграции с Яндекс Доставкой: {e}")
         logger.error(f"Критическая ошибка во время интеграции с Яндекс Доставкой: {e}", exc_info=True)
         return {
             "status": "tech_error",

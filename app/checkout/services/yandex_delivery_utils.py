@@ -3,8 +3,6 @@ def get_allowed_yandex_profiles(order_dimensions: dict, dadata_region_fias_id: s
     is_remote = dadata_region_fias_id in yandex_cfg.get("REMOTE_REGIONS_DADATA_FIAS_IDS", {})
     allowed_profiles = []
 
-    print("-- Remote:", is_remote)
-
     total_weight = order_dimensions["total_weight"]
     cubic_sum_of_sides = order_dimensions["cubic_sum_of_sides"]
     max_item_side = order_dimensions["max_item_side"]

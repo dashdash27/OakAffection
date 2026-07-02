@@ -14,8 +14,6 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         "X-User-Authorization": f"Basic {api_key}"
     }
 
-    print("Russian Post delivery info request...")
-
     try:
         total_weight = order_dimensions['total_weight']
         GLOBAL_WEIGHT_LIMIT = post_cfg.get('GLOBAL_WEIGHT_LIMIT')
@@ -36,8 +34,6 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         points = await  _get_pickup_points(latitude, longitude, search_radius, client, auth_headers, post_cfg)
         filtered_points = get_filtered_russian_post_points_by_exact_city(points, city_data)
         
-        print("-- All post points (qty):", len(points))
-        print("-- Filtered post points (qty):", len(filtered_points))
 
         if not filtered_points:
             return {
@@ -51,23 +47,19 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         details = await _get_delivery_details(index_from, index_to, order_dimensions, order_price, client, auth_headers, post_cfg)
 
         if not details:
-            print("Почта России: Не удалось рассчитать цену для региона", city_data.get('value'))
             logger.warning(f"Почта России: Не удалось рассчитать цену для региона {city_data.get('value')}")
             return {
                 "status": "tech_error",
                 "error_code": "PRICE_CALCULATION_FAILED",
                 "message": "Не удалось рассчитать стоимость доставки у Почты России."
             }
-        
-        print("-- Post delivery details:", details)
-        
+
         delivery_days = format_delivery_days(details.get('delivery_days'))
         clean_price = normalize_and_ceil_price(details.get('price'))
         multiplier = post_cfg.get('MARGIN_MULTIPLIER', 1.0)
         clean_price_with_margin = math.ceil(multiplier* clean_price)
 
         if clean_price is None:
-            print("Почта России: Ошибка парсинга цены. details.price равен None или некорректен.")
             logger.error("Почта России: Ошибка парсинга цены. details.price равен None или некорректен.")
             return {
                 "status": "tech_error",
@@ -86,7 +78,6 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         }
     
     except Exception as e:
-        print(f"Критическая ошибка во время интеграции с Почтой России: {e}")
         logger.error(f"Критическая ошибка во время интеграции с Почтой России: {e}", exc_info=True)
         return {
             "status": "tech_error",

@@ -9,7 +9,6 @@ from .services.russian_post import get_russian_post_delivery_info
 
 import asyncio
 import httpx
-import json
 from flask import Blueprint, render_template, request, jsonify, current_app
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
@@ -25,6 +24,7 @@ def checkout():
 @checkout_bp.route('/api/cart/sync', methods=['POST'])
 @limiter.limit("10 per second; 150 per minute")
 def sync_cart():
+    
     data = request.get_json()
     if not data or 'product_ids' not in data:
         return jsonify({"success": False, "error": "No data"}), 400
@@ -107,13 +107,6 @@ async def get_delivery_options():
     order_dimensions = calculate_order_dimensions(order_items)
     order_price = calculate_order_price(order_items)
 
-    print("--- ORDER INPUT DATA ---")
-    print("City:\n", json.dumps(city_data, indent=4, ensure_ascii=False))
-    print("Order items:\n", json.dumps(order_items, indent=4, ensure_ascii=False))
-    print("Order dims:\n", json.dumps(order_dimensions, indent=4, ensure_ascii=False))
-    print("Order price:", order_price)
-    print("--------------------------------------")
-
     yandex_config = current_app.config.get("YANDEX_DELIVERY", {})
     russian_post_config = current_app.config.get("RUSSIAN_POST", {})
 
@@ -129,7 +122,6 @@ async def get_delivery_options():
     russian_post_result = results[1]
     
     if isinstance(yandex_result, Exception):
-        print(f"Глобальный сбой asyncio для Яндекса (city: {city_name}): {yandex_result}")
         logger.error(f"Глобальный сбой asyncio для Яндекса (city: {city_name}): {yandex_result}", exc_info=True)
         yandex_delivery_info = {
             "status": "tech_error",
@@ -141,7 +133,6 @@ async def get_delivery_options():
         yandex_delivery_info = yandex_result
 
     if isinstance(russian_post_result, Exception):
-        print(f"Глобальный сбой asyncio для Почты России (city: {city_name}): {russian_post_result}")
         logger.error(f"Глобальный сбой asyncio для Почты России (city: {city_name}): {russian_post_result}", exc_info=True)
         russian_post_delivery_info = {
             "status": "tech_error",
