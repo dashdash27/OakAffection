@@ -72,10 +72,11 @@ def sync_cart():
         "discount_rules": discount_rules
     }), 200
 
-@checkout_bp.route('/api/suggestions/cities', methods=['GET'])
+@checkout_bp.route('/api/suggestions/cities', methods=['POST'])
 @limiter.limit("30 per minute")
 def suggest_cities():
-    query = request.args.get('q', '').strip()
+    data = request.get_json() or {}
+    query = data.get("query", "").strip()
     
     if len(query) < 3:
         return jsonify([]), 200
