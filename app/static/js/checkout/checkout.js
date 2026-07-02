@@ -210,12 +210,14 @@
 
     async function fetchCitySuggestions(query) {
         try {
-            const response = await fetch(`/checkout/api/suggestions/cities?q=${encodeURIComponent(query)}`, {
-                method: 'GET',
+            const response = await fetch(`/checkout/api/suggestions/cities`, {
+                method: 'POST',
                 headers: { 
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-CSRFToken': csrfToken
-                }
+                },
+                body: JSON.stringify({ query: query })
             })
 
             if (response.ok) {
