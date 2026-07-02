@@ -213,7 +213,8 @@
             const response = await fetch(`/checkout/api/suggestions/cities?q=${encodeURIComponent(query)}`, {
                 method: 'GET',
                 headers: { 
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrfToken
                 }
             })
 

@@ -1,4 +1,3 @@
-from app import csrf
 from app.logger import logger
 from app.models import Product
 from app.extensions import limiter
@@ -74,7 +73,6 @@ def sync_cart():
     }), 200
 
 @checkout_bp.route('/api/suggestions/cities', methods=['GET'])
-@csrf.exempt
 @limiter.limit("30 per minute")
 def suggest_cities():
     query = request.args.get('q', '').strip()
