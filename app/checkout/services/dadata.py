@@ -5,13 +5,14 @@ from flask import current_app
 dadata_session = requests.Session()
 
 def get_dadata_session():
-    if 'Authorization' not in dadata_session.headers:
-        api_key = current_app.config.get('DADATA', {}).get('API_KEY')
-        dadata_session.headers.update({
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Authorization": f"Token {api_key}"
-        })
+    api_key = current_app.config.get('DADATA', {}).get('API_KEY')
+    
+    dadata_session.headers.update({
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": f"Token {api_key}",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    })
     return dadata_session
 
 def format_suggestion(s):
