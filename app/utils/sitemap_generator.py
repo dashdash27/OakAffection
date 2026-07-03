@@ -1,10 +1,10 @@
 from app.models import Product, Category
 from app.extensions import BASE_DIR
 from app.logger import logger
-from app.routes import categories_dict
 
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from flask import current_app
 import os
 
 
@@ -30,6 +30,7 @@ def generate_sitemap():
         add_url(product_url, product.last_updated)
 
     categories = Category.query.all()
+    categories_dict = current_app.config.get('CATEGORIES_DICT', {})
     for category in categories:
         for key, val in categories_dict.items():
             if val == category.name:
