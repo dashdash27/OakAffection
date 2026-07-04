@@ -44,12 +44,13 @@
 a.card__name {
     display: block;
     margin-top: 10px;
+    margin-bottom: 10px;
     font-size: 13px;
     line-height: 22px;
     font-weight: 600;
-    height: 60px;
+    height: 45px;
     overflow: hidden;
-    color: var(--text-color)
+    color: var(--text-color);
 }
 .card__addition {
     width: 100%;
@@ -174,7 +175,7 @@ a.card__cart-view {
     }
     a.card__name {
         font-size: 17px;
-        height: 80px;
+        height: 65px;
         line-height: 28px;
     }
     .card__addition {
