@@ -1,3 +1,4 @@
+from app.models.product_wrapper_model import ProductWrapper
 from app.models.product_model import Product, ProductDraft
 from app.models.category_model import Category, products_categories, product_drafts_categories
 from app.models.characteristic_model import Characteristic, ProductCharacteristic, ProductDraftCharacteristic

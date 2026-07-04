@@ -26,10 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
         inputPrice.value = value;
     })
 
+    // Input weight
+    const inputWeight = document.querySelector(".input-weight");
+    inputWeight.addEventListener('input', () => {
+        let value = inputWeight.value;
+        value = value.replace(/\D/g, '');
+        value = value.replace(/^0+/, '');
+
+        inputWeight.value = value;
+    })
+
     form.addEventListener('submit', function(event) {
         let valid = true;
 
-        // Название
+        // Name
         const inputName = document.querySelector(".input-name");
         const nameError = document.querySelector(".name-error");
         if (inputName.value.trim() === '') {
@@ -49,15 +59,26 @@ document.addEventListener('DOMContentLoaded', () => {
             descriptionTagError.innerHTML = "";
         }
 
-        // Цена (потом откроем)
-        // const inputPrice = document.querySelector(".input-price");
-        // const priceError = document.querySelector(".price-error");
-        // if (inputPrice.value.trim() === '') {
-        //     valid = false;
-        //     priceError.innerHTML = "Поле не должно быть пустым";
-        // } else {
-        //     priceError.innerHTML = "";
-        // }
+        // Price
+        const inputPrice = document.querySelector(".input-price");
+        const priceError = document.querySelector(".price-error");
+        if (inputPrice.value.trim() === '') {
+            valid = false;
+            priceError.innerHTML = "Поле не должно быть пустым";
+        } else {
+            priceError.innerHTML = "";
+        }
+
+        // Wrapper Select
+        const wrapperSelect = document.querySelector(".wrapper-select");
+        const wrapperError = document.querySelector(".wrapper-error");
+        if (wrapperSelect.value === "0") {
+            valid = false;
+            wrapperError.innerHTML = "Поле не должно быть пустым";
+        } else {
+            wrapperError.innerHTML = "";
+        }
+
 
         // Characteristics
         const charsError = document.querySelector(".characteristics-error");

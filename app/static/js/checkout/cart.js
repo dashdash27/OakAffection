@@ -1,9 +1,6 @@
 // Constants:
 const QUANTITY_MAX = 30;
-const DISCOUNT_RULES = [
-    { threshold: 10000, value: 0.20, label: '20%' },
-    { threshold: 30000, value: 0.25, label: '25%' }
-].sort((a, b) => a.threshold - b.threshold);
+let DISCOUNT_RULES;
 
 function getCartFinances(total) {
     // ищем первую скидку
@@ -32,6 +29,7 @@ function getCartFinances(total) {
         } : null
     }
 }
+
 
 function updateCartTotalUI(finances) {
     const cartSection = document.querySelector('.cart');
@@ -160,7 +158,7 @@ async function syncCacheWithLS(cart) {
     if (missingIds.length > 0) {
         const result = await syncCartWithServer(missingIds);
         if (result.success) {
-            const newProducts = result.data;
+            const newProducts = result.data.products;
             productsCache.push(...newProducts);
             const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)))
             renderCart(productsCache, currentCart);
@@ -271,7 +269,11 @@ async function initCartSystem() {
         const result = await syncCartWithServer(ids);
 
         if (result.success) {
-            productsCache = result.data;
+            productsCache = result.data.products;
+            if (result.data.discount_rules && result.data.discount_rules.length > 0) {
+                DISCOUNT_RULES = result.data.discount_rules.sort((a, b) => a.threshold - b.threshold);
+            }
+            
             const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)));
             renderCart(productsCache, currentCart);
         } else {

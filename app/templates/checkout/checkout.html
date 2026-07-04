@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Оформление заказа{% endblock %}
+{% block description %}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout/checkout.css') }}">
+{% endblock %}
+
+{% block js %}
+    
+{% endblock %}
+
+{% block content %}
+    <section class="checkout" aria-label="Оформление заказа" data-step="city-choice">
+        <div class="container">
+            <div class="checkout__title">Оформление заказа</div>
+
+            <div class="checkout__inner">
+                <div class="checkout__form">
+                    
+                    <div class="checkout__card">
+                        <div class="card-title">Доставка</div>
+                        <div class="card-content">
+                            <div class="checkout__step">
+                                <div class="checkout__label">Куда привезти?</div>
+                                <input type="text" class="checkout__input city-input" placeholder="Введите город/населенный пункт">
+                                <div class="checkout__suggestions city-suggestions"></div>
+                            </div>
+
+                            <div class="checkout__step">
+                                <div class="checkout__label">Выбор службы доставки</div>
+                                <div class="checkout__comment delivery-options-comment">
+                                    Выберите город для расчета доставки
+                                </div>
+                                <div class="checkout__delivery-options"></div>
+                            </div>
+
+                            <div class="checkout__step">
+                                <div class="checkout__label">Пункт выдачи</div>
+                                <div class="checkout__comment pvz-comment">
+                                    Выберите службу доставки
+                                </div>
+                                <input type="text" class="checkout__input pvz-input" placeholder="Поиск по адресу или улице...">
+                                <div class="checkout__suggestions pvz-suggestions"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="checkout__card">
+                            <div class="card-title">Контакты</div>
+                            <div class="card-content">
+                                <div class="checkout__step">
+                                    <label for="name" class="checkout__input-label checkout__label">ФИО</label>
+                                    <input type="text" id="name" class="checkout__input name-input" placeholder="Иванов Иван Иванович">
+                                </div>
+                                <div class="checkout__step">
+                                    <label for="phone" class="checkout__input-label checkout__label">Номер телефона</label>
+                                    <input type="tel" id="phone" class="checkout__input phone-input" placeholder="+7 (999)-999-99-99">
+                                </div>
+                                <div class="checkout__step">
+                                    <label for="email" class="checkout__input-label checkout__label">Email</label>
+                                    <input type="email" id="email" class="checkout__input email-input" placeholder="example@gmail.com">
+                                </div>
+                            </div>
+                        </div>
+                </div>
+
+                <div class="checkout__summary">
+                    <div class="chekout__card">
+                        <div class="card-title">Ваш заказ</div>
+                        <div class="card-content">
+                            <div class="summary__items"></div>
+                            <div class="summary__total">
+                                <div class="summary__total-text">Итого:</div>    
+                                <div class="summary__total-value"></div> 
+                                <div class="summary__total-comment"></div>
+                            </div>
+
+                            <template class="summary__item-template">
+                                <div class="summary__item">
+                                    <div class="summary__item-image-wrapper">
+                                        <img src="" alt="" class="summary__item-img">
+                                    </div>
+                                    <div class="summary__item-info">
+                                        <div class="summary__item-name"></div>
+                                        <div class="summary__item-details">
+                                            <div class="summary__item-qty"></div>
+                                            <div class="summary__item-price"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <template class="summary__item-delivery-template">
+                                <div class="summary__item summary__item-delivery">
+                                    <div class="summary__item-image-wrapper">
+                                        <svg class="summary__item-img" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" stroke-width="3" stroke="var(--text-sub-color)" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M19.55,43.93H38.1a2,2,0,0,0,2-2V16.28a2,2,0,0,0-2-2H8.68a2,2,0,0,0-2,2V41.91a2,2,0,0,0,2,2h2.6"></path><path d="M44.33,43.93H40.19V23.23H50a1,1,0,0,1,.76.35l6.3,7.55a1,1,0,0,1,.23.64V43.93H53"></path><ellipse cx="15.53" cy="45.23" rx="4.44" ry="4.5"></ellipse><ellipse cx="48.58" cy="45.23" rx="4.44" ry="4.5"></ellipse></g></svg>
+                                    
+                                    </div>
+                                    <div class="summary__item-info">
+                                        <div class="summary__item-name"></div>
+                                        <div class="summary__item-details">
+                                            <div class="summary__item-price"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+                    </div>
+
+                    <div class="checkout__validation-msg"></div>
+                    <button class="checkout__submit-btn" disabled>
+                        Оформить заказ
+                    </button>
+                    <a href="{{ url_for('checkout.cart') }}" class="checkout__link-to-cart">
+                        Вернуться в корзину
+                    </a>
+
+                </div>
+     
+            </div>
+
+        </div>
+
+        <dialog class="order-modal">
+            <div class="order-modal__inner">
+                <div class="order-modal__title">
+                    Оформление заказа
+                </div>
+
+                <div class="order-modal__preview">
+                    <div class="order-modal__receipt"></div>
+                </div>
+
+                <button class="order-modal__copy">
+                    📄 Копировать текст
+                </button>
+
+                <p class="order-modal__hint">
+                    Отправьте скопированный текст любым удобным способом — мы свяжемся для уточнения деталей:
+                </p>
+
+                <div class="order-modal__actions">
+                    <a href="https://t.me/+79604870478" class="order-btn order-btn--tg" target="_blank">Telegram</a>
+                    <a href="mailto:oakaffection@gmail.com" class="order-btn order-btn--email">Email</a>
+                </div>
+
+                <button class="order-modal__close" aria-label="Закрыть">
+                    &times;
+                </button>
+
+            </div>
+        </dialog>
+
+    </section>
+
+
+    <script src="{{ url_for('static', filename='js/checkout/checkout-config.js') }}"></script>
+    <script src="https://unpkg.com/imask"></script>
+    <script src="{{ url_for('static', filename='js/checkout/checkout.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/checkout/checkout-modal.js') }}"></script>
+
+{% endblock %}

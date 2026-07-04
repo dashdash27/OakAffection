@@ -43,7 +43,7 @@
 
                     <div class="cart__upsell"></div>
                 </div>
-                <a href="" class="cart__submit">
+                <a href="{{ url_for('checkout.checkout') }}" class="cart__submit">
                     Оформить заказ
                 </a>
             </div>
@@ -92,105 +92,7 @@
                 </a>
             </div>
 
-            <dialog class="order-modal">
-                <div class="order-modal__inner">
-                    <div class="order-modal__title">
-                        Оформление заказа
-                    </div>
-
-                    <div class="order-modal__preview">
-                        <div class="order-modal__receipt"></div>
-                    </div>
-
-                    <button class="order-modal__copy">
-                        📄 Копировать текст
-                    </button>
-
-                    <p class="order-modal__hint">
-                        Отправьте скопированный текст любым удобным способом — мы свяжемся для уточнения деталей:
-                    </p>
-
-                    <div class="order-modal__actions">
-                        <a href="https://t.me/+79604870478" class="order-btn order-btn--tg" target="_blank">Telegram</a>
-                        <a href="mailto:oakaffection@gmail.com" class="order-btn order-btn--email">Email</a>
-                    </div>
-
-                    <button class="order-modal__close" aria-label="Закрыть">
-                        &times;
-                    </button>
-
-                </div>
-            </dialog>
-
         </div>
     </section>
     <script src="{{ url_for('static', filename='js/checkout/cart.js') }}"></script>
-
-    <script>
-        function generateOrderText() {
-            const items = Array.from(document.querySelectorAll('.cart__item')).map(item => {
-                const name = item.querySelector('.cart__item-name').textContent.trim();
-                const count = item.querySelector('.cart-item__count').textContent.trim();
-                const price = item.querySelector('.cart__item-total').textContent.trim();
-                return `• ${name} [${count} шт.] — ${price}`;
-            }).join('\n');
-            const totalAmount = document.querySelector('.cart__total-amount').textContent.replace(/\D/g, '');
-            const finances = getCartFinances(Number(totalAmount));
-            if (finances.discountSum > 0) {
-                return `НОВЫЙ ЗАКАЗ\n----------\n${items}\n----------\nИТОГО: ${finances.finalPrice.toLocaleString('ru-RU')} ₽ (c учетом скидки ${finances.discountPercent})`;
-            } else {
-                return `НОВЫЙ ЗАКАЗ\n----------\n${items}\n----------\nИТОГО: ${finances.finalPrice.toLocaleString('ru-RU')} ₽`;
-            }
-        }
-
-        const modal = document.querySelector('.order-modal');
-        const submitBtn = document.querySelector('.cart__submit');
-        let currentOrderText = "";
-
-        submitBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            currentOrderText = generateOrderText();
-            const orderReciept = document.querySelector('.order-modal__receipt');
-            if (orderReciept) orderReciept.innerText = currentOrderText;
-            
-            document.body.style.overflow = 'hidden';
-            modal.showModal();
-        });
-
-        const closeBtn = document.querySelector('.order-modal__close');
-        closeBtn.addEventListener('click', () => {
-            document.body.style.overflow = '';
-            modal.close();
-        });
-
-        const copyBtn = document.querySelector('.order-modal__copy');
-        let copyTimeout = null; 
-        if (copyBtn) {
-            const originalBtnText = copyBtn.innerHTML.trim();
-            copyBtn.onclick = async () => {
-                try {
-                    await navigator.clipboard.writeText(currentOrderText);
-                    
-                    if (copyTimeout) {
-                        clearTimeout(copyTimeout);
-                    }
-
-                    copyBtn.innerHTML = "✓ Скопировано!";
-                    
-                    // Возвращаем как было через 2 секунды
-                    copyTimeout = setTimeout(() => {
-                        copyBtn.innerHTML = originalBtnText;
-                        copyTimeout = null;
-                    }, 2000);
-                    
-                } catch (err) {
-                    copyBtn.innerHTML = originalBtnText;
-                    console.error('Не удалось скопировать:', err);
-                    alert('Ошибка при копировании. Пожалуйста, выделите текст в чеке вручную.');
-                }
-            };
-        }
-        
-    </script>
 {% endblock %}

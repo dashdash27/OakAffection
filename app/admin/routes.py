@@ -1,7 +1,7 @@
-from app.models import Product, Characteristic, Category, ProductGroup, Target, Color, ProductDraft, ColorCategory, AdminUser
+from app.models import Product, Characteristic, Category, ProductGroup, ProductWrapper, Target, Color, ProductDraft, ColorCategory, AdminUser
 from app.admin.publish import publish_all_changes
 from app.extensions import limiter
-from app.admin.forms import ProductForm, CategoryForm, CharacteristicForm, TargetForm, ProductGroupForm, ColorForm, ColorCategoryForm
+from app.admin.forms import ProductForm, CategoryForm, CharacteristicForm, TargetForm, ProductGroupForm, ProductWrapperForm, ColorForm, ColorCategoryForm
 from app.admin.forms import (
     create_characteristic_handler, 
     edit_characteristic_handler,
@@ -13,11 +13,14 @@ from app.admin.forms import (
     edit_target_handler,
     create_product_group_handler, 
     edit_product_group_handler,
+    create_product_wrapper_handler,
+    edit_product_wrapper_handler,
     mark_product_for_delete_handler, 
     delete_target_handler,
     delete_category_handler,
     delete_characteristic_handler,
     delete_product_group_handler,
+    delete_product_wrapper_handler,
     delete_product_draft_handler, 
     edit_product_orphan_draft_handler, 
     create_color_handler,
@@ -32,6 +35,7 @@ from app.admin.forms import (
 from flask import Blueprint, flash, request, render_template, url_for, redirect
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.datastructures import CombinedMultiDict
+from sqlalchemy import or_
 
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -84,6 +88,13 @@ def index():
     updated_products = []
     delete_marked_products = []
     orphan_drafts = ProductDraft.query.filter(ProductDraft.product_id.is_(None)).all()
+
+    incomplete_dims_products = Product.query.filter(
+        or_(
+            Product.weight.is_(None),
+            Product.wrapper_id.is_(None)
+        )
+    ).all()
     
     for product in products:
         if product.draft and not product.delete_mark:
@@ -100,7 +111,8 @@ def index():
                         targets=targets,
                         characteristics=characteristics,
                         colors=colors,
-                        product_groups=product_groups
+                        product_groups=product_groups,
+                        incomplete_dims_products=incomplete_dims_products
                         )
 
 # Product
@@ -121,8 +133,8 @@ def mark_product_for_delete():
 # Product Lists
 @admin_bp.route('/product_list', methods=['GET'])
 def product_list():
-    products = Product.query.all()
-    orphan_drafts = ProductDraft.query.filter(ProductDraft.product_id.is_(None)).all()
+    products = Product.query.order_by(Product.name).all()
+    orphan_drafts = ProductDraft.query.filter(ProductDraft.product_id.is_(None)).order_by(ProductDraft.name).all()
     return render_template('admin/lists/product_list.html', 
                             products=products,
                             orphan_drafts=orphan_drafts)
@@ -287,9 +299,35 @@ def product_group_list():
     groups = ProductGroup.query.all()
     return render_template('admin/lists/product_group_list.html', groups=groups)
 
+# Product Wrapper
+@admin_bp.route('/create_product_wrapper', methods=['GET', 'POST'])
+def create_product_wrapper():
+    form = ProductWrapperForm()
+    return create_product_wrapper_handler(form, request.method)
+
+@admin_bp.route('/edit_product_wrapper/<int:wrapper_id>', methods=['GET', 'POST'])
+def edit_product_wrapper(wrapper_id):
+    wrapper = ProductWrapper.query.get_or_404(wrapper_id)
+    if request.method == 'GET':
+        form = ProductWrapperForm(obj=wrapper)
+    else:
+        form = ProductWrapperForm()
+    return edit_product_wrapper_handler(form, request.method, wrapper_id)
+
+@admin_bp.route('/delete_product_wrapper', methods=['POST'])
+def delete_product_wrapper():
+    wrapper_id = request.form.get('wrapper_id')
+    return delete_product_wrapper_handler(wrapper_id)
+
+@admin_bp.route('/product_wrapper_list', methods=['GET'])
+def product_wrapper_list():
+    wrappers = ProductWrapper.query.all()
+    return render_template('admin/lists/product_wrapper_list.html', wrappers=wrappers)
+
 # Colors
 @admin_bp.route('/color_list', methods=['GET'])
 def color_list():
+    
     colors = Color.query.all()
     return render_template('admin/lists/color_list.html', colors=colors)
 
