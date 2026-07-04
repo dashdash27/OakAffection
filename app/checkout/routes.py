@@ -38,9 +38,6 @@ def sync_cart():
         except (ValueError, TypeError):
             continue
     
-    if not clean_ids:
-        return jsonify([]), 200
-    
     products = Product.query.filter(Product.id.in_(clean_ids)).all()
 
     result = []

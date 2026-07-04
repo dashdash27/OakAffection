@@ -195,7 +195,7 @@ function renderCart(products, cart) {
 
     cartItemsContainer.innerHTML = "";
 
-    if (products.length === 0) {
+    if (products.length == 0) {
         cartSection.dataset.state = "empty";
         return;
     }
