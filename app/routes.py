@@ -73,3 +73,7 @@ def show_oils(category_key):
 @main_bp.route('/how-to-order')
 def how_to_order():
     return render_template('how_to_order.html')
+
+@main_bp.route('/requisites')
+def requisites():
+    return render_template('requisites.html')

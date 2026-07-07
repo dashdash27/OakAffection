@@ -77,6 +77,16 @@ a.footer__item-title {
     color: rgb(226, 226, 226);
     margin-top: 30px;
 }
+/* Docs links */
+.footer__docs {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+a.footer__docs-link {
+    color: white;
+    font-size: 17px;
+}
 
 
 @media (min-width: 768px) {
