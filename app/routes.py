@@ -77,3 +77,7 @@ def how_to_order():
 @main_bp.route('/requisites')
 def requisites():
     return render_template('requisites.html')
+
+@main_bp.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
