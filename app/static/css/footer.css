@@ -82,6 +82,8 @@ a.footer__item-title {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 a.footer__docs-link {
     color: white;
