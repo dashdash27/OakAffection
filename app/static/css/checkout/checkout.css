@@ -250,12 +250,21 @@
     font-weight: 600;
     box-shadow: var(--shadow);
 }
+.checkout__agreement {
+    margin-top: 15px;
+    font-size: 14px;
+    color: var(--text-color);
+    text-align: center;
+}
+.checkout__agreement a {
+    text-decoration: underline;
+}
 a.checkout__link-to-cart {
     display: block;
     text-align: center;
     padding: 16px 30px;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 30px;
     color: var(--text-sub-color);
     font-weight: 600;
 }
