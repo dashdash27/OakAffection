@@ -258,6 +258,7 @@
 }
 .checkout__agreement a {
     text-decoration: underline;
+    color: var(--text-color);
 }
 a.checkout__link-to-cart {
     display: block;
