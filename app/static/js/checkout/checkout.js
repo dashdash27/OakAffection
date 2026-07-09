@@ -517,7 +517,7 @@
         } else if (!s.selectedDeliveryOption) {
             error = "Выберите способ доставки";
         } else if (s.selectedDeliveryOption.points && !s.selectedPvz) {
-            error = "Выберите пункт выдачи на карте или из списка";
+            error = "Выберите пункт выдачи из списка";
         } else {
             const nameParts = (c.name || "").trim().split(/\s+/);
             const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email || "");
