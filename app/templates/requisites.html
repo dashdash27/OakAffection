@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Реквизиты{% endblock %}
+{% block description %}Реквизиты{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/terms.css') }}">
+{% endblock %}
+
+{% block content %}
+    <article class="terms">
+        <div class="container">
+            <h1 class="terms__title">
+                Реквизиты
+            </h1>
+            <div class="terms__text">
+                <div class="terms__section">
+                    <p>
+                        Продавец: ИП Жданов Алексей Вячеславович <br>
+                        ИНН: 231100545903<br>
+                        ОРГНИП: 323057100058519<br>
+                    </p>
+                    <p>
+                        Адрес: Российская Федерация, 368115, 05 - Республика Дагестан, КИЗИЛЮРТОВСКИЙ Р-Н, ЗУБУТЛИ-МИАТЛИ С., ИСМАИЛГАДЖИ ДАРБИШОВА УЛ., ДВЛД. 4
+                    </p>
+                    <p>
+                        Контакты:<br>
+                        Тел: +79034112255<br>
+                        Email: K9184450791@gmail.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </article>
+{% endblock %}

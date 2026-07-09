@@ -324,9 +324,22 @@
                     <a href="{{ url_for('main.how_to_order') }}" class="footer__item-title">Как оформить заказ?</a>
                 </div>
 
-            </div>
-            <div class="freepik">
-                Designed by Freepik
+                <div class="footer__docs">
+                    <a href="{{ url_for('main.requisites') }}" class="footer__docs-link">Реквизиты</a>
+                    <a href="{{ url_for('main.privacy') }}" class="footer__docs-link">Политика конфиденциальности</a>
+                    <a href="{{ url_for('main.terms') }}" class="footer__docs-link">Публичная оферта</a>
+                    <a href="{{ url_for('main.requisites') }}" class="footer__docs-link">ИП Жданов А.В.</a>
+                    <a href="{{ url_for('main.requisites') }}" class="footer__docs-link">ИНН 231100545903</a>
+                    
+                </div>
+
+                <div class="footer__payment-logos">
+                    <img data-src="{{ url_for('static', filename='img/logos/sbp.png') }}" class="lozad" alt="СБП" style="height: 45px">
+                    <img data-src="{{ url_for('static', filename='img/logos/mir.webp') }}" class="lozad" alt="МИР" style="height: 25px; filter: brightness(0) invert(1);">
+                    <img data-src="{{ url_for('static', filename='img/logos/mastercard.svg') }}" class="lozad" alt="Mastercard">
+                    <img data-src="{{ url_for('static', filename='img/logos/visa.png') }}" class="lozad" alt="VISA" style="height: 22px">
+                </div>
+
             </div>
         </div>
     </footer>

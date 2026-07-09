@@ -114,6 +114,11 @@
                     <button class="checkout__submit-btn" disabled>
                         Оформить заказ
                     </button>
+                    <div class="checkout__agreement">
+                        Нажимая кнопку, вы соглашаетесь с условиями 
+                        <a href="{{ url_for('main.terms') }}">Публичной оферты</a> и 
+                        <a href="{{ url_for('main.privacy') }}">Политики конфиденциальности</a>
+                    </div>
                     <a href="{{ url_for('checkout.cart') }}" class="checkout__link-to-cart">
                         Вернуться в корзину
                     </a>
