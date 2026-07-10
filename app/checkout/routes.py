@@ -2,6 +2,7 @@ from app.logger import logger
 from app.models import Product
 from app.extensions import limiter
 from .utils import process_cart, calculate_order_dimensions, calculate_order_price
+from .schemas import OrderCreateSchema 
 
 from .services.dadata import get_city_suggestions
 from .services.yandex import get_yandex_delivery_info
@@ -10,6 +11,7 @@ from .services.russian_post import get_russian_post_delivery_info
 import asyncio
 import httpx
 from flask import Blueprint, render_template, request, jsonify, current_app
+from pydantic import ValidationError
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 
@@ -154,10 +156,27 @@ async def get_delivery_options():
 
 @checkout_bp.route('/api/orders', methods=['POST'])
 def create_order():
-    data = request.get_json()
-    if not data:
+    raw_data = request.get_json()
+    if not raw_data:
         return jsonify({"success": False, "error": "Данные не переданы"}), 400
     
-    print("Прилетели данные для заказа:", data)
+    print("Прилетели данные для заказа:", raw_data)
+
+    # TODO: validation
+    try:
+        validated_order = OrderCreateSchema(**raw_data)
+    except ValidationError as e:
+        # Красиво форматируем ошибки Pydantic для фронтенда
+        formatted_errors = []
+        for error in e.errors():
+            # Склеиваем путь к полю (например: client_contacts.email)
+            field_path = " -> ".join(str(loc) for loc in error["loc"])
+            # Берем текст ошибки на английском (или пишем свой)
+            error_msg = error["msg"]
+            formatted_errors.append(f"Поле [{field_path}]: {error_msg}")
+            
+        print(formatted_errors)
+
+        return jsonify({"success": False, "error": formatted_errors}), 400
 
     return jsonify({"success": True}), 200

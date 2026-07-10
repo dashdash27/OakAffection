@@ -9,7 +9,7 @@
             "client_contacts": {
                 "name": "Имя",
                 "phone": "+7888",
-                "email": "example@gmail.com"   
+                "email": "examplegmail.com"   
             },
             "delivery": {
                 "service": checkoutState.selectedDeliveryOption.service,
