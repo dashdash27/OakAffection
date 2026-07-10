@@ -111,6 +111,9 @@
                     </div>
 
                     <div class="checkout__validation-msg"></div>
+                    <button class="checkout__payment-btn">
+                        Оплатить
+                    </button>
                     <button class="checkout__submit-btn" disabled>
                         Оформить заказ
                     </button>
@@ -166,5 +169,6 @@
     <script src="https://unpkg.com/imask"></script>
     <script src="{{ url_for('static', filename='js/checkout/checkout.js') }}"></script>
     <script src="{{ url_for('static', filename='js/checkout/checkout-modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/checkout/checkout-payment.js') }}"></script>
 
 {% endblock %}

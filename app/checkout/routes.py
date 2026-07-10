@@ -24,7 +24,6 @@ def checkout():
 @checkout_bp.route('/api/cart/sync', methods=['POST'])
 @limiter.limit("10 per second; 150 per minute")
 def sync_cart():
-    
     data = request.get_json()
     if not data or 'product_ids' not in data:
         return jsonify({"success": False, "error": "No data"}), 400
@@ -152,3 +151,13 @@ async def get_delivery_options():
             "post": russian_post_delivery_info
         }
     }), 200
+
+@checkout_bp.route('/api/orders', methods=['POST'])
+def create_order():
+    data = request.get_json()
+    if not data:
+        return jsonify({"success": False, "error": "Данные не переданы"}), 400
+    
+    print("Прилетели данные для заказа:", data)
+
+    return jsonify({"success": True}), 200

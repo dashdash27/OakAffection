@@ -238,7 +238,8 @@
 }
 
 /* Submin Btn */
-.checkout__submit-btn {
+.checkout__submit-btn,
+.checkout__payment-btn {
     display: block;
     padding: 16px 30px;
     width: 100%;

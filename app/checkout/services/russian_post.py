@@ -75,6 +75,7 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
             "status": "success",
             "error_code": None,
             "name": "Почта России",
+            "service": "russian_post",
             "points": filtered_points,
             "delivery_days": delivery_days,
             "price": clean_price_with_margin,

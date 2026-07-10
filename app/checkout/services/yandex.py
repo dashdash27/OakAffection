@@ -90,6 +90,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
             "status": "success",
             "error_code": None,
             "name": "Яндекс Доставка",
+            "service": "yandex",
             "points": filtered_points,
             "delivery_days": delivery_days,
             "price": clean_price_with_margin, 
