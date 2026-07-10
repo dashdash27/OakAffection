@@ -1,7 +1,7 @@
 import math
 
 from app.logger import logger
-from ..utils import format_delivery_days, normalize_and_ceil_price
+from ..utils import format_delivery_days, normalize_and_ceil_price, generate_jwt_delivery_token
 from .russian_post_utils import get_search_radius_by_fias_level, get_filtered_russian_post_points_by_exact_city
 
 
@@ -67,6 +67,9 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
                 "message": "Не удалось рассчитать стоимость доставки у Почты России.",
                 "points": []
             }
+        
+        token = generate_jwt_delivery_token("yandex", clean_price_with_margin)
+        print("Post token:", token)
 
         return {
             "status": "success",
@@ -74,7 +77,8 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
             "name": "Почта России",
             "points": filtered_points,
             "delivery_days": delivery_days,
-            "price": clean_price_with_margin
+            "price": clean_price_with_margin,
+            "delivery_token": token
         }
     
     except Exception as e:

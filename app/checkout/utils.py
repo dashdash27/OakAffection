@@ -3,6 +3,18 @@ from app.models import Product
 import math
 import re
 from flask import current_app
+from datetime import datetime, timedelta, timezone
+import jwt
+import os
+
+def generate_jwt_delivery_token(delivery_service: str, price: int) -> str:
+    secret_key = os.getenv("SECRET_KEY") 
+    payload = {
+        "delivery_service": delivery_service,
+        "price": price,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=20)
+    }
+    return jwt.encode(payload, secret_key, algorithm="HS256")
 
 def pluralize(number, titles):
     cases = [2, 0, 1, 1, 1, 2]

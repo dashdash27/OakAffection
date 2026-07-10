@@ -2,7 +2,7 @@ import json
 import math
 
 from app.logger import logger
-from ..utils import format_delivery_days, normalize_and_ceil_price
+from ..utils import format_delivery_days, normalize_and_ceil_price, generate_jwt_delivery_token
 from .yandex_delivery_utils import get_allowed_yandex_profiles, get_filtered_yandex_points
 
 
@@ -83,13 +83,17 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
                 "points": []
             }
         
+        token = generate_jwt_delivery_token("yandex", clean_price_with_margin)
+        print("Yandex token:", token)
+        
         return {
             "status": "success",
             "error_code": None,
             "name": "Яндекс Доставка",
             "points": filtered_points,
             "delivery_days": delivery_days,
-            "price": clean_price_with_margin
+            "price": clean_price_with_margin, 
+            "delivery_token": token
         }
     
     except Exception as e:
