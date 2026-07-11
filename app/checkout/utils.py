@@ -4,6 +4,7 @@ import math
 import re
 from flask import current_app
 from datetime import datetime, timedelta, timezone
+from typing import Dict
 import jwt
 import os
 
@@ -15,6 +16,14 @@ def generate_jwt_delivery_token(delivery_service: str, price: int) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(minutes=20)
     }
     return jwt.encode(payload, secret_key, algorithm="HS256")
+
+def calculate_order_total(
+    cart: Dict[str, int], 
+    delivery_price: int
+) -> int:
+    order_items = process_cart(cart)
+    items_price_with_discount = calculate_order_price(order_items)
+    return items_price_with_discount + delivery_price
 
 def pluralize(number, titles):
     cases = [2, 0, 1, 1, 1, 2]
@@ -71,7 +80,6 @@ def process_cart(cart):
 
     return order_items
 
-    
 def calculate_order_dimensions(cart_items):
     """Approximately order params"""
     total_weight = 0

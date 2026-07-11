@@ -25,7 +25,7 @@ class ClientContactsSchema(BaseModel):
 
 class SettlementSchema(BaseModel):
     name: str = Field(..., min_length=2)
-    postal_code: str = Field(..., min_length=5, max_length=6)
+    postal_code: str = Field(default="")
 
 class PointSchema(BaseModel):
     address: str = Field(..., min_length=2)

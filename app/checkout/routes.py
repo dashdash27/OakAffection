@@ -1,7 +1,7 @@
 from app.logger import logger
 from app.models import Product
 from app.extensions import limiter
-from .utils import process_cart, calculate_order_dimensions, calculate_order_price
+from .utils import process_cart, calculate_order_dimensions, calculate_order_price, calculate_order_total
 from .schemas import OrderCreateSchema 
 
 from .services.dadata import get_city_suggestions
@@ -12,6 +12,9 @@ import asyncio
 import httpx
 from flask import Blueprint, render_template, request, jsonify, current_app
 from pydantic import ValidationError
+import os
+import jwt
+
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
 
@@ -116,7 +119,7 @@ async def get_delivery_options():
             get_russian_post_delivery_info(city_data, order_dimensions, order_price, client, russian_post_config)
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
     yandex_result = results[0]
     russian_post_result = results[1]
     
@@ -158,25 +161,59 @@ async def get_delivery_options():
 def create_order():
     raw_data = request.get_json()
     if not raw_data:
-        return jsonify({"success": False, "error": "Данные не переданы"}), 400
+        return jsonify({"success": False, "error": "Недостаточно данных для создания заказа"}), 422
     
     print("Прилетели данные для заказа:", raw_data)
 
-    # TODO: validation
+    # 1. Validation
     try:
         validated_order = OrderCreateSchema(**raw_data)
     except ValidationError as e:
-        # Красиво форматируем ошибки Pydantic для фронтенда
         formatted_errors = []
         for error in e.errors():
-            # Склеиваем путь к полю (например: client_contacts.email)
             field_path = " -> ".join(str(loc) for loc in error["loc"])
-            # Берем текст ошибки на английском (или пишем свой)
             error_msg = error["msg"]
             formatted_errors.append(f"Поле [{field_path}]: {error_msg}")
             
-        print(formatted_errors)
+        print("Ошибки при валидации:", formatted_errors)
 
-        return jsonify({"success": False, "error": formatted_errors}), 400
+        return jsonify({
+            "success": False, 
+            "error": "Некоторые данные заполнены некорректно. Пожалуйста, проверьте правильность заполнения формы."
+        }), 422
+    
+    # 2. Checking JWT Token
+    delivery_token = validated_order.delivery.delivery_token
+    secret_key = os.getenv("SECRET_KEY")
+
+    try:
+        decoded_delivery = jwt.decode(delivery_token, secret_key, algorithms=["HS256"])
+        trusted_delivery_price = int(decoded_delivery.get("price"))
+        
+    except jwt.ExpiredSignatureError:
+        # Токен истек
+        return jsonify({
+            "success": False, 
+            "error": "Время действия тарифа доставки истекло. Пожалуйста, выберите город и , способ доставки и пункт выдачи (ПВЗ) заново для обновления цены."
+        }), 422
+    except jwt.InvalidTokenError:
+        # Если токен подделан, изменен или поврежден
+        return jsonify({
+            "success": False, 
+            "error": "Ошибка проверки безопасности доставки. Пожалуйста, обновите страницу и попробуйте снова."
+        }), 422
+    
+    # 3.  Calculate total_amount and compare
+    client_total_amount = validated_order.client_total_amount
+    server_total_amount = calculate_order_total(validated_order.cart, trusted_delivery_price)
+
+    print("Client total amount", client_total_amount)
+    print("Server total amount", server_total_amount)
+
+    if client_total_amount != server_total_amount:
+        return jsonify({
+            "success": False, 
+            "error": "Ошибка расчета стоимости заказа. Пожалуйста, обновите корзину или выберите ПВЗ заново."
+        }), 422
 
     return jsonify({"success": True}), 200

@@ -24,7 +24,7 @@ def format_suggestion(s):
         "fias_level": data.get('fias_level'),
         "latitude": data.get('geo_lat'),
         "longitude": data.get('geo_lon'),
-        "postal_code": data.get('postal_code'),
+        "postal_code": data.get('postal_code') or "",
         "settlement": data.get('city') or data.get('settlement') or ""
     }
 
