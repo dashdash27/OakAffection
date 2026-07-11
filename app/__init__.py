@@ -50,8 +50,8 @@ def create_app():
         app.register_blueprint(checkout_bp)
 
 
-        with app.app_context():
-            db.create_all()
+        # with app.app_context():
+        #     db.create_all()
 
         @app.before_request
         def assign_request_id():
