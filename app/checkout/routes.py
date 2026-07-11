@@ -3,6 +3,7 @@ from app.models import Product
 from app.extensions import limiter
 from .utils import process_cart, calculate_order_dimensions, calculate_order_price, calculate_order_total
 from .schemas import OrderCreateSchema 
+from .core.order_creator import create_new_order_transaction
 
 from .services.dadata import get_city_suggestions
 from .services.yandex import get_yandex_delivery_info
@@ -215,5 +216,18 @@ def create_order():
             "success": False, 
             "error": "Ошибка расчета стоимости заказа. Пожалуйста, обновите корзину или выберите ПВЗ заново."
         }), 422
+    
+    # 4. Create order
+    try:
+        order = create_new_order_transaction(validated_order)
+    except ValueError as val_err:
+        # Ошибка, если товара нет в базе
+        return jsonify({"success": False, "error": str(val_err)}), 422
+    except Exception:
+        # Любая другая системная ошибка БД
+        return jsonify({"success": False, "error": "Ошибка сервера при формировании заказа."}), 422
 
-    return jsonify({"success": True}), 200
+    return jsonify({
+        "success": True,
+        "order_id": order.id
+    }), 200

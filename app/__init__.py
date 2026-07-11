@@ -49,10 +49,6 @@ def create_app():
         app.register_blueprint(admin_bp)
         app.register_blueprint(checkout_bp)
 
-
-        # with app.app_context():
-        #     db.create_all()
-
         @app.before_request
         def assign_request_id():
             g.request_id = str(uuid.uuid4())
