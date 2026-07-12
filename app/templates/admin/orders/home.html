@@ -1,0 +1,60 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Заказы
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/order_list.css') }}">
+{% endblock %}
+
+{% block content %}
+   <div class="container">
+        <h1>Заказы</h1>
+    
+        <div class="orders-table">
+            <div class="orders-table__header">
+                <div class="col-id">№ Заказа</div>
+                <div class="col-date">Дата</div>
+                <div class="col-customer">Покупатель</div>
+                <div class="col-delivery">Доставка</div>
+                <div class="col-amount">Сумма</div>
+                <div class="col-status">Статус</div>
+            </div>
+
+            {% for order in orders %}
+                <a href="{{ url_for('admin.order_detail', order_id=order.id) }}" class="orders-table__row">
+                    
+                    <div class="col-id">{{order.id}}</div>
+
+                    <div class="col-date">{{order.created_at.strftime('%d.%m.%Y %H:%M')}}</div>
+
+                    <div class="col-customer">
+                        <div class="customer-name">{{order.customer_name}}</div>
+                        <div class="customer-phone">{{order.customer_phone}}</div>
+                    </div>
+
+                    <div class="col-delivery">
+                        <div class="delivery-service delivery-service-{{order.delivery_service.value}}">
+                            {{ order.delivery_service.value }}
+                        </div>
+                        <div class="delivery-sub-text">
+                            {{ order.delivery_settlement }}, {{ order.delivery_point_address }}
+                        </div>
+                    </div>
+
+                    <div class="col-amount">{{order.total_amount}} ₽</div>
+
+                    <div class="col-status">
+                        <span class="badge-status status-{{ order.status.value }}">
+                            {{ order.status.value }}
+                        </span>
+                    </div>
+                    
+                </a>
+            {% endfor %}
+
+        </div>
+
+    </div>
+{% endblock %}

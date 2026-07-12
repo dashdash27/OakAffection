@@ -1,0 +1,137 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Заказ #{{order.id}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/order_detail.css') }}">
+{% endblock %}
+
+{% block content %}
+   <div class="container">
+        
+        <div class="order-detail">
+            <h1>Заказ #{{ order.id }}</h1>
+
+            <div class="order-detail-grid">
+                <div class="order-detail-grid__main">
+            
+                    <!-- 1 Reciept -->
+                    <div class="detail-card">
+                        <h2 class="detail-card__title">Состав заказа</h2>
+                        
+                        <div class="receipt-list">
+                            {% for item in order.items %}
+                                <div class="receipt-item">
+                                    <div class="product-name">
+                                        {{ item.product_name }}
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div class="product-qty">{{ item.quantity }} шт. × {{ item.price_at_purchase }} ₽</div>
+                                        <div class="product-price">
+                                            {{ item.quantity * item.price_at_purchase }} ₽
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Receipt Footer -->
+                        <div class="receipt-footer">
+                            <div class="receipt-delivery">
+                                <div>Стоимость доставки ({{ order.delivery_service.value | upper }}):</div>
+                                <div>{{ order.delivery_price }} ₽</div>
+                            </div>
+                            {% if order.discount_amount > 0 %}
+                                <div class="receipt-discount">
+                                    <div>Пороговая скидка на товары:</div>
+                                    <div>-{{ order.discount_amount }} ₽</div>
+                                </div>
+                            {% endif %}
+                            <div class="receipt-total">
+                                <div>Итоговая сумма:</div>
+                                <div>{{ order.total_amount }} ₽</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Contacts and Delivery -->
+                    <div class="detail-card">
+                        <h2 class="detail-card__title">Доставка и контакты клиента</h2>
+                        <div class="customer-and-delivery">
+                            
+                            <!-- Customer -->
+                            <div class="customer-block">
+                                <h3>Покупатель</h3>
+                                <p>
+                                    <strong>ФИО:</strong> {{ order.customer_name }}
+                                </p>
+                                <p>
+                                    <strong>Телефон:</strong> 
+                                    <a href="tel:{{ order.customer_phone }}" style="color: #1677ff; text-decoration: none;">{{ order.customer_phone }}</a>
+                                </p>
+                                <p>
+                                    <strong>Email:</strong> {{ order.customer_email }}
+                                </p>
+                                {% if order.comment %}
+                                    <p class="comment-block">
+                                        <strong>Комментарий:</strong> <span style="color: #4a5568; font-style: italic;">"{{ order.comment }}"</span>
+                                    </p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Delivery and Point -->
+                            <div>
+                                <h3>Пункт выдачи (ПВЗ)</h3>
+                                <p><strong>Город/Регион:</strong> {{ order.delivery_settlement }}</p>
+                                <p><strong>Идентификатор точки:</strong> <code>{{ order.delivery_point_id }}</code></p>
+                                <p><strong>Адрес выдачи:</strong> {{ order.delivery_point_address }}</p>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Finance and Management -->
+                <div class="order-detail-grid__sidebar">
+                    
+                    <!-- Payment System -->
+                    <div class="detail-card payment">
+                        <h2 class="detail-card__title">Статус оплаты</h2>
+                        {% if order.payment %}
+                            <div class="payment-item">
+                                <strong>Сумма транзакции:</strong> {{ order.payment.amount }} ₽
+                            </div>
+                            <div class="payment-item">
+                                <strong>ID транзакции банка:</strong> 
+                                <code class="transaction-id">{{ order.payment.external_id or 'Ожидает генерации сессии' }}</code>
+                            </div>
+                            <div class="payment-status">
+                                <strong>Текущий статус:</strong> 
+                                {% if order.payment.status.value == 'completed' %}
+                                    <span style="color: #389e0d; font-weight: 700;">● COMPLETED (Оплачено)</span>
+                                {% elif order.payment.status.value == 'pending' %}
+                                    <span style="color: #d46b08; font-weight: 700;">● PENDING (Ожидает ввода карты)</span>
+                                {% else %}
+                                    <span style="color: #cf1322; font-weight: 700;">● REJECTED (Ошибка/Отказ банка)</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div style="color: #a0aec0; font-size: 13px; font-style: italic;">Платежная сессия для Озона не была сформирована на чекауте.</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Manager Actions -->
+                    <div class="detail-card">
+                        <h2 class="detail-card__title" style="font-size: 16px; margin-bottom: 16px; padding-bottom: 8px;">Действия менеджера</h2>
+   
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

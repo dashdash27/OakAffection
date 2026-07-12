@@ -227,6 +227,7 @@ def create_order():
         # Любая другая системная ошибка БД
         return jsonify({"success": False, "error": "Ошибка сервера при формировании заказа."}), 422
 
+    print("Order created:", order.id)
     return jsonify({
         "success": True,
         "order_id": order.id

@@ -6,6 +6,7 @@
     paymentBtn.addEventListener('click', async (e) => {
         const orderData = {
             "client_total_amount": checkoutState.totalPrice,
+            "client_items_total": checkoutState.itemsTotal,
             "client_contacts": {
                 "name": "Иван Иванов",
                 "phone": "+78889221122",

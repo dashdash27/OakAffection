@@ -41,6 +41,7 @@ class DeliverySchema(BaseModel):
 
 class OrderCreateSchema(BaseModel):
     client_total_amount: int = Field(..., ge=0)
+    client_items_total: int = Field(..., ge=0)
     client_contacts: ClientContactsSchema
     delivery: DeliverySchema
     cart: Dict[str, int] = Field(..., min_length=1)

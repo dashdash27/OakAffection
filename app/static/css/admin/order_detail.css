@@ -1,0 +1,115 @@
+.order-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Левая колонка в 2 раза шире правой */
+    gap: 24px;
+    align-items: start;
+}
+
+/* Detail Card */
+.detail-card {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    margin-bottom: 24px;
+}
+.detail-card__title {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #edf2f7;
+    color: #1a202c;
+}
+
+/* Reciept */
+.receipt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #f7fafc;
+}
+.receipt-item:last-child {
+    border-bottom: none;
+}
+.product-name {
+    font-weight: 600; 
+    font-size: 15px;
+}
+.product-qty {
+    color: #4a5568;
+}
+.product-price {
+    font-weight: 600; margin-top: 2px; color: #1a202c;
+}
+.receipt-footer {
+    margin-top: 24px; 
+    padding-top: 20px; 
+    border-top: 2px dashed #e2e8f0; 
+    font-size: 15px; 
+    color: #4a5568;
+}
+.receipt-delivery {
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 10px;
+}
+.receipt-discount {
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 10px; 
+    color: #e53e3e;
+}
+.receipt-total {
+    display: flex; 
+    justify-content: space-between; 
+    margin-top: 14px; 
+    font-size: 19px; 
+    font-weight: 700; 
+    color: #1a202c;
+}
+
+/* Customer and Ddelivery */
+.customer-and-delivery {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 32px; 
+    font-size: 14px; 
+    line-height: 1.6;
+}
+h3 {
+    font-size: 13px; 
+    text-transform: uppercase; 
+    color: #a0aec0; 
+    margin-bottom: 12px; 
+    letter-spacing: 0.5px;
+}
+.comment-block {
+    margin-top: 12px; 
+    padding: 10px; 
+    background: #f7fafc; 
+    border-left: 3px solid #cbd5e0; 
+    border-radius: 0 4px 4px 0;
+}
+
+/* Payment */
+.payment-item {
+    font-size: 14px; 
+    margin-bottom: 10px; 
+    color: #4a5568;
+}
+.transaction-id {
+    font-size: 11px; 
+    background: #fff; 
+    padding: 2px 4px; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 4px;
+}
+.payment-status {
+    margin-top: 14px; 
+    padding-top: 12px; 
+    border-top: 1px solid #e2e8f0; 
+    font-size: 14px;
+}
