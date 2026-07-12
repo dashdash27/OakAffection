@@ -58,3 +58,5 @@ class OrderItem(db.Model):
     
     product_name = db.Column(db.String(255), nullable=False) 
     price_at_purchase = db.Column(db.BigInteger, nullable=False)
+
+    product = db.relationship('Product', lazy=True)
