@@ -96,3 +96,61 @@
 .status-paid    { background: #e6f7ff; color: #0050b3; }
 .status-sent    { background: #f6ffed; color: #389e0d; }
 .status-cancelled { background: #fff1f0; color: #cf1322; }
+
+/* Filters */
+.orders-filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+    width: max-content;
+}
+.filter-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #595959;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.15s ease-in-out;
+}
+.filter-btn:hover {
+    color: #1f1f1f;
+    background: #f0f0f0;
+}
+.filter-btn.active {
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+}
+.filter-btn:not([class*="status-"]).active {
+    background: #262626;
+    color: #ffffff;
+}
+.filter-btn.status-pending.active {
+    background: #fff7e6;
+    color: #d46b08;
+    border-color: #ffd591;
+}
+.filter-btn.status-paid.active {
+    background: #e6f7ff;
+    color: #0050b3;
+    border-color: #91d5ff;
+}
+.filter-btn.status-sent.active {
+    background: #f6ffed;
+    color: #389e0d;
+    border-color: #b7eb8f;
+}
+.filter-btn.status-cancelled.active {
+    background: #fff1f0;
+    color: #cf1322;
+    border-color: #ffa39e;
+}

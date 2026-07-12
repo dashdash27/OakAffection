@@ -71,7 +71,7 @@
     color: #1a202c;
 }
 
-/* Customer and Ddelivery */
+/* Customer and Delivery */
 .customer-and-delivery {
     display: grid; 
     grid-template-columns: 1fr 1fr; 
@@ -85,6 +85,12 @@ h3 {
     color: #a0aec0; 
     margin-bottom: 12px; 
     letter-spacing: 0.5px;
+}
+.delivery-service-yandex {
+    color: rgb(237, 169, 12);
+}
+.delivery-service-russian_post {
+    color: rgb(6, 54, 176);
 }
 .comment-block {
     margin-top: 12px; 

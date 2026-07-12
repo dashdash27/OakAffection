@@ -11,6 +11,27 @@
 {% block content %}
    <div class="container">
         <h1>Заказы</h1>
+
+        <div class="orders-filter-bar">
+            <a href="{{ url_for('admin.orders') }}" class="filter-btn {% if not current_status %}active{% endif %}">
+                Все заказы
+            </a>
+            <a href="{{ url_for('admin.orders', status='active') }}" class="filter-btn {% if current_status == 'active' %}active{% endif %}">
+                Активные
+            </a>
+            <a href="{{ url_for('admin.orders', status='pending') }}" class="filter-btn status-pending {% if current_status == 'pending' %}active{% endif %}">
+                Ожидает
+            </a>
+            <a href="{{ url_for('admin.orders', status='paid') }}" class="filter-btn status-paid {% if current_status == 'paid' %}active{% endif %}">
+                Оплачен
+            </a>
+            <a href="{{ url_for('admin.orders', status='sent') }}" class="filter-btn status-sent {% if current_status == 'sent' %}active{% endif %}">
+                Отправлен
+            </a>
+            <a href="{{ url_for('admin.orders', status='cancelled') }}" class="filter-btn status-cancelled {% if current_status == 'cancelled' %}active{% endif %}">
+                Отменен
+            </a>
+        </div>
     
         <div class="orders-table">
             <div class="orders-table__header">

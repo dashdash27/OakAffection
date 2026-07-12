@@ -25,7 +25,7 @@
                             {% for item in order.items %}
                                 <div class="receipt-item">
                                     <div class="product-name">
-                                        {{ item.product_name }}
+                                        {{ item.product.name }}
                                     </div>
                                     <div style="text-align: right;">
                                         <div class="product-qty">{{ item.quantity }} шт. × {{ item.price_at_purchase }} ₽</div>
@@ -40,7 +40,7 @@
                         <!-- Receipt Footer -->
                         <div class="receipt-footer">
                             <div class="receipt-delivery">
-                                <div>Стоимость доставки ({{ order.delivery_service.value | upper }}):</div>
+                                <div>Стоимость доставки:</div>
                                 <div>{{ order.delivery_price }} ₽</div>
                             </div>
                             {% if order.discount_amount > 0 %}
@@ -84,8 +84,8 @@
                             
                             <!-- Delivery and Point -->
                             <div>
-                                <h3>Пункт выдачи (ПВЗ)</h3>
-                                <p><strong>Город/Регион:</strong> {{ order.delivery_settlement }}</p>
+                                <h3>Пункт выдачи (<span class="delivery-service-{{order.delivery_service.value}}">{{order.delivery_service.value}}</span>)</h3>
+                                <p><strong>Город/Населенный пункт:</strong> {{ order.delivery_settlement }}</p>
                                 <p><strong>Идентификатор точки:</strong> <code>{{ order.delivery_point_id }}</code></p>
                                 <p><strong>Адрес выдачи:</strong> {{ order.delivery_point_address }}</p>
                             </div>
