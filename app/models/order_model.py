@@ -1,7 +1,7 @@
 from app.extensions import db
 
 import enum
-from datetime import datetime, timezone
+from sqlalchemy import func
 
 
 class OrderStatus(enum.Enum):
@@ -36,7 +36,11 @@ class Order(db.Model):
     discount_amount = db.Column(db.BigInteger, default=0, nullable=False)
     total_amount = db.Column(db.BigInteger, nullable=False)
     
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(
+        db.DateTime(timezone=True), 
+        server_default=func.now(), 
+        nullable=False
+    )
     comment = db.Column(db.String(600), default="", nullable=False)
     delivery_track = db.Column(db.String(500), default="", nullable=False)
 

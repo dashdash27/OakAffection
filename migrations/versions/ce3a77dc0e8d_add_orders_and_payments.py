@@ -1,8 +1,8 @@
-"""feat: add orders, order_items and payments tables
+"""add_orders_and_payments
 
-Revision ID: 2e91aa29a162
+Revision ID: ce3a77dc0e8d
 Revises: ebfe5ef56623
-Create Date: 2026-07-11 12:44:18.314936
+Create Date: 2026-07-13 14:46:42.087992
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2e91aa29a162'
+revision = 'ce3a77dc0e8d'
 down_revision = 'ebfe5ef56623'
 branch_labels = None
 depends_on = None
@@ -31,7 +31,7 @@ def upgrade():
     sa.Column('delivery_price', sa.BigInteger(), nullable=False),
     sa.Column('discount_amount', sa.BigInteger(), nullable=False),
     sa.Column('total_amount', sa.BigInteger(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('comment', sa.String(length=600), nullable=False),
     sa.Column('delivery_track', sa.String(length=500), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_orders'))
@@ -43,8 +43,8 @@ def upgrade():
     sa.Column('external_id', sa.String(length=255), nullable=False),
     sa.Column('amount', sa.BigInteger(), nullable=False),
     sa.Column('status', sa.Enum('PENDING', 'REJECTED', 'COMPLETED', name='paymentstatus'), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], name=op.f('fk_payments_order_id_orders'), ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_payments')),
     sa.UniqueConstraint('order_id', name=op.f('uq_payments_order_id'))

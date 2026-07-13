@@ -1,7 +1,7 @@
 from app.extensions import db
 
 import enum
-from datetime import datetime, timezone
+from sqlalchemy import func
 
 
 class PaymentStatus(enum.Enum):
@@ -24,6 +24,14 @@ class Payment(db.Model):
     amount = db.Column(db.BigInteger, nullable=False)
     status = db.Column(db.Enum(PaymentStatus), default=PaymentStatus.PENDING, nullable=False)
     
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
-    # onupdate автоматически обновляет время при любом изменении строки
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(
+        db.DateTime(timezone=True), 
+        server_default=func.now(), 
+        nullable=False
+    )
+    updated_at = db.Column(
+        db.DateTime(timezone=True), 
+        server_default=func.now(), 
+        onupdate=func.now(), 
+        nullable=False
+    )
