@@ -6,7 +6,6 @@
     paymentBtn.addEventListener('click', async (e) => {
         const orderData = {
             "client_total_amount": checkoutState.totalPrice,
-            "client_items_total": checkoutState.itemsTotal,
             "client_contacts": {
                 "name": "Иван Иванов",
                 "phone": "+78889221122",
@@ -22,7 +21,6 @@
                     "address": checkoutState.selectedPvz.address,
                     "id": checkoutState.selectedPvz.id
                 },
-                "price": checkoutState.selectedDeliveryOption.price,
                 "days": checkoutState.selectedDeliveryOption.delivery_days,
                 "delivery_token": checkoutState.selectedDeliveryOption.delivery_token
             },

@@ -1,7 +1,7 @@
 from app.logger import logger
 from app.models import Product
 from app.extensions import limiter
-from .utils import process_cart, calculate_order_dimensions, calculate_order_price, calculate_order_total
+from .utils import process_cart, calculate_order_dimensions, calculate_cart_base_total, calculate_order_total, apply_threshold_discount
 from .schemas import OrderCreateSchema 
 from .core.order_creator import create_new_order_transaction
 
@@ -90,7 +90,6 @@ def suggest_cities():
     
     return jsonify(city_suggestions), 200
 
-
 @checkout_bp.route('/api/delivery/options', methods=['POST'])
 @limiter.limit("20 per minute")
 async def get_delivery_options():
@@ -108,7 +107,7 @@ async def get_delivery_options():
     
     order_items = process_cart(cart)
     order_dimensions = calculate_order_dimensions(order_items)
-    order_price = calculate_order_price(order_items)
+    order_price = calculate_cart_base_total(order_items)
 
     yandex_config = current_app.config.get("YANDEX_DELIVERY", {})
     russian_post_config = current_app.config.get("RUSSIAN_POST", {})
@@ -192,24 +191,27 @@ def create_order():
         trusted_delivery_price = int(decoded_delivery.get("price"))
         
     except jwt.ExpiredSignatureError:
-        # Токен истек
         return jsonify({
             "success": False, 
             "error": "Время действия тарифа доставки истекло. Пожалуйста, выберите город и , способ доставки и пункт выдачи (ПВЗ) заново для обновления цены."
         }), 422
     except jwt.InvalidTokenError:
-        # Если токен подделан, изменен или поврежден
         return jsonify({
             "success": False, 
             "error": "Ошибка проверки безопасности доставки. Пожалуйста, обновите страницу и попробуйте снова."
         }), 422
     
     # 3.  Calculate total_amount and compare
-    client_total_amount = validated_order.client_total_amount
-    server_total_amount = calculate_order_total(validated_order.cart, trusted_delivery_price)
+    order_items = process_cart(validated_order.cart)
+    items_base_total = calculate_cart_base_total(order_items)
+    items_discounted_total = apply_threshold_discount(items_base_total)
+    discount_amount = items_base_total - items_discounted_total
+    server_total_amount = items_discounted_total + trusted_delivery_price
 
-    print("Client total amount", client_total_amount)
-    print("Server total amount", server_total_amount)
+    client_total_amount = validated_order.client_total_amount
+
+    print("Client total amount:", client_total_amount)
+    print("Server total amount:", server_total_amount)
 
     if client_total_amount != server_total_amount:
         return jsonify({
@@ -218,8 +220,17 @@ def create_order():
         }), 422
     
     # 4. Create order
+    enriched_delivery = validated_order.delivery.model_copy(update={
+        "price": trusted_delivery_price
+    })
+    final_order_to_save = validated_order.model_copy(update={
+        "delivery": enriched_delivery,
+        "discount_amount": discount_amount,
+        "total_amount": server_total_amount
+    })
+
     try:
-        order = create_new_order_transaction(validated_order)
+        order = create_new_order_transaction(final_order_to_save)
     except ValueError as val_err:
         # Ошибка, если товара нет в базе
         return jsonify({"success": False, "error": str(val_err)}), 422

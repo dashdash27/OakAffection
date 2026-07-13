@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, EmailStr
-from typing import Dict
+from typing import Dict, Optional
 
 # name - ФИО минимум 2 слова
 # phone - +7 и 10 цифр
@@ -35,13 +35,18 @@ class DeliverySchema(BaseModel):
     service: str = Field(default="") 
     settlement: SettlementSchema
     point: PointSchema
-    price: int = Field(..., ge=0)
     days: str = Field(default="")
     delivery_token: str = Field(..., min_length=11)
 
+    # hidden field for backend
+    price: Optional[int] = None
+
 class OrderCreateSchema(BaseModel):
     client_total_amount: int = Field(..., ge=0)
-    client_items_total: int = Field(..., ge=0)
     client_contacts: ClientContactsSchema
     delivery: DeliverySchema
     cart: Dict[str, int] = Field(..., min_length=1)
+
+    # hidden fields for backend
+    discount_amount: Optional[int] = None
+    total_amount: Optional[int] = None

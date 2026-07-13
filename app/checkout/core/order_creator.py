@@ -4,8 +4,6 @@ from app.models.payment_model import Payment, PaymentStatus, PaymentGateway
 from app.models.product_model import Product
 from app.checkout.schemas import OrderCreateSchema
 
-from ..utils import calculate_discounted_price
-
 
 def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
     """Атомарная транзакция создания заказа в БД.
@@ -32,8 +30,8 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
             
             # TODO: вот эту цену проверять на фронте, чтобы она с trusted совпадала - в том файле проверку сделать
             delivery_price=validated_order.delivery.price,
-            discount_amount=validated_order.client_items_total - calculate_discounted_price(validated_order.client_items_total),
-            total_amount=validated_order.client_total_amount
+            discount_amount=validated_order.discount_amount,
+            total_amount=validated_order.total_amount
         )
         db.session.add(new_order)
         
