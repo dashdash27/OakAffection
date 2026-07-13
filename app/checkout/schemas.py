@@ -50,3 +50,4 @@ class OrderCreateSchema(BaseModel):
     # hidden fields for backend
     discount_amount: Optional[int] = None
     total_amount: Optional[int] = None
+    order_items: Optional[list[dict]] = None 

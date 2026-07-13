@@ -9,7 +9,7 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
     """Атомарная транзакция создания заказа в БД.
     
     1. Создает шапку заказа (Order)
-    2. Извлекает из БД актуальные цены и названия товаров и создает чеки (OrderItem)
+    2. Создает чеки (OrderItem)
     3. Создает запись платежа (Payment)
     
     Гарантирует Rollback при любой ошибке.
@@ -27,43 +27,26 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
             delivery_settlement=validated_order.delivery.settlement.name,
             delivery_point_id=validated_order.delivery.point.id,
             delivery_point_address=validated_order.delivery.point.address,
-            
-            # TODO: вот эту цену проверять на фронте, чтобы она с trusted совпадала - в том файле проверку сделать
+
             delivery_price=validated_order.delivery.price,
             discount_amount=validated_order.discount_amount,
             total_amount=validated_order.total_amount
         )
         db.session.add(new_order)
-        
-        # 2. Flash to get new_order.id,
-        db.session.flush()
+        db.session.flush()  # flash to get new_order.id,
 
-        # 3. Get all products IDs
-        product_ids = [int(pid) for pid in validated_order.cart.keys()]
-        
-        # 4. Get all products
-        db_products = Product.query.filter(Product.id.in_(product_ids)).all()
-        products_lookup = {p.id: p for p in db_products}
-
-        # 5. Create Order Items
-        for product_id_str, quantity in validated_order.cart.items():
-            pid_int = int(product_id_str)
-            product_obj = products_lookup.get(pid_int)
-            
-            if not product_obj:
-                # На всякий случай: если товар удалили из каталога прямо в секунду оформления
-                raise ValueError(f"Товар с ID {pid_int} больше недоступен в каталоге.")
-
+        # 2. Create Order Items
+        for item in validated_order.order_items:
             order_item = OrderItem(
                 order_id=new_order.id,
-                product_id=product_obj.id,
-                quantity=quantity,
-                product_name=product_obj.name,
-                price_at_purchase=product_obj.price
+                product_id=item["id"],
+                quantity=item["quantity"],
+                product_name=item["name"],
+                price_at_purchase=item["price"]
             )
             db.session.add(order_item)
 
-        # 6. Create Payment
+        # 3. Create Payment
         new_payment = Payment(
             order_id=new_order.id,
             gateway=PaymentGateway.OZON,
@@ -72,7 +55,7 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
         )
         db.session.add(new_payment)
 
-        # 7. Fix transaction
+        # 4. Fix transaction
         db.session.commit()
         return new_order
 

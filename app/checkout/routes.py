@@ -226,7 +226,8 @@ def create_order():
     final_order_to_save = validated_order.model_copy(update={
         "delivery": enriched_delivery,
         "discount_amount": discount_amount,
-        "total_amount": server_total_amount
+        "total_amount": server_total_amount,
+        "order_items": order_items
     })
 
     try:
