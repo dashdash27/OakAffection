@@ -1,8 +1,8 @@
 """add_orders_and_payments
 
-Revision ID: ce3a77dc0e8d
+Revision ID: 64facc8c308f
 Revises: ebfe5ef56623
-Create Date: 2026-07-13 14:46:42.087992
+Create Date: 2026-07-14 21:26:44.075354
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ce3a77dc0e8d'
+revision = '64facc8c308f'
 down_revision = 'ebfe5ef56623'
 branch_labels = None
 depends_on = None
@@ -56,6 +56,7 @@ def upgrade():
     sa.Column('quantity', sa.BigInteger(), nullable=False),
     sa.Column('product_name', sa.String(length=255), nullable=False),
     sa.Column('price_at_purchase', sa.BigInteger(), nullable=False),
+    sa.Column('price_with_discount', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], name=op.f('fk_order_items_order_id_orders'), ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], name=op.f('fk_order_items_product_id_products'), ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_order_items'))
