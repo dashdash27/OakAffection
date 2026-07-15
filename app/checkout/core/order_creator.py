@@ -42,7 +42,8 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
                 product_id=item["id"],
                 quantity=item["quantity"],
                 product_name=item["name"],
-                price_at_purchase=item["price"]
+                price_at_purchase=item["price"],
+                price_with_discount=item["price_with_discount"]
             )
             db.session.add(order_item)
 

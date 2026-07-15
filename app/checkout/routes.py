@@ -1,9 +1,10 @@
 from app.logger import logger
 from app.models import Product
 from app.extensions import limiter
-from .utils import process_cart, calculate_order_dimensions, calculate_cart_base_total, calculate_order_total, apply_threshold_discount
+from .utils import process_cart, calculate_order_dimensions, calculate_cart_base_total, apply_threshold_discount
 from .schemas import OrderCreateSchema 
 from .core.order_creator import create_new_order_transaction
+from app.payments.services.ozon_pay import request_ozon_pay_link
 
 from .services.dadata import get_city_suggestions
 from .services.yandex import get_yandex_delivery_info
@@ -219,7 +220,50 @@ def create_order():
             "error": "Ошибка расчета стоимости заказа. Пожалуйста, обновите корзину или выберите ПВЗ заново."
         }), 422
     
-    # 4. Create order
+    # 4. Распределение скидки на все товары
+    discount_coefficient = items_discounted_total / items_base_total
+
+    allocated_sum = 0
+    for item in order_items:
+        # считаем цену со скидкой за 1 шт, округляя до ближайшего целого рубля
+        item_discounted_price = round(item["price"] * discount_coefficient)
+        item["price_with_discount"] = item_discounted_price
+        
+        # прибавляем к сумме
+        allocated_sum += item_discounted_price * item["quantity"]
+        print("Price with discount:", item["price_with_discount"])
+        print("Allocated sum:", allocated_sum)
+    
+    rubles_difference = items_discounted_total - allocated_sum
+    if rubles_difference != 0 and len(order_items) > 0:
+        corrected = False
+
+        for item in order_items:
+            if item["quantity"] == 1:
+                item["price_with_discount"] += rubles_difference
+                corrected = True
+                print(f"Погрешность {rubles_difference} руб. успешно добавлена к единичному товару ID {item['id']}")
+                break
+
+        # Сценарий Б: Если все товары куплены по несколько штук (оптом),
+        # мы забираем ровно 1 штуку от самого первого товара и выделяем под неё новую строчку
+        if not corrected:
+            first_item = order_items[0]
+            
+            # Уменьшаем количество в текущей строке на 1 шт.
+            first_item["quantity"] -= 1
+            
+            # Создаем изолированную копию этой позиции ровно на 1 штуку
+            adjusted_item = first_item.copy()
+            adjusted_item["quantity"] = 1
+            # Прибавляем к ней всю погрешность округления
+            adjusted_item["price_with_discount"] += rubles_difference
+            
+            # Вставляем эту скорректированную позицию в самое начало списка
+            order_items.insert(0, adjusted_item)
+            print(f"Все товары оптовые. Позиция ID {first_item['id']} разбита на две строки для коррекции цены.")
+
+    # 5. Create order
     enriched_delivery = validated_order.delivery.model_copy(update={
         "price": trusted_delivery_price
     })
@@ -233,13 +277,22 @@ def create_order():
     try:
         order = create_new_order_transaction(final_order_to_save)
     except ValueError as val_err:
-        # Ошибка, если товара нет в базе
         return jsonify({"success": False, "error": str(val_err)}), 422
     except Exception:
-        # Любая другая системная ошибка БД
         return jsonify({"success": False, "error": "Ошибка сервера при формировании заказа."}), 422
 
-    print("Order created:", order.id)
+    print("Order in DB created:", order.id)
+
+    # TODO: create order in ozon pay
+    # try:
+    #     payment_url = request_ozon_pay_link(
+
+    #     )
+    #     return jsonify({"success": True, "order_id": order.id, "payment_url": payment_url}), 200
+    # except Exception as e:
+    #     print(f"Ошибка Ozon Pay: {e}")
+    #     return jsonify({"success": True, "order_id": order.id, "payment_error": "Ошибка платежного шлюза"}), 200
+
     return jsonify({
         "success": True,
         "order_id": order.id
