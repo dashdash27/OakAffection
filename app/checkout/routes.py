@@ -1,10 +1,12 @@
 from app.logger import logger
 from app.models import Product
 from app.extensions import limiter
-from .utils import process_cart, calculate_order_dimensions, calculate_cart_base_total, apply_threshold_discount
+from .utils import process_cart, calculate_order_dimensions, calculate_cart_base_total
 from .schemas import OrderCreateSchema 
 from .core.order_creator import create_new_order_transaction
 from app.payments.services.ozon_pay import request_ozon_pay_link
+from app.checkout.core.utils import verify_and_get_delivery_price
+from app.checkout.core.utils import validate_order_totals, allocate_items_discount
 
 from .services.dadata import get_city_suggestions
 from .services.yandex import get_yandex_delivery_info
@@ -170,130 +172,56 @@ def create_order():
     try:
         validated_order = OrderCreateSchema(**raw_data)
     except ValidationError as e:
-        formatted_errors = []
-        for error in e.errors():
-            field_path = " -> ".join(str(loc) for loc in error["loc"])
-            error_msg = error["msg"]
-            formatted_errors.append(f"Поле [{field_path}]: {error_msg}")
-            
-        print("Ошибки при валидации:", formatted_errors)
-
+        print("Ошибки при валидации:", [f"Поле {err['loc']}: {err['msg']}" for err in e.errors()])
         return jsonify({
             "success": False, 
-            "error": "Некоторые данные заполнены некорректно. Пожалуйста, проверьте правильность заполнения формы."
+            "error": "Некоторые данные заполнены некорректно. Пожалуйста, проверьте форму."
         }), 422
     
-    # 2. Checking JWT Token
-    delivery_token = validated_order.delivery.delivery_token
-    secret_key = os.getenv("SECRET_KEY")
-
     try:
-        decoded_delivery = jwt.decode(delivery_token, secret_key, algorithms=["HS256"])
-        trusted_delivery_price = int(decoded_delivery.get("price"))
+        # 2. Checking JWT Token
+        trusted_delivery_price = verify_and_get_delivery_price(validated_order.delivery.delivery_token)
         
-    except jwt.ExpiredSignatureError:
-        return jsonify({
-            "success": False, 
-            "error": "Время действия тарифа доставки истекло. Пожалуйста, выберите город и , способ доставки и пункт выдачи (ПВЗ) заново для обновления цены."
-        }), 422
-    except jwt.InvalidTokenError:
-        return jsonify({
-            "success": False, 
-            "error": "Ошибка проверки безопасности доставки. Пожалуйста, обновите страницу и попробуйте снова."
-        }), 422
-    
-    # 3.  Calculate total_amount and compare
-    order_items = process_cart(validated_order.cart)
-    items_base_total = calculate_cart_base_total(order_items)
-    items_discounted_total = apply_threshold_discount(items_base_total)
-    discount_amount = items_base_total - items_discounted_total
-    server_total_amount = items_discounted_total + trusted_delivery_price
-
-    client_total_amount = validated_order.client_total_amount
-
-    print("Client total amount:", client_total_amount)
-    print("Server total amount:", server_total_amount)
-
-    if client_total_amount != server_total_amount:
-        return jsonify({
-            "success": False, 
-            "error": "Ошибка расчета стоимости заказа. Пожалуйста, обновите корзину или выберите ПВЗ заново."
-        }), 422
-    
-    # 4. Распределение скидки на все товары
-    discount_coefficient = items_discounted_total / items_base_total
-
-    allocated_sum = 0
-    for item in order_items:
-        # считаем цену со скидкой за 1 шт, округляя до ближайшего целого рубля
-        item_discounted_price = round(item["price"] * discount_coefficient)
-        item["price_with_discount"] = item_discounted_price
+        # 3. Calculate total_amount and compare
+        totals_match, order_items, discount_amount, items_discounted_total = validate_order_totals(
+            cart=validated_order.cart,
+            trusted_delivery_price=trusted_delivery_price,
+            client_total_amount=validated_order.client_total_amount
+        )
+        if not totals_match:
+            return jsonify({"success": False, "error": "Ошибка расчета стоимости заказа. Пожалуйста, обновите корзину или выберите ПВЗ заново."}), 422
         
-        # прибавляем к сумме
-        allocated_sum += item_discounted_price * item["quantity"]
-        print("Price with discount:", item["price_with_discount"])
-        print("Allocated sum:", allocated_sum)
-    
-    rubles_difference = items_discounted_total - allocated_sum
-    if rubles_difference != 0 and len(order_items) > 0:
-        corrected = False
+        # 4. Распределяем скидку на товары
+        items_base_total = items_discounted_total + discount_amount
+        allocated_items = allocate_items_discount(order_items, items_base_total, items_discounted_total)
 
-        for item in order_items:
-            if item["quantity"] == 1:
-                item["price_with_discount"] += rubles_difference
-                corrected = True
-                print(f"Погрешность {rubles_difference} руб. успешно добавлена к единичному товару ID {item['id']}")
-                break
-
-        # Сценарий Б: Если все товары куплены по несколько штук (оптом),
-        # мы забираем ровно 1 штуку от самого первого товара и выделяем под неё новую строчку
-        if not corrected:
-            first_item = order_items[0]
-            
-            # Уменьшаем количество в текущей строке на 1 шт.
-            first_item["quantity"] -= 1
-            
-            # Создаем изолированную копию этой позиции ровно на 1 штуку
-            adjusted_item = first_item.copy()
-            adjusted_item["quantity"] = 1
-            # Прибавляем к ней всю погрешность округления
-            adjusted_item["price_with_discount"] += rubles_difference
-            
-            # Вставляем эту скорректированную позицию в самое начало списка
-            order_items.insert(0, adjusted_item)
-            print(f"Все товары оптовые. Позиция ID {first_item['id']} разбита на две строки для коррекции цены.")
-
-    # 5. Create order
-    enriched_delivery = validated_order.delivery.model_copy(update={
-        "price": trusted_delivery_price
-    })
-    final_order_to_save = validated_order.model_copy(update={
-        "delivery": enriched_delivery,
-        "discount_amount": discount_amount,
-        "total_amount": server_total_amount,
-        "order_items": order_items
-    })
-
-    try:
+        # 5. Create order
+        enriched_delivery = validated_order.delivery.model_copy(update={
+            "price": trusted_delivery_price
+        })
+        server_total_amount = items_discounted_total + trusted_delivery_price
+        final_order_to_save = validated_order.model_copy(update={
+            "delivery": enriched_delivery,
+            "discount_amount": discount_amount,
+            "total_amount": server_total_amount,
+            "order_items": allocated_items
+        })
+        
         order = create_new_order_transaction(final_order_to_save)
+        print("Order in DB created:", order.id)
+
+        # 6. Create order in ozon pay
+        ozon_pay_cfg = current_app.config.get("OZON_PAY", {})
+        pay_link = request_ozon_pay_link(order, ozon_pay_cfg)
+
+        if pay_link is not None:
+            return jsonify({"success": True, "order_id": order.id, "pay_link": pay_link}), 200
+        else:
+            return jsonify({"success": False, "error": "Ошибка платежного шлюза"}), 500
+        
     except ValueError as val_err:
+        # Сюда прилетят ошибки протухшего JWT или ошибки самого create_new_order_transaction
         return jsonify({"success": False, "error": str(val_err)}), 422
-    except Exception:
-        return jsonify({"success": False, "error": "Ошибка сервера при формировании заказа."}), 422
-
-    print("Order in DB created:", order.id)
-
-    # TODO: create order in ozon pay
-    # try:
-    #     payment_url = request_ozon_pay_link(
-
-    #     )
-    #     return jsonify({"success": True, "order_id": order.id, "payment_url": payment_url}), 200
-    # except Exception as e:
-    #     print(f"Ошибка Ozon Pay: {e}")
-    #     return jsonify({"success": True, "order_id": order.id, "payment_error": "Ошибка платежного шлюза"}), 200
-
-    return jsonify({
-        "success": True,
-        "order_id": order.id
-    }), 200
+    except Exception as e:
+        print(f"[FATAL ERROR] Критическая ошибка при оформлении: {e}")
+        return jsonify({"success": False, "error": "Ошибка сервера при формировании заказа."}), 500
