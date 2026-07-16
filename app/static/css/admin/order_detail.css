@@ -38,11 +38,24 @@
     font-weight: 600; 
     font-size: 15px;
 }
-.product-qty {
+.product__qty {
     color: #4a5568;
 }
-.product-price {
-    font-weight: 600; margin-top: 2px; color: #1a202c;
+.product-item__old-price {
+    text-decoration: line-through; 
+    color: #9c9b9b; 
+    font-size: 14px; 
+    margin-right: 4px;
+}
+.product-item__new-price {
+    color: #cf1322; 
+    font-weight: 600;
+}
+.product__price {
+    font-size: 16px; 
+    font-weight: 700; 
+    color: #262626; 
+    margin-top: 7px;
 }
 .receipt-footer {
     margin-top: 24px; 
@@ -51,22 +64,19 @@
     font-size: 15px; 
     color: #4a5568;
 }
-.receipt-delivery {
+.receipt-footer__item {
     display: flex; 
     justify-content: space-between; 
     margin-bottom: 10px;
 }
 .receipt-discount {
-    display: flex; 
-    justify-content: space-between; 
-    margin-bottom: 10px; 
     color: #e53e3e;
 }
 .receipt-total {
     display: flex; 
     justify-content: space-between; 
-    margin-top: 14px; 
-    font-size: 19px; 
+    margin-top: 16px; 
+    font-size: 20px; 
     font-weight: 700; 
     color: #1a202c;
 }

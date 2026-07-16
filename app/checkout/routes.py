@@ -16,8 +16,6 @@ import asyncio
 import httpx
 from flask import Blueprint, render_template, request, jsonify, current_app
 from pydantic import ValidationError
-import os
-import jwt
 
 
 checkout_bp = Blueprint('checkout', __name__, url_prefix='/checkout')
@@ -217,10 +215,9 @@ def create_order():
         if pay_link is not None:
             return jsonify({"success": True, "order_id": order.id, "pay_link": pay_link}), 200
         else:
-            return jsonify({"success": False, "error": "Ошибка платежного шлюза"}), 500
+            return jsonify({"success": False, "error": "Ошибка платежного шлюза"}), 502
         
     except ValueError as val_err:
-        # Сюда прилетят ошибки протухшего JWT или ошибки самого create_new_order_transaction
         return jsonify({"success": False, "error": str(val_err)}), 422
     except Exception as e:
         print(f"[FATAL ERROR] Критическая ошибка при оформлении: {e}")

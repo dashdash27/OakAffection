@@ -1,7 +1,6 @@
 from app.models import Order 
 from app.payments.utils import generate_ozon_pay_sign   
 
-from flask import current_app
 import requests
 import json
 

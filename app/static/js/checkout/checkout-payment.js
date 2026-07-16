@@ -29,11 +29,11 @@
         console.log(orderData);
 
         const result = await fetchCreateOrder(orderData);
-        
-        console.log(result);
 
         if (result.success) {
-            console.log("Запрос пришел успешно, переходим на страницу оплаты");
+            console.log(`Заказ #${result.data.order_id} успешно создан, переход к оплате`);
+            window.location.href = result.data.pay_link;
+            return;
         } else {
             alert(result.message); 
         }
