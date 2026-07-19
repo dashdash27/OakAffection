@@ -21,6 +21,8 @@ class Order(db.Model):
     __tablename__ = 'orders'
     
     id = db.Column(db.BigInteger, primary_key=True)
+    ext_id = db.Column(db.String(255), nullable=True)
+
     status = db.Column(db.Enum(OrderStatus), default=OrderStatus.PENDING, nullable=False)
     
     customer_name = db.Column(db.String(150), nullable=False)
