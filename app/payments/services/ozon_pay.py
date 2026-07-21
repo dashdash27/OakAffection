@@ -22,8 +22,6 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
         print("[OZON PAY ERROR] Не настроены URL_CREATE_ORDER или ACCESS_KEY в конфигурации.")
         return None
 
-    target_total_amount_kopecks = int(order.total_amount * 100)
-
     # Add Order Items
     ozon_items = []
     for item in order.items:
@@ -32,7 +30,7 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
             "name": f"{item.product_name}",
             "price": {
                 "currencyCode": "643",
-                "value": str(int(item.price_with_discount * 100))
+                "value": str(item.price_with_discount)
             },
             "quantity": item.quantity,
             "type": "TYPE_PRODUCT",
@@ -45,7 +43,7 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
             "name": f"Доставка ({order.delivery_service.value})",
             "price": {
                 "currencyCode": "643",
-                "value": str(int(order.delivery_price * 100))
+                "value": str(order.delivery_price)
             },
             "quantity": 1,
             "type": "TYPE_SERVICE",
@@ -57,14 +55,15 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
         "accessKey": access_key,
         "amount": {
             "currencyCode": "643",
-            "value": str(target_total_amount_kopecks)
+            "value": str(order.total_amount)
         },
         "enableFiscalization": True,
-        "extId": f"LOCAL-{order.id}",
+        "extId": f"LOCAL1-{order.id}",
         "fiscalizationPhone": order.customer_phone,
         "fiscalizationType": "FISCAL_TYPE_SINGLE",
         "items": ozon_items,
         "mode": "MODE_FULL",
+        "notificationUrl": "http://bgers-85-174-194-191.run.pinggy-free.link/payments/api/ozon-pay-webhook",
         "paymentAlgorithm": "PAY_ALGO_SMS"
     }
     # generate sign
@@ -78,9 +77,11 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
 
         response_data = response.json() or {}
         order_data = response_data.get('order') or {}
+
+        ext_order_id = order_data.get('id')
         pay_link = order_data.get('payLink')
         
-        return pay_link
+        return pay_link, ext_order_id
 
     except requests.exceptions.RequestException as req_err:
         print(f"[OZON PAY HTTP ERROR] Сбой API для заказа {order.id}: {req_err}")

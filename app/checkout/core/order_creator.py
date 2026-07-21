@@ -15,7 +15,7 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
     Гарантирует Rollback при любой ошибке.
     """
     try:
-        # 1. Create Order (Order.status = PENDING)
+        # 1. Create Order (Order.status = PENDING) - переводим цены в копейки
         new_order = Order(
             status=OrderStatus.PENDING,
 
@@ -28,9 +28,9 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
             delivery_point_id=validated_order.delivery.point.id,
             delivery_point_address=validated_order.delivery.point.address,
 
-            delivery_price=validated_order.delivery.price,
-            discount_amount=validated_order.discount_amount,
-            total_amount=validated_order.total_amount
+            delivery_price=int(validated_order.delivery.price * 100),
+            discount_amount=int(validated_order.discount_amount * 100),
+            total_amount=int(validated_order.total_amount * 100)
         )
         db.session.add(new_order)
         db.session.flush()  # flash to get new_order.id,
@@ -42,8 +42,8 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
                 product_id=item["id"],
                 quantity=item["quantity"],
                 product_name=item["name"],
-                price_at_purchase=item["price"],
-                price_with_discount=item["price_with_discount"]
+                price_at_purchase=int(item["price"] * 100),
+                price_with_discount=int(item["price_with_discount"] * 100)
             )
             db.session.add(order_item)
 

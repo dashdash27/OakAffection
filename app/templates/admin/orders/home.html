@@ -64,7 +64,7 @@
                         </div>
                     </div>
 
-                    <div class="col-amount">{{order.total_amount}} ₽</div>
+                    <div class="col-amount">{{order.total_amount // 100}} ₽</div>
 
                     <div class="col-status">
                         <span class="badge-status status-{{ order.status.value }}">

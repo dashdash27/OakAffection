@@ -33,16 +33,16 @@
                                             
                                             {% if item.price_at_purchase != item.price_with_discount %}
                                                 <!-- Есть скидка: зачеркиваем оригинал, показываем финальную -->
-                                                <span class="product-item__old-price">{{ item.price_at_purchase }} ₽</span>
-                                                <span class="product-item__new-price">{{ item.price_with_discount }} ₽</span>
+                                                <span class="product-item__old-price">{{ item.price_at_purchase // 100 }} ₽</span>
+                                                <span class="product-item__new-price">{{ item.price_with_discount // 100 }} ₽</span>
                                             {% else %}
                                                 <!-- Скидки нет: обычная цена -->
-                                                <span class="product-item__price">{{ item.price_at_purchase }} ₽</span>
+                                                <span class="product-item__price">{{ item.price_at_purchase // 100 }} ₽</span>
                                             {% endif %}
                                         </div>
                                         <!-- Итоговая стоимость строки (Всегда по цене со скидкой, чтобы сходился Итог) -->
                                         <div class="product__price">
-                                            {{ item.quantity * item.price_with_discount }} ₽
+                                            {{ (item.quantity * item.price_with_discount) // 100 }} ₽
                                         </div>
                                     </div>
                                 </div>
@@ -60,24 +60,24 @@
                             <div class="receipt-footer__item">
                                 <div>Стоимость товаров (без скидки):</div>
                                 <div>
-                                    {{ ns.items_raw_total }} ₽
+                                    {{ ns.items_raw_total // 100}} ₽
                                 </div>
                             </div>
                             {% if order.discount_amount > 0 %}
                                 <div class="receipt-discount receipt-footer__item">
                                     <div>Скидка на товары:</div>
-                                    <div>-{{ order.discount_amount }} ₽</div>
+                                    <div>-{{ order.discount_amount // 100 }} ₽</div>
                                 </div>
                             {% endif %}
 
                             <div class="receipt-delivery receipt-footer__item">
                                 <div>Стоимость доставки:</div>
-                                <div>{{ order.delivery_price }} ₽</div>
+                                <div>{{ order.delivery_price // 100 }} ₽</div>
                             </div>
 
                             <div class="receipt-total receipt-footer__item">
                                 <div>Итого к оплате:</div>
-                                <div>{{ order.total_amount }} ₽</div>
+                                <div>{{ order.total_amount // 100 }} ₽</div>
                             </div>
                         </div>
 
@@ -128,7 +128,7 @@
                         <h2 class="detail-card__title">Статус оплаты</h2>
                         {% if order.payment %}
                             <div class="payment-item">
-                                <strong>Сумма транзакции:</strong> {{ order.payment.amount }} ₽
+                                <strong>Сумма транзакции:</strong> {{ order.payment.amount // 100 }} ₽
                             </div>
                             <div class="payment-item">
                                 <strong>ID транзакции банка:</strong> 
