@@ -1,3 +1,35 @@
+.order__header {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.order-meta.detail-card {
+    color: #4a5568;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.order-date span {
+    font-size: 14px;
+}
+/* Status */
+.badge-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+}
+.status-pending { background: #fff7e6; color: #d46b08; }
+.status-paid, .status-completed    { background: #e6f7ff; color: #0050b3; }
+.status-sent    { background: #f6ffed; color: #389e0d; }
+.status-cancelled { background: #fff1f0; color: #cf1322; }
+
 .order-detail-grid {
     display: grid;
     grid-template-columns: 2fr 1fr; /* Левая колонка в 2 раза шире правой */
@@ -113,7 +145,7 @@ h3 {
 /* Payment */
 .payment-item {
     font-size: 14px; 
-    margin-bottom: 10px; 
+    margin-bottom: 15px; 
     color: #4a5568;
 }
 .transaction-id {
@@ -124,6 +156,9 @@ h3 {
     border-radius: 4px;
 }
 .payment-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-top: 14px; 
     padding-top: 12px; 
     border-top: 1px solid #e2e8f0; 

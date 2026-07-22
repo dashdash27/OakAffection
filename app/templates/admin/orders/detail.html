@@ -12,7 +12,25 @@
    <div class="container">
         
         <div class="order-detail">
-            <h1>Заказ #{{ order.id }}</h1>
+
+            <div class="order__header">
+                <h1>Заказ #{{ order.id }}</h1>
+                
+                <div class="order-meta detail-card">
+                    <div class="order-date">
+                        <strong>Дата создания:</strong>
+                        <span class="order-date">{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                    </div>
+                    <div class="order-status">
+                        <strong>Статус заказа:</strong>
+                        <span class="badge-status status-{{ order.status.value }}">
+                        {{ order.status.value }}
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+            
 
             <div class="order-detail-grid">
                 <div class="order-detail-grid__main">
@@ -131,18 +149,25 @@
                                 <strong>Сумма транзакции:</strong> {{ order.payment.amount // 100 }} ₽
                             </div>
                             <div class="payment-item">
+                                <strong>Платежный шлюз:</strong> {{ order.payment.gateway.value }}
+                            </div>
+                            <div class="payment-item">
+                                <strong>ID платежа:</strong> 
+                                <code class="transaction-id">{{ order.payment.id }}</code>
+                            </div>
+                            <div class="payment-item">
                                 <strong>ID транзакции банка:</strong> 
                                 <code class="transaction-id">{{ order.payment.external_id or 'Ожидает генерации сессии' }}</code>
                             </div>
+                            <div class="payment-item">
+                                <strong>Обновлен статус:</strong> {{order.payment.updated_at.strftime('%d.%m.%Y %H:%M')}}
+                            </div>
                             <div class="payment-status">
                                 <strong>Текущий статус:</strong> 
-                                {% if order.payment.status.value == 'completed' %}
-                                    <span style="color: #389e0d; font-weight: 700;">● COMPLETED (Оплачено)</span>
-                                {% elif order.payment.status.value == 'pending' %}
-                                    <span style="color: #d46b08; font-weight: 700;">● PENDING (Ожидает ввода карты)</span>
-                                {% else %}
-                                    <span style="color: #cf1322; font-weight: 700;">● REJECTED (Ошибка/Отказ банка)</span>
-                                {% endif %}
+
+                                <div class="badge-status status-{{order.payment.status.value}}">
+                                    {{order.payment.status.value}}
+                                </div>
                             </div>
                         {% else %}
                             <div style="color: #a0aec0; font-size: 13px; font-style: italic;">Платежная сессия для Озона не была сформирована на чекауте.</div>
