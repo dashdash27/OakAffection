@@ -10,4 +10,4 @@ from app.models.target_model import Target, products_targets, product_draft_targ
 from app.models.video_model import ProductVideo, ProductDraftVideo
 from app.models.admin_user_model import AdminUser
 from app.models.order_model import Order, OrderItem, OrderStatus
-from app.models.payment_model import Payment
+from app.models.payment_model import Payment, PaymentStatus, PaymentGateway

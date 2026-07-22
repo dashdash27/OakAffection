@@ -18,6 +18,9 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
     url = ozon_pay_cfg.get("URL_CREATE_ORDER")
     access_key = ozon_pay_cfg.get("ACCESS_KEY")
 
+    notification_url = ozon_pay_cfg.get("NOTIFICATION_URL")
+    order_prefix = ozon_pay_cfg.get("ORDER_PREFIX")
+
     if not url or not access_key:
         print("[OZON PAY ERROR] Не настроены URL_CREATE_ORDER или ACCESS_KEY в конфигурации.")
         return None
@@ -58,12 +61,12 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
             "value": str(order.total_amount)
         },
         "enableFiscalization": True,
-        "extId": f"LOCAL1-{order.id}",
+        "extId": f"{order_prefix}{order.id}",
         "fiscalizationPhone": order.customer_phone,
         "fiscalizationType": "FISCAL_TYPE_SINGLE",
         "items": ozon_items,
         "mode": "MODE_FULL",
-        "notificationUrl": "http://bgers-85-174-194-191.run.pinggy-free.link/payments/api/ozon-pay-webhook",
+        "notificationUrl": notification_url,
         "paymentAlgorithm": "PAY_ALGO_SMS"
     }
     # generate sign

@@ -1,6 +1,6 @@
 from app.logger import logger
 from app.models import Product
-from app.extensions import limiter
+from app.extensions import limiter, db
 from .utils import process_cart, calculate_order_dimensions, calculate_cart_base_total
 from .schemas import OrderCreateSchema 
 from .core.order_creator import create_new_order_transaction
@@ -210,13 +210,21 @@ def create_order():
 
         # 6. Create order in ozon pay
         ozon_pay_cfg = current_app.config.get("OZON_PAY", {})
-        pay_link = request_ozon_pay_link(order, ozon_pay_cfg)
+        pay_link, ext_order_id = request_ozon_pay_link(order, ozon_pay_cfg)
 
-        if pay_link is not None:
+        if pay_link is not None and ext_order_id is not None:
+            # 7. Save ext_db for order in DB
+            try:
+                order.ext_id = ext_order_id  
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({"success": False, "error": "Ошибка сервера при сохранения данных оплаты"}), 500
+            
             return jsonify({"success": True, "order_id": order.id, "pay_link": pay_link}), 200
         else:
             return jsonify({"success": False, "error": "Ошибка платежного шлюза"}), 502
-        
+
     except ValueError as val_err:
         return jsonify({"success": False, "error": str(val_err)}), 422
     except Exception as e:
