@@ -138,6 +138,7 @@
                             </div>
                             
                         </div>
+
                     </div>
                 </div>
 
@@ -181,28 +182,49 @@
                     <div class="detail-card">
                         <h2 class="detail-card__title" style="font-size: 16px; margin-bottom: 16px; padding-bottom: 8px;">Действия менеджера</h2>
 
-                        <div class="actions">
-                            {% if buttons.ship %}
-                                <button class="action-btn action-ship" data-order-id="{{ order.id }}" data-action="ship">Отправить заказ</button>
-                            {% endif %}
+                        <div class="actions-box">
+                            <h3>Изменить статус заказа</div>
+                            <div class="actions-btns">
+                                {% if buttons.ship %}
+                                    <button class="action-btn action-ship" data-order-id="{{ order.id }}" data-action="ship">Отправить заказ</button>
+                                {% endif %}
 
-                            {% if buttons.deliver %}
-                                <button class="action-btn action-deliver" data-order-id="{{ order.id }}" data-action="deliver">Отметить «Доставлен»</button>
-                            {% endif %}
+                                {% if buttons.deliver %}
+                                    <button class="action-btn action-deliver" data-order-id="{{ order.id }}" data-action="deliver">Отметить «Доставлен»</button>
+                                {% endif %}
 
-                            {% if buttons.rollback_sent %}
-                                <button class="action-btn action-rollback" data-order-id="{{ order.id }}" data-action="rollback_sent">Вернуть в «Отправлен»</button>
-                            {% endif %}
+                                {% if buttons.rollback_sent %}
+                                    <button class="action-btn action-rollback" data-order-id="{{ order.id }}" data-action="rollback_sent">Вернуть в «Отправлен»</button>
+                                {% endif %}
 
-                            {% if buttons.refund_mark %}
-                                <button class="action-btn action-refund-mark" data-order-id="{{ order.id }}" data-action="refund_mark">Отметить возврат</button>
-                            {% endif %}
+                                {% if buttons.refund_mark %}
+                                    <button class="action-btn action-refund-mark" data-order-id="{{ order.id }}" data-action="refund_mark">Отметить возврат</button>
+                                {% endif %}
 
-                            {% if buttons.refund_cancel %}
-                                <button class="action-btn action-refund-cancel" data-order-id="{{ order.id }}" data-action="refund_cancel">Отменить возврат</button>
+                                {% if buttons.refund_cancel %}
+                                    <button class="action-btn action-refund-cancel" data-order-id="{{ order.id }}" data-action="refund_cancel">Отменить возврат</button>
+                                {% endif %}
+                            </div>
+
+                        <div class="actions-box">
+                            <h3>Трек-номер</h3>
+                            {% if order.status.value in ['paid', 'sent', 'delivered', 'returned'] %}
+                                <div class="track-wrapper">
+                                    <!-- Если трек уже есть в БД, поле заблокировано (disabled) -->
+                                    <input class="track-input" type="text" id="trackInput" placeholder="Введите трек-номер" 
+                                        value="{{ order.delivery_track or '' }}"
+                                        {% if order.delivery_track %}disabled{% endif %}>
+                                    
+                                    <!-- Если трека нет — показываем фиолетовую кнопку отправки -->
+                                    <button class="track-btn" id="trackBtn" class="btn-action" data-order-id="{{order.id}}">
+                                        {% if order.delivery_track %}Редактировать{% else %}Отправить клиенту{% endif %}
+                                    </button>
+                                </div>
+                            {% else %}
+                                <span style="color: #a0aec0; font-size: 13px; font-style: italic;">Трек-номер отправить пока нельзя, так как заказ еще не оплачен.</span>
                             {% endif %}
                         </div>
-                    
+
                     </div>
 
                 </div>

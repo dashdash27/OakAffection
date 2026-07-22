@@ -117,3 +117,29 @@ def change_order_status(order_id):
         db.session.rollback()
         print(f"-> [Админка Ошибка]: Ошибка транзакции при действии {action} для заказа #{order_id}: {e}")
         return jsonify({"success": False, "error": "Внутренняя ошибка сервера при записи в БД"}), 500
+    
+
+@admin_bp.route('/orders/<int:order_id>/track', methods=['POST'])
+def save_order_track(order_id):
+    order = Order.query.get_or_404(order_id)
+    
+    req_data = request.get_json(silent=True)
+    track_number = req_data.get('track_number', '').strip()
+
+    if not track_number:
+        return jsonify({"success": False, "error": "Пустой трек-номер"}), 400
+
+    try:
+        # 1. Сохраняем трек в модель заказа
+        order.delivery_track = track_number
+        
+        # 2. ТУТ ВЫЗЫВАЕТСЯ ВАША СТАНДАРТНАЯ ФУНКЦИЯ ОТПРАВКИ EMAIL:
+        # send_track_email(email=order.user.email, track=track_number)
+        print(f"-> [Email]: Письмо с треком {track_number} отправлено для заказа #{order_id}")
+
+        db.session.commit()
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500

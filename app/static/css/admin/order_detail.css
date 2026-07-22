@@ -62,10 +62,10 @@
     color: #cf1322;
     border: 1px solid #ffa39e;
 }
-.payment-status-returned {
-    background: #fff0f6;
-    color: #c41d7f;
-    border: 1px solid #ffadd2;
+.payment-status-pending {
+    background: #fff7e6;
+    color: #d46b08;
+    border: 1px solid #ffd591; 
 }
 
 .order-detail-grid {
@@ -204,7 +204,10 @@ h3 {
 }
 
 /* Manager */
-.actions {
+.actions-title {
+    text-transform: uppercase;
+}
+.actions-btns {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
@@ -253,4 +256,32 @@ h3 {
     background: #e6f7ff;
     color: #0050b3;
     border-color: #bae7ff;
+}
+
+/* Track */
+.track-wrapper input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 7px;
+    border: 1px solid rgb(201, 201, 201);
+}
+.track-wrapper button {
+    margin-top: 15px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    
+    /* Изначально нейтральный, строгий вид */
+    background: #f6f8fa;
+    color: #515154;
+    border: 1px solid #e5e5ea;
+    
+    transition: all 0.2s ease-in-out;
 }
