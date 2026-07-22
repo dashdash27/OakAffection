@@ -92,10 +92,32 @@
     text-transform: uppercase;
     text-align: center;
 }
-.status-pending { background: #fff7e6; color: #d46b08; }
-.status-paid    { background: #e6f7ff; color: #0050b3; }
-.status-sent    { background: #f6ffed; color: #389e0d; }
-.status-cancelled { background: #fff1f0; color: #cf1322; }
+.order-status-pending { 
+    background: #fff7e6;
+    color: #d46b08;
+    border: 1px solid #ffd591; 
+}
+.order-status-paid { 
+    background: #e6f7ff;
+    color: #0050b3;
+    border: 1px solid #91d5ff;
+ }
+.order-status-sent    { 
+    background: #f9f0ff;
+    color: #531dab;
+    border: 1px solid #d3adf7;
+}
+.order-status-delivered {
+    background: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+.order-status-returned {
+    background: #fff0f6;
+    color: #c41d7f;
+    border: 1px solid #ffadd2;
+}
+
 
 /* Filters */
 .orders-filter-bar {

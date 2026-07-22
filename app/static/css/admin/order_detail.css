@@ -25,10 +25,48 @@
     text-transform: uppercase;
     text-align: center;
 }
-.status-pending { background: #fff7e6; color: #d46b08; }
-.status-paid, .status-completed    { background: #e6f7ff; color: #0050b3; }
-.status-sent    { background: #f6ffed; color: #389e0d; }
-.status-cancelled { background: #fff1f0; color: #cf1322; }
+.order-status-pending { 
+    background: #fff7e6;
+    color: #d46b08;
+    border: 1px solid #ffd591; 
+}
+.order-status-paid { 
+    background: #e6f7ff;
+    color: #0050b3;
+    border: 1px solid #91d5ff;
+ }
+.order-status-sent    { 
+    background: #f9f0ff;
+    color: #531dab;
+    border: 1px solid #d3adf7;
+}
+.order-status-delivered {
+    background: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+.order-status-returned {
+    background: #fff0f6;
+    color: #c41d7f;
+    border: 1px solid #ffadd2;
+}
+
+/* Payment Status */
+.payment-status-completed {
+    background: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+.payment-status-rejected {
+    background: #fff1f0;
+    color: #cf1322;
+    border: 1px solid #ffa39e;
+}
+.payment-status-returned {
+    background: #fff0f6;
+    color: #c41d7f;
+    border: 1px solid #ffadd2;
+}
 
 .order-detail-grid {
     display: grid;
@@ -163,4 +201,56 @@ h3 {
     padding-top: 12px; 
     border-top: 1px solid #e2e8f0; 
     font-size: 14px;
+}
+
+/* Manager */
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    
+    /* Изначально нейтральный, строгий вид */
+    background: #f6f8fa;
+    color: #515154;
+    border: 1px solid #e5e5ea;
+    
+    transition: all 0.2s ease-in-out;
+}
+
+.action-ship:hover, .action-deliver:hover {
+    background: #f6ffed;
+    color: #389e0d;
+    border-color: #d9f7be;
+}
+
+/* Кнопка "Ошибся / Вернуть назад" (Цвет статуса PENDING — оранжевый) */
+.action-rollback:hover {
+    background: #fff7e6; 
+    color: #d46b08;
+    border-color: #ffd591;
+}
+
+/* Кнопка "Отметить ручной возврат" (Цвет статуса CANCELLED — красный) */
+.action-refund-mark:hover {
+    background: #fff1f0;
+    color: #cf1322;
+    border-color: #ffccc7;
+}
+
+/* Кнопка "Отменить возврат" (Цвет статуса PAID — нежно-голубой) */
+.action-refund-cancel:hover {
+    background: #e6f7ff;
+    color: #0050b3;
+    border-color: #bae7ff;
 }

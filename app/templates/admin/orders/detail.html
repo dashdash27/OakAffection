@@ -9,6 +9,9 @@
 {% endblock %}
 
 {% block content %}
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
    <div class="container">
         
         <div class="order-detail">
@@ -23,7 +26,7 @@
                     </div>
                     <div class="order-status">
                         <strong>Статус заказа:</strong>
-                        <span class="badge-status status-{{ order.status.value }}">
+                        <span class="badge-status order-status-{{ order.status.value }}">
                         {{ order.status.value }}
                         </span>
                     </div>
@@ -165,7 +168,7 @@
                             <div class="payment-status">
                                 <strong>Текущий статус:</strong> 
 
-                                <div class="badge-status status-{{order.payment.status.value}}">
+                                <div class="badge-status payment-status-{{order.payment.status.value}}">
                                     {{order.payment.status.value}}
                                 </div>
                             </div>
@@ -177,7 +180,29 @@
                     <!-- Manager Actions -->
                     <div class="detail-card">
                         <h2 class="detail-card__title" style="font-size: 16px; margin-bottom: 16px; padding-bottom: 8px;">Действия менеджера</h2>
-   
+
+                        <div class="actions">
+                            {% if buttons.ship %}
+                                <button class="action-btn action-ship" data-order-id="{{ order.id }}" data-action="ship">Отправить заказ</button>
+                            {% endif %}
+
+                            {% if buttons.deliver %}
+                                <button class="action-btn action-deliver" data-order-id="{{ order.id }}" data-action="deliver">Отметить «Доставлен»</button>
+                            {% endif %}
+
+                            {% if buttons.rollback_sent %}
+                                <button class="action-btn action-rollback" data-order-id="{{ order.id }}" data-action="rollback_sent">Вернуть в «Отправлен»</button>
+                            {% endif %}
+
+                            {% if buttons.refund_mark %}
+                                <button class="action-btn action-refund-mark" data-order-id="{{ order.id }}" data-action="refund_mark">Отметить возврат</button>
+                            {% endif %}
+
+                            {% if buttons.refund_cancel %}
+                                <button class="action-btn action-refund-cancel" data-order-id="{{ order.id }}" data-action="refund_cancel">Отменить возврат</button>
+                            {% endif %}
+                        </div>
+                    
                     </div>
 
                 </div>
@@ -185,4 +210,6 @@
         </div>
 
     </div>
+
+    <script src="{{ url_for('static', filename='js/admin/order.js') }}"></script>
 {% endblock %}
