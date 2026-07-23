@@ -68,20 +68,20 @@ document.addEventListener('DOMContentLoaded', () => {
             trackInput.disabled = false; // Разблокируем поле для ввода
             trackInput.focus();          // Ставим курсор внутрь
             trackBtn.innerText = "Сохранить и отправить клиенту";
-            trackBtn.style.background = "#a1de65"; // Делаем кнопку зеленой (статус DELIVERED)
+            trackBtn.style.background = "var(--accent-color)"; // Делаем кнопку зеленой (статус DELIVERED)
             trackBtn.style.color = "#ffffff";
             trackBtn.style.borderColor = "#b7eb8f";
             return;
         }
 
-        const trackNumber = trackInput.value.trim();
-        if (!trackNumber) {
+        const deliveryTrack = trackInput.value.trim();
+        if (!deliveryTrack) {
             alert("Введите трек-номер!");
             return;
         }
 
         // Вызываем fetch
-        const result = await fetchSaveOrderTrack(orderId, trackNumber);
+        const result = await fetchSaveOrderTrack(orderId, deliveryTrack);
 
         if (result.success) {
             location.reload();
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
-    async function fetchSaveOrderTrack(orderId, trackNumber) {
+    async function fetchSaveOrderTrack(orderId, deliveryTrack) {
         try {
             const response = await fetch(`/admin/orders/${orderId}/track`, {
                 method: 'POST',
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Accept': 'application/json',
                     'X-CSRFToken': csrfToken
                 },
-                body: JSON.stringify({ track_number: trackNumber })
+                body: JSON.stringify({ delivery_track: deliveryTrack })
             })
 
             if (response.ok) {

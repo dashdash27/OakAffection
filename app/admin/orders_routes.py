@@ -124,18 +124,18 @@ def save_order_track(order_id):
     order = Order.query.get_or_404(order_id)
     
     req_data = request.get_json(silent=True)
-    track_number = req_data.get('track_number', '').strip()
+    delivery_track = req_data.get('delivery_track', '').strip()
 
-    if not track_number:
+    if not delivery_track:
         return jsonify({"success": False, "error": "Пустой трек-номер"}), 400
 
     try:
         # 1. Сохраняем трек в модель заказа
-        order.delivery_track = track_number
+        order.delivery_track = delivery_track
         
-        # 2. ТУТ ВЫЗЫВАЕТСЯ ВАША СТАНДАРТНАЯ ФУНКЦИЯ ОТПРАВКИ EMAIL:
+        # 2. TODO: Отправляем письмо на EMAIL:
         # send_track_email(email=order.user.email, track=track_number)
-        print(f"-> [Email]: Письмо с треком {track_number} отправлено для заказа #{order_id}")
+        print(f"-> [Email]: Письмо с треком {delivery_track} отправлено для заказа #{order_id}")
 
         db.session.commit()
         return jsonify({"success": True}), 200

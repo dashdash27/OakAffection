@@ -1,3 +1,4 @@
+/* Order Header */
 .order__header {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -6,6 +7,7 @@
     justify-content: space-between;
 }
 .order-meta.detail-card {
+    margin: 0;
     color: #4a5568;
     padding: 15px 25px;
     display: flex;
@@ -14,8 +16,39 @@
 }
 .order-date span {
     font-size: 14px;
+    color: var(--accent-color);
 }
-/* Status */
+/* Titles and comments */
+h1 {
+    font-size: 27px; 
+    font-weight: 600; 
+    color: #4b5262;
+    text-transform: uppercase;
+}
+h2.detail-card__title {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #edf2f7;
+    color: #1a202c;
+}
+h3 {
+    font-size: 13px; 
+    text-transform: uppercase; 
+    color: #a0aec0; 
+    margin-bottom: 12px; 
+    letter-spacing: 0.5px;
+}
+.comment {
+    color: #8b98aa; 
+    font-size: 14px; 
+    line-height: 20px;
+    font-style: italic;
+    margin-top: 20px;
+}
+
+/* Status Badge*/
 .badge-status {
     display: inline-block;
     padding: 6px 12px;
@@ -25,6 +58,8 @@
     text-transform: uppercase;
     text-align: center;
 }
+
+/* Order Status Colors */
 .order-status-pending { 
     background: #fff7e6;
     color: #d46b08;
@@ -35,7 +70,7 @@
     color: #0050b3;
     border: 1px solid #91d5ff;
  }
-.order-status-sent    { 
+.order-status-sent { 
     background: #f9f0ff;
     color: #531dab;
     border: 1px solid #d3adf7;
@@ -51,7 +86,7 @@
     border: 1px solid #ffadd2;
 }
 
-/* Payment Status */
+/* Payment Status Colors */
 .payment-status-completed {
     background: #f6ffed;
     color: #389e0d;
@@ -68,9 +103,10 @@
     border: 1px solid #ffd591; 
 }
 
+/* Order Detail Grid */
 .order-detail-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Левая колонка в 2 раза шире правой */
+    grid-template-columns: 2fr 1fr;
     gap: 24px;
     align-items: start;
 }
@@ -84,16 +120,9 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
     margin-bottom: 24px;
 }
-.detail-card__title {
-    font-size: 19px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #edf2f7;
-    color: #1a202c;
-}
 
-/* Reciept */
+
+/* Receipt */
 .receipt-item {
     display: flex;
     align-items: center;
@@ -109,7 +138,8 @@
     font-size: 15px;
 }
 .product__qty {
-    color: #4a5568;
+    font-size: 15px; 
+    color: #595959;
 }
 .product-item__old-price {
     text-decoration: line-through; 
@@ -159,13 +189,6 @@
     font-size: 14px; 
     line-height: 1.6;
 }
-h3 {
-    font-size: 13px; 
-    text-transform: uppercase; 
-    color: #a0aec0; 
-    margin-bottom: 12px; 
-    letter-spacing: 0.5px;
-}
 .delivery-service-yandex {
     color: rgb(237, 169, 12);
 }
@@ -203,10 +226,7 @@ h3 {
     font-size: 14px;
 }
 
-/* Manager */
-.actions-title {
-    text-transform: uppercase;
-}
+/* Actions */
 .actions-btns {
     display: flex;
     flex-wrap: wrap;
@@ -222,8 +242,7 @@ h3 {
     font-weight: 500;
     letter-spacing: 0.2px;
     cursor: pointer;
-    
-    /* Изначально нейтральный, строгий вид */
+
     background: #f6f8fa;
     color: #515154;
     border: 1px solid #e5e5ea;
@@ -231,57 +250,60 @@ h3 {
     transition: all 0.2s ease-in-out;
 }
 
+/* Action Btns Colors */
 .action-ship:hover, .action-deliver:hover {
     background: #f6ffed;
     color: #389e0d;
     border-color: #d9f7be;
 }
-
-/* Кнопка "Ошибся / Вернуть назад" (Цвет статуса PENDING — оранжевый) */
 .action-rollback:hover {
     background: #fff7e6; 
     color: #d46b08;
     border-color: #ffd591;
 }
-
-/* Кнопка "Отметить ручной возврат" (Цвет статуса CANCELLED — красный) */
 .action-refund-mark:hover {
     background: #fff1f0;
     color: #cf1322;
     border-color: #ffccc7;
 }
-
-/* Кнопка "Отменить возврат" (Цвет статуса PAID — нежно-голубой) */
 .action-refund-cancel:hover {
     background: #e6f7ff;
     color: #0050b3;
     border-color: #bae7ff;
 }
 
-/* Track */
+/* Delivery Track */
 .track-wrapper input {
     width: 100%;
     padding: 10px 15px;
     border-radius: 7px;
     border: 1px solid rgb(201, 201, 201);
 }
+.track-wrapper input:disabled {
+    cursor: not-allowed;
+}
 .track-wrapper button {
     margin-top: 15px;
+    width: 100%;
 
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 16px;
+    padding: 10px 16px;
     border-radius: 20px;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 0.2px;
     cursor: pointer;
     
-    /* Изначально нейтральный, строгий вид */
     background: #f6f8fa;
     color: #515154;
     border: 1px solid #e5e5ea;
     
     transition: all 0.2s ease-in-out;
+}
+.track-wrapper button:hover {
+    transition: all 0.2s ease-in-out;
+    background: var(--accent-color);
+    color: white;
 }
