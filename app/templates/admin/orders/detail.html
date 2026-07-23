@@ -14,7 +14,7 @@
 
    <div class="container">
         
-        <div class="order-detail">
+        <div class="order-detail" data-order-id="{{order.id}}">
 
             <div class="order__header">
                 <h1>Заказ #{{ order.id }}</h1>
@@ -157,7 +157,7 @@
                     
                     <!-- Payment System -->
                     <div class="detail-card payment">
-                        <h2 class="detail-card__title">Статус оплаты</h2>
+                        <h2 class="detail-card__title">Оплата заказа</h2>
                         {% if order.payment %}
                             <div class="payment-item">
                                 <strong>Сумма транзакции:</strong> {{ order.payment.amount // 100 }} ₽
@@ -250,7 +250,12 @@
             
         </div>
 
+            
+
     </div>
+
+    <div class="toast-container">
+            </div>
 
     <script src="{{ url_for('static', filename='js/admin/order.js') }}"></script>
 {% endblock %}

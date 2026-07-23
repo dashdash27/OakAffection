@@ -69,14 +69,14 @@ def change_order_status(order_id):
 
     req_data = request.get_json(silent=True)
     if not req_data:
-        return jsonify({"success": False, "error": "Тело запроса должно быть в формате JSON"}), 400
+        return jsonify({"success": False, "error": "invalid_json"}), 400
     
     action = req_data.get('action')
     if not action:
-        return jsonify({"success": False, "error": "Не передан обязательный параметр 'action'"}), 400
+        return jsonify({"success": False, "error": "missing_action"}), 400
     
     if not payment or payment.status != PaymentStatus.COMPLETED:
-        return jsonify({"success": False, "error": "Действие невозможно: заказ не оплачен"}), 400
+        return jsonify({"success": False, "error": "order_not_paid"}), 400
     
     try:
         # Действие: Отправить заказ (PAID -> SENT)
@@ -104,9 +104,10 @@ def change_order_status(order_id):
             order.status = OrderStatus.PAID
 
         else:
+            print(f"-> [Админка Ошибка]: Неизвестное действие {action} для заказа #{order_id}")
             return jsonify({
                 "success": False, 
-                "error": f"Действие '{action}' недопустимо для текущего статуса заказа ({order.status.value})"
+                "error": f"invalid_status_action"
             }), 400
         
         db.session.commit()
@@ -116,7 +117,7 @@ def change_order_status(order_id):
     except Exception as e:
         db.session.rollback()
         print(f"-> [Админка Ошибка]: Ошибка транзакции при действии {action} для заказа #{order_id}: {e}")
-        return jsonify({"success": False, "error": "Внутренняя ошибка сервера при записи в БД"}), 500
+        return jsonify({"success": False, "error": "database_error"}), 500
     
 
 @admin_bp.route('/orders/<int:order_id>/track', methods=['POST'])
@@ -127,7 +128,7 @@ def save_order_track(order_id):
     delivery_track = req_data.get('delivery_track', '').strip()
 
     if not delivery_track:
-        return jsonify({"success": False, "error": "Пустой трек-номер"}), 400
+        return jsonify({"success": False, "error": "empty_delivery_track"}), 400
 
     try:
         # 1. Сохраняем трек в модель заказа
@@ -142,7 +143,7 @@ def save_order_track(order_id):
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "database_error"}), 500
     
 
 @admin_bp.route('/orders/<int:order_id>/comment', methods=['POST'])
@@ -151,12 +152,11 @@ def save_order_comment(order_id):
     
     req_data = request.get_json(silent=True)
     if not req_data:
-        return jsonify({"success": False, "error": "Неверный формат запроса"}), 400
+        return jsonify({"success": False, "error": "data_transfer_error"}), 400
         
     comment_text = req_data.get('comment_text', '').strip()
 
     try:
-        # 1. Сохраняем трек в модель заказа
         order.comment = comment_text if comment_text else ""
         
         print(f"-> [Админка]: Обновлен внутренний комментарий к заказу #{order_id}, {order.comment}")
@@ -166,4 +166,4 @@ def save_order_comment(order_id):
     except Exception as e:
         db.session.rollback()
         print(f"-> [Админка Ошибка]: Не удалось сохранить комментарий для заказа #{order_id}: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "database_error"}), 500

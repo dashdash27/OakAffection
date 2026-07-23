@@ -337,3 +337,65 @@ h3 {
     background: var(--accent-color);
     color: white;
 }
+
+/* Toast */
+.toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.toast-item {
+    min-width: 280px;
+    max-width: 400px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    
+    /* Анимация появления */
+    animation: toastSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transition: all 0.3s ease;
+}
+
+/* Плашка плавного исчезновения */
+.toast-item.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+/* Цвета для успешных операций (в цвет статуса COMPLETED) */
+.toast-success {
+    background: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+
+/* Цвета для ошибок (в цвет статуса REJECTED) */
+.toast-error {
+    background: #fff1f0;
+    color: #cf1322;
+    border: 1px solid #ffa39e;
+}
+
+
+/* Анимация вылета справа налево */
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

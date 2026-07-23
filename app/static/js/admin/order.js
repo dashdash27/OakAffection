@@ -1,31 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const orderId = document.querySelector('.order-detail').getAttribute('data-order-id');
     
-    // Action Buttons
+    // 1. Action Buttons
     const actionButtons = document.querySelectorAll('.action-btn');
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
     actionButtons.forEach(button => {
         button.addEventListener('click', async (e) => {
-            // Извлекаем данные из data-атрибутов кликнутой кнопки
-            const orderId = button.getAttribute('data-order-id');
             const action = button.getAttribute('data-action');
 
-            console.log(orderId, action);
-
-            // Вызываем логику обработки (переносим сюда ваш прошлый код)
-            if (action === 'refund_mark') {
-                if (!confirm("Вы уверены, что хотите отметить заказа как 'Возвращенный'?\nДеньги нужно вернуть руками в ЛК Ozon Pay!")) {
-                    return;
-                }
-            }
-
-            // Вызываем fetch
             const result = await fetchChangeOrderStatus(orderId, action);
 
             if (result.success) {
+                showToastAfterReload("Статус заказа успешно обновлен", "success");
                 location.reload();
             } else {
-                alert(`Ошибка при изменении статуса заказа: ${result.message}`);; 
+                showToast("Не удалось изменить статус заказа. Попробуйте еще раз", "error");
             }
 
         });
@@ -58,18 +48,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Track Number
+    // 2. Track Number
     const trackInput = document.querySelector('.track-input');
     const trackBtn = document.querySelector('.track-btn');
 
     trackBtn.addEventListener('click', async (e) => {
-        const orderId = trackBtn.getAttribute('data-order-id');
-
         if (trackInput.disabled) {
             trackInput.disabled = false; // Разблокируем поле для ввода
             trackInput.focus();          // Ставим курсор внутрь
             trackBtn.innerText = "Сохранить и отправить клиенту";
-            trackBtn.style.background = "var(--accent-color)"; // Делаем кнопку зеленой (статус DELIVERED)
+            trackBtn.style.background = "var(--accent-color)";
             trackBtn.style.color = "#ffffff";
             trackBtn.style.borderColor = "#b7eb8f";
             return;
@@ -85,9 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await fetchSaveOrderTrack(orderId, deliveryTrack);
 
         if (result.success) {
+            showToastAfterReload("Трек номер успешно сохранен и отправлен клиенту", "success");
             location.reload();
         } else {
-            alert(`Ошибка при изменении статуса заказа: ${result.message}`);; 
+            showToast("Не удалось сохранить и отправить трек-номер. Попробуйте еще раз", "error");
         }
 
     });
@@ -124,18 +113,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const commentBtn = document.querySelector('.save-comment-btn');
 
     commentBtn.addEventListener('click', async (e) => {
-        const orderId = commentBtn.getAttribute('data-order-id');
-
         const commentText = commentInput.value.trim();
-        console.log(commentText);
 
-        // Вызываем fetch
         const result = await fetchSaveOrderComment(orderId, commentText);
 
         if (result.success) {
+            showToastAfterReload("Комментарий к заказу успешно обновлен", "success");
             location.reload();
         } else {
-            alert(`Ошибка при изменении комментария к заказу: ${result.message}`);; 
+            showToast("Не удалось сохранить комментарий. Попробуйте еще раз", "error");
         }
 
     });
@@ -165,6 +151,35 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             return { success: false, message: "Проблема с сетью: " + error.message };
         }
+    }
+
+    /* Toasts */
+    function showToast(message, type = 'success') {
+        const toastContainer = document.querySelector('.toast-container');
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-item toast-${type}`;
+        toast.innerHTML = `<span>${message}</span>`;
+
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('fade-out');
+            setTimeout(() => {
+                toast.remove();
+            }, 250);
+        }, 3000);
+    }
+
+    function showToastAfterReload(message, type = 'success') {
+        sessionStorage.setItem('pendingToast', JSON.stringify({ message, type }));
+    }
+
+    const pendingToast = sessionStorage.getItem('pendingToast');
+    if (pendingToast) {
+        const toastData = JSON.parse(pendingToast);
+        showToast(toastData.message, toastData.type);
+        sessionStorage.removeItem('pendingToast'); 
     }
 
 });
