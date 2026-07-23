@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Находим все кнопки менеджера на странице
+    
+    // Action Buttons
     const actionButtons = document.querySelectorAll('.action-btn');
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
@@ -117,4 +118,53 @@ document.addEventListener('DOMContentLoaded', () => {
             return { success: false, message: "Проблема с сетью: " + error.message };
         }
     }
+
+    // Comment 
+    const commentInput = document.querySelector('.order-comment-input');
+    const commentBtn = document.querySelector('.save-comment-btn');
+
+    commentBtn.addEventListener('click', async (e) => {
+        const orderId = commentBtn.getAttribute('data-order-id');
+
+        const commentText = commentInput.value.trim();
+        console.log(commentText);
+
+        // Вызываем fetch
+        const result = await fetchSaveOrderComment(orderId, commentText);
+
+        if (result.success) {
+            location.reload();
+        } else {
+            alert(`Ошибка при изменении комментария к заказу: ${result.message}`);; 
+        }
+
+    });
+
+    async function fetchSaveOrderComment(orderId, commentText) {
+        try {
+            const response = await fetch(`/admin/orders/${orderId}/comment`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({ comment_text: commentText })
+            })
+
+            if (response.ok) {
+                const data = await response.json();
+                return { success: true, data: data };
+            }
+            
+            const errorData = await response.json().catch(() => ({}));
+            return { 
+                success: false, 
+                message: errorData.error || "Ошибка сервера при изменении комментария к заказу" 
+            };
+        } catch (error) {
+            return { success: false, message: "Проблема с сетью: " + error.message };
+        }
+    }
+
 });

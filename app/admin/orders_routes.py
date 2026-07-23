@@ -143,3 +143,27 @@ def save_order_track(order_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"success": False, "error": str(e)}), 500
+    
+
+@admin_bp.route('/orders/<int:order_id>/comment', methods=['POST'])
+def save_order_comment(order_id):
+    order = Order.query.get_or_404(order_id)
+    
+    req_data = request.get_json(silent=True)
+    if not req_data:
+        return jsonify({"success": False, "error": "Неверный формат запроса"}), 400
+        
+    comment_text = req_data.get('comment_text', '').strip()
+
+    try:
+        # 1. Сохраняем трек в модель заказа
+        order.comment = comment_text if comment_text else ""
+        
+        print(f"-> [Админка]: Обновлен внутренний комментарий к заказу #{order_id}, {order.comment}")
+        db.session.commit()
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"-> [Админка Ошибка]: Не удалось сохранить комментарий для заказа #{order_id}: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500

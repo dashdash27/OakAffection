@@ -123,11 +123,7 @@
                                 <p>
                                     <strong>Email:</strong> {{ order.customer_email }}
                                 </p>
-                                {% if order.comment %}
-                                    <p class="comment-block">
-                                        <strong>Комментарий:</strong> <span style="color: #4a5568; font-style: italic;">"{{ order.comment }}"</span>
-                                    </p>
-                                {% endif %}
+                                
                             </div>
                             
                             <!-- Delivery and Point -->
@@ -138,6 +134,18 @@
                                 <p><strong>Адрес выдачи:</strong> {{ order.delivery_point_address }}</p>
                             </div>
                             
+                        </div>
+
+                        <div class="order-comment">
+
+                            <h3>Комментарий к заказу</h3>
+
+                            <textarea class="order-comment-input" placeholder="Добавьте важную заметку к заказу (изменение данных, пожелания клиента)..." rows="1">{{ order.comment or '' }}</textarea>
+
+                            <button class="save-comment-btn" data-order-id="{{ order.id }}">
+                                Сохранить заметку
+                            </button>
+
                         </div>
 
                     </div>

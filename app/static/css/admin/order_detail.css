@@ -202,6 +202,36 @@ h3 {
     border-left: 3px solid #cbd5e0; 
     border-radius: 0 4px 4px 0;
 }
+.order-comment-input {
+    width: 100%; 
+    padding: 10px 14px; 
+    border: 1px solid #d1d1d6; 
+    border-radius: 12px; 
+    font-size: 13px;
+    resize: vertical; 
+    box-sizing: border-box; 
+    background: #ffffff; 
+    color: #1c1c1e;
+}
+.save-comment-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+
+    background: #f6f8fa;
+    color: #515154;
+    border: 1px solid #e5e5ea;
+    
+    transition: all 0.2s ease-in-out;
+
+    margin-top: 10px;
+}
 
 /* Payment */
 .payment-item {
