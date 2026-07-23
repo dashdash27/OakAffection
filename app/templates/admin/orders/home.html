@@ -68,7 +68,21 @@
 
                     <div class="col-status">
                         <span class="badge-status order-status-{{ order.status.value }}">
-                            {{ order.status.value }}
+                            {% if order.status.value == 'pending' %}
+                                В ожидании
+                            {% elif order.status.value == 'paid' %}
+                                Оплачен
+                            {% elif order.status.value == 'sent' %}
+                                Отправлен
+                            {% elif order.status.value == 'delivered' %}
+                                Доставлен
+                            {% elif order.status.value == 'returned' %}
+                                Возвращен
+                            {% elif order.status.value == 'cancelled' %}
+                                Отменен
+                            {% else %}
+                                {{ order.status.value }}
+                            {% endif %}
                         </span>
                     </div>
                     
