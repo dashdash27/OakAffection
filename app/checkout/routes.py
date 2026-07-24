@@ -1,5 +1,5 @@
 from app.logger import logger
-from app.models import Product
+from app.models import Product, PaymentStatus
 from app.extensions import limiter, db
 from .utils import process_cart, calculate_order_dimensions, calculate_cart_base_total
 from .schemas import OrderCreateSchema 
@@ -219,11 +219,25 @@ def create_order():
                 db.session.commit()
             except Exception as e:
                 db.session.rollback()
+
+                try:
+                    order.payment.status = PaymentStatus.CREATION_FAILED
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
+  
                 return jsonify({"success": False, "error": "Ошибка сервера при сохранения данных оплаты"}), 500
             
             return jsonify({"success": True, "order_id": order.id, "pay_link": pay_link}), 200
-        else:
-            return jsonify({"success": False, "error": "Ошибка платежного шлюза"}), 502
+
+        try:
+            order.payment.status = PaymentStatus.CREATION_FAILED
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "error": "Ошибка сервера при сохранения данных оплаты"}), 500
+        
+        return jsonify({"success": False, "error": "Ошибка платежного шлюза"}), 502
 
     except ValueError as val_err:
         return jsonify({"success": False, "error": str(val_err)}), 422
