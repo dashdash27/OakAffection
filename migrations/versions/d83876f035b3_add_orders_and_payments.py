@@ -1,8 +1,8 @@
 """add orders and payments
 
-Revision ID: f3d7dc63e3d2
+Revision ID: d83876f035b3
 Revises: ebfe5ef56623
-Create Date: 2026-07-19 13:01:56.695097
+Create Date: 2026-07-24 10:10:49.726139
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f3d7dc63e3d2'
+revision = 'd83876f035b3'
 down_revision = 'ebfe5ef56623'
 branch_labels = None
 depends_on = None
@@ -43,7 +43,7 @@ def upgrade():
     sa.Column('gateway', sa.Enum('OZON', name='paymentgateway'), nullable=False),
     sa.Column('external_id', sa.String(length=255), nullable=False),
     sa.Column('amount', sa.BigInteger(), nullable=False),
-    sa.Column('status', sa.Enum('PENDING', 'REJECTED', 'COMPLETED', name='paymentstatus'), nullable=False),
+    sa.Column('status', sa.Enum('PENDING', 'CREATION_FAILED', 'REJECTED', 'COMPLETED', name='paymentstatus'), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], name=op.f('fk_payments_order_id_orders'), ondelete='CASCADE'),
