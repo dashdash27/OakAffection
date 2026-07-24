@@ -2,6 +2,8 @@ from app.checkout.utils import process_cart, calculate_cart_base_total, apply_th
 
 import os
 import jwt
+import hmac
+import hashlib
 
 def verify_and_get_delivery_price(delivery_token: str) -> int:
     """Проверяет JWT токен доставки и возвращает проверенную сервером цену."""
@@ -77,4 +79,15 @@ def allocate_items_discount(order_items: list, items_base_total: int, items_disc
 
     return order_items
 
-        
+def generate_order_hash(order_id: int) -> str:
+    """Генерирует уникальный токен для ID заказа на основе SECRET_KEY."""
+    secret_key = os.getenv("SECRET_KEY")
+    message = str(order_id).encode('utf-8')
+    return hmac.new(secret_key, message, hashlib.sha256).hexdigest()
+
+def verify_order_hash(order_id: int, client_hash: str) -> bool:
+    """Безопасно сверяет токен заказа от клиента с ожидаемым."""
+    if not client_hash:
+        return False
+    expected_hash = generate_order_hash(order_id)
+    return hmac.compare_digest(expected_hash, client_hash)
