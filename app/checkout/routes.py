@@ -258,6 +258,12 @@ def success_page():
     """Success payment page. Логика проверок будет на JS."""
     return render_template('/checkout/success.html')
 
+@checkout_bp.route('/failure', methods=['GET'])
+def failure_page():
+    """Failure payment page. Логика проверок будет на JS."""
+    return render_template('/checkout/failure.html')
+
+
 @checkout_bp.route('/api/orders/<int:order_id>/status', methods=['GET'])
 def get_single_order_status(order_id):
     """Проверка статуса одного заказа"""

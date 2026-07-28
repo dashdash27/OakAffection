@@ -22,11 +22,13 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
 
     notification_url = ozon_pay_cfg.get("NOTIFICATION_URL")
     base_success_url = ozon_pay_cfg.get("SUCCESS_URL")
+    base_failure_url = ozon_pay_cfg.get("FAILURE_URL")
     order_prefix = ozon_pay_cfg.get("ORDER_PREFIX")
 
     token = generate_order_hash(order.id)
 
     success_url = f"{base_success_url}?order_id={order.id}&token={token}"
+    failure_url = f"{base_failure_url}?order_id={order.id}&token={token}"
 
     if not url or not access_key:
         print("[OZON PAY ERROR] Не настроены URL_CREATE_ORDER или ACCESS_KEY в конфигурации.")
@@ -70,6 +72,7 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
         "enableFiscalization": True,
         "expiresAt": (order.created_at + timedelta(minutes=30)).isoformat(),
         "extId": f"{order_prefix}{order.id}",
+        "failUrl": failure_url,
         "fiscalizationPhone": order.customer_phone,
         "fiscalizationType": "FISCAL_TYPE_SINGLE",
         "items": ozon_items,

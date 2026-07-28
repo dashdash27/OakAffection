@@ -10,5 +10,6 @@ class PaymentsConfig:
         "URL_CREATE_ORDER": "https://payapi.ozon.ru/v1/createOrder",
         "NOTIFICATION_URL": f"{_base_url}/payments/api/ozon-pay-webhook",
         "SUCCESS_URL": f"{_base_url}/checkout/success",
+        "FAILURE_URL": f"{_base_url}/checkout/failure",
         "ORDER_PREFIX": "LOCAL2-"
     }

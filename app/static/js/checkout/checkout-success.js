@@ -13,8 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!orderId || !token) {
         loader.classList.add("hidden");
-        title.innerText = "Ошибка доступа";
-        message.innerText = "Ссылка недействительна. Обратитесь в техподдержку.";
+        errorBox.classList.remove("hidden");
         return;
     }
 
