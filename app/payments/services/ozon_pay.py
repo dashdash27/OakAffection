@@ -1,8 +1,10 @@
 from app.models import Order 
-from app.payments.utils import generate_ozon_pay_sign   
+from app.payments.utils import generate_ozon_pay_sign
+from app.checkout.core.utils import generate_order_hash
 
 import requests
 import json
+from datetime import timedelta
 
 ozon_pay_session = requests.Session()
 
@@ -19,7 +21,12 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
     access_key = ozon_pay_cfg.get("ACCESS_KEY")
 
     notification_url = ozon_pay_cfg.get("NOTIFICATION_URL")
+    base_success_url = ozon_pay_cfg.get("SUCCESS_URL")
     order_prefix = ozon_pay_cfg.get("ORDER_PREFIX")
+
+    token = generate_order_hash(order.id)
+
+    success_url = f"{base_success_url}?order_id={order.id}&token={token}"
 
     if not url or not access_key:
         print("[OZON PAY ERROR] Не настроены URL_CREATE_ORDER или ACCESS_KEY в конфигурации.")
@@ -61,13 +68,15 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
             "value": str(order.total_amount)
         },
         "enableFiscalization": True,
+        "expiresAt": (order.created_at + timedelta(minutes=30)).isoformat(),
         "extId": f"{order_prefix}{order.id}",
         "fiscalizationPhone": order.customer_phone,
         "fiscalizationType": "FISCAL_TYPE_SINGLE",
         "items": ozon_items,
         "mode": "MODE_FULL",
         "notificationUrl": notification_url,
-        "paymentAlgorithm": "PAY_ALGO_SMS"
+        "paymentAlgorithm": "PAY_ALGO_SMS",
+        "successUrl": success_url
     }
     # generate sign
     payload["requestSign"] = generate_ozon_pay_sign(payload)
@@ -88,7 +97,7 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
 
     except requests.exceptions.RequestException as req_err:
         print(f"[OZON PAY HTTP ERROR] Сбой API для заказа {order.id}: {req_err}")
-        return None
+        return None, None
     except Exception as e:
         print(f"[OZON PAY ERROR] Непредвиденная ошибка парсинга ответа: {e}")
-        return None
+        return None, None

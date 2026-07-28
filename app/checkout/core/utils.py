@@ -81,7 +81,7 @@ def allocate_items_discount(order_items: list, items_base_total: int, items_disc
 
 def generate_order_hash(order_id: int) -> str:
     """Генерирует уникальный токен для ID заказа на основе SECRET_KEY."""
-    secret_key = os.getenv("SECRET_KEY")
+    secret_key = os.getenv("SECRET_KEY").encode('utf-8') 
     message = str(order_id).encode('utf-8')
     return hmac.new(secret_key, message, hashlib.sha256).hexdigest()
 

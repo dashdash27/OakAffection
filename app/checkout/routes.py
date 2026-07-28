@@ -1,12 +1,12 @@
 from app.logger import logger
-from app.models import Product, PaymentStatus
+from app.models import Product, PaymentStatus, Order, OrderStatus
 from app.extensions import limiter, db
 from .utils import process_cart, calculate_order_dimensions, calculate_cart_base_total
 from .schemas import OrderCreateSchema 
 from .core.order_creator import create_new_order_transaction
 from app.payments.services.ozon_pay import request_ozon_pay_link
 from app.checkout.core.utils import verify_and_get_delivery_price
-from app.checkout.core.utils import validate_order_totals, allocate_items_discount
+from app.checkout.core.utils import validate_order_totals, allocate_items_discount, verify_order_hash, generate_order_hash
 
 from .services.dadata import get_city_suggestions
 from .services.yandex import get_yandex_delivery_info
@@ -210,7 +210,10 @@ def create_order():
 
         # 6. Create order in ozon pay
         ozon_pay_cfg = current_app.config.get("OZON_PAY", {})
+        print(ozon_pay_cfg)
         pay_link, ext_order_id = request_ozon_pay_link(order, ozon_pay_cfg)
+
+        print(pay_link, ext_order_id)
 
         if pay_link is not None and ext_order_id is not None:
             # 7. Save ext_db for order in DB
@@ -228,7 +231,12 @@ def create_order():
   
                 return jsonify({"success": False, "error": "Ошибка сервера при сохранения данных оплаты"}), 500
             
-            return jsonify({"success": True, "order_id": order.id, "pay_link": pay_link}), 200
+            return jsonify({
+                "success": True, 
+                "order_id": order.id, 
+                "pay_link": pay_link,
+                "token": generate_order_hash(order.id)
+            }), 200
 
         try:
             order.payment.status = PaymentStatus.CREATION_FAILED
@@ -244,3 +252,49 @@ def create_order():
     except Exception as e:
         print(f"[FATAL ERROR] Критическая ошибка при оформлении: {e}")
         return jsonify({"success": False, "error": "Ошибка сервера при формировании заказа."}), 500
+    
+@checkout_bp.route('/success', methods=['GET'])
+def success_page():
+    """Success payment page. Логика проверок будет на JS."""
+    return render_template('/checkout/success.html')
+
+@checkout_bp.route('/api/orders/<int:order_id>/status', methods=['GET'])
+def get_single_order_status(order_id):
+    """Проверка статуса одного заказа"""
+    client_token = request.args.get('token')
+
+    if not verify_order_hash(order_id, client_token):
+        return jsonify({"success": False, "error": "Forbidden"}), 403
+    
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"success": False, "error": "Not Found"}), 404
+    
+    order_details = None
+    if order.status == OrderStatus.PAID:
+        order_details = {
+            "total_amount": order.total_amount / 100,
+            "items": [
+                {
+                    "name": item.product_name,
+                    "quantity": item.quantity,
+                    "price": item.price_with_discount / 100,
+                }
+                for item in order.items
+            ],
+            "delivery_service": order.delivery_service.value,
+            "delivery_price": order.delivery_price / 100,
+            "customer": {
+                "name" : order.customer_name,
+                "phone": order.customer_phone,
+                "email": order.customer_email
+            },
+            "created_at": order.created_at
+        }
+
+    return jsonify({
+        "success": True, 
+        "paid": order.status == OrderStatus.PAID, 
+        "order_id": order.id,
+        "details": order_details
+    }), 200

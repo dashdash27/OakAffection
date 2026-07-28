@@ -6,6 +6,7 @@ from sqlalchemy import func
 
 class PaymentStatus(enum.Enum):
     PENDING = 'pending'
+    CREATION_FAILED = 'failed'
     REJECTED = 'rejected'
     COMPLETED = 'completed'
 

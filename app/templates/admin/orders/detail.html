@@ -200,6 +200,8 @@
                                         Выполнено
                                     {% elif order.payment.status.value == 'rejected' %}
                                         Отклонено
+                                    {% elif order.payment.status.value == 'failed' %}
+                                        Не сгенерирована ссылка
                                     {% else %}
                                         {{ order.payment.status.value }}
                                     {% endif %}

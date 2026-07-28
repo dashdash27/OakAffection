@@ -32,6 +32,10 @@
 
         if (result.success) {
             console.log(`Заказ #${result.data.order_id} успешно создан, переход к оплате`);
+            console.log(result.data)
+
+            saveOrderToLS(result.data.order_id, result.data.token);
+
             window.location.href = result.data.pay_link;
             return;
         } else {
@@ -65,6 +69,31 @@
         } catch (error) {
             return { success: false, message: "Проблема с сетью: " + error.message };
         }
+    }
+
+    function saveOrderToLS(orderId, token) {
+        console.log(`Сохраняем заказ #${orderId} в LS`);
+        
+        // 1. Сохраняем текущую рабочую корзину в черновик, а оригинал очищаем
+        const currentCart = localStorage.getItem('cart');
+        localStorage.setItem('cart_draft', currentCart);
+        localStorage.removeItem('cart');
+
+        // 2. Зашиваем ID текущего заказа
+        localStorage.setItem('current_checkout_order_id', orderId);
+
+        // 3. Сохраняем заказ в локальную историю my_orders
+        let myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+
+        const items = JSON.parse(currentCart || '[]'); 
+
+        myOrders.push({
+            id: orderId,
+            token: token,
+            status: 'pending'
+        });
+
+        localStorage.setItem('my_orders', JSON.stringify(myOrders));
     }
     
 })();
