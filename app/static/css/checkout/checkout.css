@@ -273,7 +273,8 @@ a.checkout__link-to-cart {
 a.checkout__link-to-cart:hover {
     color: var(--text-color);
 }
-.checkout__submit-btn:disabled {
+.checkout__submit-btn:disabled,
+.checkout__payment-btn:disabled {
     background: var(--checkout-card-bg);
     color: var(--accent-color);
     cursor: not-allowed;

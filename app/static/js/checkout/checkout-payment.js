@@ -28,7 +28,14 @@
         }
         console.log(orderData);
 
+        // Блокируем paymentBtn
+        paymentBtn.disabled = true;
+        paymentBtn.textContent = 'Обработка платежа...';
+
         const result = await fetchCreateOrder(orderData);
+
+        // Разблокируем paymentBtn
+        resetButton(paymentBtn);
 
         if (result.success) {
             console.log(`Заказ #${result.data.order_id} успешно создан, переход к оплате`);
@@ -69,6 +76,11 @@
         } catch (error) {
             return { success: false, message: "Проблема с сетью: " + error.message };
         }
+    }
+
+    function resetButton(button) {
+        button.disabled = false;
+        button.textContent = 'Оплатить';
     }
 
     function saveOrderToLS(orderId, token) {
