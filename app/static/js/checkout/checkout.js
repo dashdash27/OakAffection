@@ -577,7 +577,12 @@
 
     async function initCheckout() {
         const cart = cleanProductIdsInLS();
-        // TODO: редирект если корзина пустая
+        
+        // Редирект, если корзина пустая
+        console.log(cart);
+        if (!cart || Object.keys(cart).length === 0) {
+            window.location.href = '/checkout/cart';
+        }
         
         const ids = Object.keys(cart);
         const result = await syncCartWithServer(ids);
