@@ -48,7 +48,9 @@
                     
                     <div class="col-id">{{order.id}}</div>
 
-                    <div class="col-date">{{order.created_at.strftime('%d.%m.%Y %H:%M')}}</div>
+                    <div class="col-date js-local-time" data-utc="{{ order.created_at | to_iso }}">
+                        {{order.created_at.strftime('%d.%m.%Y %H:%M')}}
+                    </div>
 
                     <div class="col-customer">
                         <div class="customer-name">{{order.customer_name}}</div>
@@ -92,4 +94,6 @@
         </div>
 
     </div>
+
+    <script src="{{ url_for('static', filename='js/utils/local-time.js') }}"></script>
 {% endblock %}

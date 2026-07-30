@@ -82,9 +82,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector('.order-id').innerHTML = `#${orderId}`;
         
         // 2. Дата и время
-        const formattedDate = new Date(details.created_at).toLocaleString('ru-RU', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        const localDate = new Date(details.created_at);
+        const formattedDate = localDate.toLocaleString(navigator.language, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
         });
         document.querySelector('.order-date').textContent = formattedDate;
 

@@ -22,7 +22,9 @@
                 <div class="order-meta detail-card">
                     <div class="order-date">
                         <strong>Дата создания:</strong>
-                        <span class="order-date">{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                        <span class="order-date js-local-time" data-utc="{{ order.created_at | to_iso }}">
+                            {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}
+                        </span>
                     </div>
                     <div class="order-status">
                         <strong>Статус заказа:</strong>
@@ -188,7 +190,7 @@
                                 <code class="transaction-id">{{ order.payment.external_id or 'Ожидает генерации сессии' }}</code>
                             </div>
                             <div class="payment-item">
-                                <strong>Обновлен статус:</strong> {{order.payment.updated_at.strftime('%d.%m.%Y %H:%M')}}
+                                <strong>Обновлен статус:</strong> <span class="js-local-time" data-utc="{{ order.payment.updated_at | to_iso }}">{{order.payment.updated_at.strftime('%d.%m.%Y %H:%M')}}</span>
                             </div>
                             <div class="payment-status">
                                 <strong>Текущий статус:</strong> 
@@ -279,7 +281,8 @@
     </div>
 
     <div class="toast-container">
-            </div>
+    </div>
 
+    <script src="{{ url_for('static', filename='js/utils/local-time.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin/order.js') }}"></script>
 {% endblock %}

@@ -2,6 +2,7 @@ from app.extensions import db, migrate
 from app.logger import logger
 from app.models import AdminUser
 from app.extensions import init_limiter 
+from app.utils.filters import to_iso_filter
 
 from flask_login import LoginManager
 from flask import Flask, g, request, render_template
@@ -40,7 +41,10 @@ def create_app():
 
         from app import models  # импорт моделей
 
+        # фильтры
+        app.jinja_env.filters['to_iso'] = to_iso_filter
 
+        # блюпринты
         from app.routes import main_bp
         from app.admin import admin_bp, login_bp
         from app.checkout.routes import checkout_bp

@@ -295,7 +295,7 @@ def get_single_order_status(order_id):
                 "phone": order.customer_phone,
                 "email": order.customer_email
             },
-            "created_at": order.created_at
+            "created_at": order.created_at.isoformat() 
         }
 
     return jsonify({

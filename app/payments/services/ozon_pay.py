@@ -1,5 +1,5 @@
 from app.models import Order 
-from app.payments.utils import generate_ozon_pay_sign
+from app.payments.utils import generate_ozon_pay_sign, generate_ozon_expires_at
 from app.checkout.core.utils import generate_order_hash
 
 import requests
@@ -70,7 +70,7 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
             "value": str(order.total_amount)
         },
         "enableFiscalization": True,
-        "expiresAt": (order.created_at + timedelta(minutes=30)).isoformat(),
+        "expiresAt": generate_ozon_expires_at(30),
         "extId": f"{order_prefix}{order.id}",
         "failUrl": failure_url,
         "fiscalizationPhone": order.customer_phone,

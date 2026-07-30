@@ -1,5 +1,6 @@
 import os
 import hashlib
+from datetime import datetime, timedelta, timezone
 
 def generate_ozon_pay_sign(payload: dict) -> str:
     secret_key = os.getenv("OZON_PAY_SECRET_KEY")
@@ -44,3 +45,12 @@ def generate_ozon_pay_notification_sign(payload: dict) -> str:
     computed_signature = hashlib.sha256(digest.encode('utf-8')).hexdigest()
 
     return computed_signature
+
+def generate_ozon_expires_at(minutes_to_live=30):
+    now_utc = datetime.now(timezone.utc)
+    expires_at_utc = now_utc + timedelta(minutes=minutes_to_live)
+    
+    # Сбрасываем микросекунды до 0 перед форматированием
+    expires_at_utc = expires_at_utc.replace(microsecond=0)
+    
+    return expires_at_utc.isoformat().replace('+00:00', 'Z')
