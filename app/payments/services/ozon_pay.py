@@ -79,6 +79,7 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
         "mode": "MODE_FULL",
         "notificationUrl": notification_url,
         "paymentAlgorithm": "PAY_ALGO_SMS",
+        "receiptEmail": order.customer_email,
         "successUrl": success_url
     }
     # generate sign
