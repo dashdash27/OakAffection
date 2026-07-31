@@ -50,9 +50,15 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
         })
 
     # Add Delivery
+    DELIVERY_NAMES = {
+        'yandex': 'Яндекс.Доставка',
+        'russian_post': 'Почта России'
+    }
     if order.delivery_price > 0:
+        service_name = DELIVERY_NAMES.get(order.delivery_service.value, order.delivery_service.value)
+
         ozon_items.append({
-            "name": f"Доставка ({order.delivery_service.value})",
+            "name": f"Доставка {service_name}",
             "price": {
                 "currencyCode": "643",
                 "value": str(order.delivery_price)
