@@ -1,6 +1,7 @@
 from app.admin.routes import admin_bp 
 from app.models import Order, OrderStatus, PaymentStatus
 from app.extensions import db
+from app.services.email import send_delivery_track_email
 
 
 from flask import render_template, request, jsonify, request
@@ -133,12 +134,12 @@ def save_order_track(order_id):
     try:
         # 1. Сохраняем трек в модель заказа
         order.delivery_track = delivery_track
-        
-        # 2. TODO: Отправляем письмо на EMAIL:
-        # send_track_email(email=order.user.email, track=track_number)
+        db.session.commit()
+
+        # 2. Отправляем письмо с треком
+        send_delivery_track_email(order.customer_email, order.id)
         print(f"-> [Email]: Письмо с треком {delivery_track} отправлено для заказа #{order_id}")
 
-        db.session.commit()
         return jsonify({"success": True}), 200
 
     except Exception as e:

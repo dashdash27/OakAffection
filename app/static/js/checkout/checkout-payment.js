@@ -7,9 +7,9 @@
         const orderData = {
             "client_total_amount": checkoutState.totalPrice,
             "client_contacts": {
-                "name": "Иван Иванов",
-                "phone": "+78889221122",
-                "email": "example@gmail.com"   
+                "name": checkoutState.contacts.name,
+                "phone": `+${checkoutState.contacts.phone}`,
+                "email": checkoutState.contacts.email   
             },
             "delivery": {
                 "service": checkoutState.selectedDeliveryOption.service,

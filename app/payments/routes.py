@@ -1,12 +1,12 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
 import json
-import os, hashlib
 
 from app import csrf
 from app.extensions import db
 from app.models import Order, PaymentStatus, OrderStatus
 from app.payments.utils import generate_ozon_pay_notification_sign
+from app.services.email import send_order_confirmation_email
 
 payments_bp = Blueprint('payments', __name__, url_prefix='/payments')
 
@@ -76,6 +76,9 @@ def ozon_pay_webhook():
                 payment.external_id = str(tx_uid_raw) if tx_uid_raw else str(tx_id_raw)
 
             db.session.commit()
+
+            # Отправляем письмо-подтверждение клиенту
+            send_order_confirmation_email(order.customer_email, order.id)
         except Exception as e:
             db.session.rollback()
             print(f"Ошибка при сохранении успешного платежа в БД: {e}")
