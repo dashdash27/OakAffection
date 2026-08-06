@@ -228,6 +228,10 @@
                                 <button class="action-btn action-deliver" data-order-id="{{ order.id }}" data-action="deliver">Отметить «Доставлен»</button>
                             {% endif %}
 
+                            {% if buttons.rollback_paid %}
+                                <button class="action-btn action-rollback" data-order-id="{{ order.id }}" data-action="rollback_paid">Вернуть в «Оплачен»</button>
+                            {% endif %}
+
                             {% if buttons.rollback_sent %}
                                 <button class="action-btn action-rollback" data-order-id="{{ order.id }}" data-action="rollback_sent">Вернуть в «Отправлен»</button>
                             {% endif %}

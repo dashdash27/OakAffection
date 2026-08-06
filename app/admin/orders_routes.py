@@ -67,6 +67,7 @@ def order_detail(order_id):
 def change_order_status(order_id):
     order = Order.query.get_or_404(order_id)
     payment = order.payment
+    
 
     req_data = request.get_json(silent=True)
     if not req_data:
