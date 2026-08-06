@@ -166,8 +166,12 @@ async def get_delivery_options():
 @checkout_bp.route('/api/orders', methods=['POST'])
 def create_order():
     raw_data = request.get_json()
+
+    # TODO: Для теста
+    return jsonify({"success": False, "error": "DELIVERY_ERROR"}), 500
+
     if not raw_data:
-        return jsonify({"success": False, "error": "Недостаточно данных для создания заказа"}), 422
+        return jsonify({"success": False, "error": "BAD_REQUEST"}), 400
     
     logger.debug(f"Получен запрос на создание заказа: {raw_data}")
 

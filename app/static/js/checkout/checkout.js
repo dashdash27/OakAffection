@@ -22,6 +22,7 @@
     const summaryTotalComment = document.querySelector('.summary__total-comment');
 
     const submitBtn = document.querySelector('.checkout__submit-btn');
+    const paymentBtn = document.querySelector('.checkout__payment-btn');
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
@@ -544,6 +545,7 @@
         const isValid = error === "";
         if (submitBtn) {
             submitBtn.disabled = !isValid;
+            paymentBtn.disabled = !isValid;
         }
     }
 

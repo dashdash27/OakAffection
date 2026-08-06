@@ -1,6 +1,9 @@
 (() => {
     const checkoutState = window.Checkout.state;
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    
+    const errorBox = document.querySelector('.checkout__error-box');
+    const errorText = document.querySelector('.checkout__error-text');
 
     const paymentBtn = document.querySelector('.checkout__payment-btn');
     paymentBtn.addEventListener('click', async (e) => {
@@ -26,11 +29,15 @@
             },
             "cart": checkoutState.cart
         }
-        console.log(orderData);
+        console.log("Попытка создания заказа:", orderData);
 
         // Блокируем paymentBtn
         paymentBtn.disabled = true;
         paymentBtn.textContent = 'Обработка платежа...';
+
+        // Блок с ошибкой очищаем
+        errorBox.classList.add("hidden");
+        errorText.textContent = '';
 
         const result = await fetchCreateOrder(orderData);
 
@@ -46,9 +53,14 @@
             window.location.href = result.data.pay_link;
             return;
         } else {
-            alert(result.message); 
+            // TODO: красиво пишет ошибку
+            errorBox.classList.remove("hidden");
+            errorText.textContent = result.message;
+            
+            errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     });
+
 
 
     async function fetchCreateOrder(orderData) {
@@ -69,18 +81,58 @@
             }
             
             const errorData = await response.json().catch(() => ({}));
+
+            // Обработка по статус-кодам
+            if (response.status === 400) {
+                return { 
+                    success: false, 
+                    message: "Что-то пошло не так. Пожалуйста, попробуйте обновить страницу и оформите заказ снова." 
+                };
+            }
+            if (response.status === 422) {
+                if (errorData.error === 'PRICE_MISMATCH') {
+                    return { 
+                        success: false,
+                        message: "Стоимость некоторых товаров изменилась. Пожалуйста, обновите страницу и повторите попытку." 
+                    };
+                }
+                if (errorData.error === 'VALIDATION_ERROR') {
+                    return { 
+                        success: false,
+                        message: "Некоторые данные заполнены некорректно. Пожалуйста, проверьте форму и повторите попытку." 
+                    };
+                }
+                if (errorData.error === 'DELIVERY_ERROR') {
+                    return { 
+                        success: false,
+                        message: "Стоимость доставки могла измениться. Пожалуйста, выберите населенный пункт и детали доставки снова." 
+                    };
+                }
+            }
+            if (response.status === 503) {
+                return { 
+                    success: false, 
+                    message: "Платежная система временно недоступна. Пожалуйста, попробуйте оформить заказ еще раз." 
+                };
+            }
+            if (response.status === 500) {
+                return { 
+                    success: false, 
+                    message: "Произошла ошибка на сервере. Мы уже восстанавливаем работу, пожалуйста, попробуйте чуть позже." 
+                };
+            }
             return { 
-                success: false, 
-                message: errorData.error || "Ошибка сервера при создании заказа" 
+            success: false, 
+                message: "Не удалось оформить заказ. Пожалуйста, повторите попытку." 
             };
         } catch (error) {
-            return { success: false, message: "Проблема с сетью: " + error.message };
+            return { success: false, message: "Проблема с сетью. Пожалуйста, повторите попытку или обновите страницу." };
         }
     }
 
     function resetButton(button) {
         button.disabled = false;
-        button.textContent = 'Оплатить';
+        button.textContent = 'Перейти к оплате';
     }
 
     function saveOrderToLS(orderId, token) {

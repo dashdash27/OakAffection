@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="checkout__summary">
-                    <div class="chekout__card">
+                    <div class="checkout__card">
                         <div class="card-title">Ваш заказ</div>
                         <div class="card-content">
                             <div class="summary__items"></div>
@@ -111,14 +111,19 @@
                     </div>
 
                     <div class="checkout__validation-msg"></div>
-                    <button class="checkout__payment-btn">
-                        Оплатить
+                    <div class="checkout__error-box card-content hidden">
+                        <div class="checkout__error-text">
+                            Ошибка сервера
+                        </div>
+                    </div>
+                    <button class="checkout__payment-btn" disabled>
+                        Перейти к оплате
                     </button>
                     <button class="checkout__submit-btn" disabled>
-                        Оформить заказ
+                        Оформить заказ через мессенджер
                     </button>
                     <div class="checkout__agreement">
-                        Нажимая кнопку, вы соглашаетесь с условиями 
+                        Оформляя заказ, вы соглашаетесь с условиями 
                         <a href="{{ url_for('main.terms') }}">Публичной оферты</a> и 
                         <a href="{{ url_for('main.privacy') }}">Политики конфиденциальности</a>
                     </div>

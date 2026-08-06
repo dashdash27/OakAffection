@@ -32,9 +32,6 @@ def validate_order_totals(cart, trusted_delivery_price: int, client_total_amount
     
     server_total_amount = items_discounted_total + trusted_delivery_price
 
-    print("Client total amount:", client_total_amount)
-    print("Server total amount:", server_total_amount)
-
     is_valid = (client_total_amount == server_total_amount)
 
     return is_valid, order_items, discount_amount, items_discounted_total
@@ -66,7 +63,6 @@ def allocate_items_discount(order_items: list, items_base_total: int, items_disc
             if item["quantity"] == 1:
                 item["price_with_discount"] += rubles_difference
                 corrected = True
-                print(f"Погрешность {rubles_difference} руб. успешно добавлена к единичному товару ID {item['id']}")
                 break
 
          # Сценарий Б: Оптовый случай — разбиваем первую строку
@@ -79,7 +75,6 @@ def allocate_items_discount(order_items: list, items_base_total: int, items_disc
             adjusted_item["price_with_discount"] += rubles_difference
             
             order_items.insert(0, adjusted_item)
-            print(f"Опт. Позиция ID {first_item['id']} разбита для коррекции цены.")
 
     return order_items
 
