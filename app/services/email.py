@@ -1,4 +1,5 @@
 from app.models import Order
+from app.logger import logger
 
 import smtplib
 from concurrent.futures import ThreadPoolExecutor
@@ -13,8 +14,6 @@ def _sync_send_smtp(to_email, subject, html_body):
     Внутренняя функция. Выполняется изолированно в фоновом потоке.
     Занимается реальной отправкой почты через SMTP.
     """
-    print("Фон: Начало отправки письма _...")
-
     smtp_server = current_app.config.get("MAIL_SERVER", "smtp.yandex.ru")
     smtp_port = current_app.config.get("MAIL_PORT", 465)
     smtp_user = current_app.config.get("MAIL_USERNAME")
@@ -22,7 +21,7 @@ def _sync_send_smtp(to_email, subject, html_body):
     sender_email = smtp_user
 
     if not smtp_user or not smtp_password:
-        print("Фон: Ошибка отправки. Не настроены MAIL_USERNAME или MAIL_PASSWORD в config.")
+        logger.warning("[ФОН] Ошибка отправки почты: Не настроены MAIL_USERNAME или MAIL_PASSWORD в config.")
         return
 
     # Формируем структуру письма (поддерживает HTML и кириллицу)
@@ -33,24 +32,22 @@ def _sync_send_smtp(to_email, subject, html_body):
 
     # Добавляем копию письма
     msg["Bcc"] = sender_email
-
     msg.attach(MIMEText(html_body, "html", "utf-8"))
 
     try:
-        print(f"Фон: Попытка отправки письма для {to_email}...")
+        logger.debug(f"[ФОН] Попытка отправки SMTP-пакета на адрес: {to_email}")
         
         with smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=10) as server:
             server.login(smtp_user, smtp_password)
             server.sendmail(sender_email, [to_email, sender_email], msg.as_string())
             
-        print(f"Фон: Письмо успешно отправлено на {to_email}")
+        logger.info(f"[ФОН] Письмо успешно отправлено на {to_email} (Тема: {subject})")
         
-    except smtplib.SMTPConnectError:
-        print(f"Фон: Ошибка подключения к SMTP серверу {smtp_server}")
-    except smtplib.SMTPAuthenticationError:
-        print("Фон: Ошибка авторизации в SMTP. Проверьте логин или пароль приложения почты.")
-    except Exception as e:
-        print(f"Фон: Непредвиденная ошибка при отправке на {to_email}: {e}",)
+    except smtplib.SMTPException as smtp_err:
+        logger.error(f"[ФОН] Сбой SMTP при отправке письма на {to_email}. Ошибка: {smtp_err}")
+        
+    except Exception:
+        logger.exception(f"[ФОН] Непредвиденая ошибка при отправке письма на {to_email}")
 
 
 # --- Публичные функции --- 
@@ -59,29 +56,32 @@ def send_order_confirmation_email(to_email, order_id):
     Тип 1: Письмо об успешной оплате заказа с деталями.
     Принимает email клиента и id заказа.
     """
-    print("Фон: Начало отправки письма confirm...")
+    logger.debug(f"Инициализация фоновой отправки письма-подтверждения для заказа №{order_id}")
+
     app = current_app._get_current_object()
     def _prepare_and_send():
-        # Этот код выполнится уже ИЗНУТРИ потока, где активен app_context
-        # Находим заказ в БД. get() автоматически подтянет данные
+        # Этот код выполнится уже изнутри потока, где активен app_context
         with app.app_context():
-            order = Order.query.get(order_id)
-            if not order:
-                print(f"Фон: Заказ №{order_id} не найден в БД для отправки письма.")
-                return
+            try:
+                order = Order.query.get(order_id)
+                if not order:
+                    logger.warning(f"[ФОН] Заказ №{order_id} не найден в БД. Отмена отправки письма-подтверждения.")
+                    return
 
-            subject = f"Заказ №{order.id} успешно оплачен"
-            
-            # Передаем объект модели напрямую в шаблонизатор Jinja2
-            html_body = render_template(
-                'emails/order_email.html', 
-                type='paid',
-                subject=subject,
-                order=order
-            )
-            
-            # Вызываем отпвку
-            _sync_send_smtp(to_email, subject, html_body)
+                subject = f"Заказ №{order.id} успешно оплачен"
+
+                html_body = render_template(
+                    'emails/order_email.html', 
+                    type='paid',
+                    subject=subject,
+                    order=order
+                )
+                
+                # Вызываем отравку
+                _sync_send_smtp(to_email, subject, html_body)
+
+            except Exception:
+                logger.exception(f"[ФОН] Критический сбой при подготовке письма подтверждения для заказа №{order_id}")
 
     # Закидываем в пул внутреннюю функцию-обертку
     email_executor.submit(_prepare_and_send)
@@ -91,27 +91,29 @@ def send_delivery_track_email(to_email, order_id):
     Тип 2: Письмо с трек номером заказа.
     Принимает email клиента и id заказа.
     """
-    print("Фон: Начало отправки письма track...")
+    logger.debug(f"Инициализация фоновой отправки письма с текр-номером для заказа №{order_id}")
+
     app = current_app._get_current_object()
     def _prepare_and_send():
         with app.app_context():
-            order = Order.query.get(order_id)
-            if not order:
-                print(f"Фон: Заказ №{order_id} не найден в БД для отправки письма с трек номером.")
-                return
+            try:
+                order = Order.query.get(order_id)
+                if not order:
+                    logger.warning(f"[ФОН] Заказ №{order_id} не найден в БД. Отмена отправки письма с трек-номером.")
+                    return
 
-            subject = f"Ваш заказ №{order.id} отправлен! Трек-номер внутри"
-            
-            # Передаем объект модели напрямую в шаблонизатор Jinja2
-            html_body = render_template(
-                'emails/order_email.html', 
-                type='track',
-                subject=subject,
-                order=order
-            )
-            
-            # Вызываем отпвку
-            _sync_send_smtp(to_email, subject, html_body)
+                subject = f"Ваш заказ №{order.id} отправлен! Трек-номер внутри"
 
+                html_body = render_template(
+                    'emails/order_email.html', 
+                    type='track',
+                    subject=subject,
+                    order=order
+                )
+                
+                _sync_send_smtp(to_email, subject, html_body)
+            except Exception:
+                logger.exception(f"[ФОН] Критический сбой при подготовке письма с трек-номером для заказа №{order_id}")
+            
     # Закидываем в пул внутреннюю функцию-обертку
     email_executor.submit(_prepare_and_send)

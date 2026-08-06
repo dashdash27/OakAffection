@@ -204,7 +204,7 @@
             renderDeliveryOptions(result.data["deliveries"]);
         } else {
             renderDeliveryOptions({});
-            console.log(`Не удалось получить список доступных доставок: ${result.message}`)
+            console.log(`Не удалось получить список доступных доставок.`)
         }
     }
 

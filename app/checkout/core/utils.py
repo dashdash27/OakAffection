@@ -1,4 +1,5 @@
 from app.checkout.utils import process_cart, calculate_cart_base_total, apply_threshold_discount
+from app.logger import logger
 
 import os
 import jwt
@@ -10,11 +11,14 @@ def verify_and_get_delivery_price(delivery_token: str) -> int:
     secret_key = os.getenv("SECRET_KEY")
     try:
         decoded_delivery = jwt.decode(delivery_token, secret_key, algorithms=["HS256"])
+        logger.debug("Проверка токена доставки прошла успешно.")
         return int(decoded_delivery.get("price"))
     except jwt.ExpiredSignatureError:
-        raise ValueError("Время действия тарифа доставки истекло. Пожалуйста, выберите параметры доставки заново.")
+        logger.warning("Время действия докена доставки истекло.")
+        raise ValueError("Время действия тарифа доставки истекло.")
     except jwt.InvalidTokenError:
-        raise ValueError("Ошибка проверки безопасности доставки. Пожалуйста, обновите страницу.")
+        logger.warning("Ошибка во время проверки токена доставки.")
+        raise ValueError("Ошибка во время проверки токена доставки.")
     
 def validate_order_totals(cart, trusted_delivery_price: int, client_total_amount: int) -> tuple[bool, list, int, int]:
     """

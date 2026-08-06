@@ -1,5 +1,6 @@
+from app.logger import logger
+
 import requests
-import random
 from flask import current_app
 
 dadata_session = requests.Session()
@@ -45,6 +46,10 @@ def get_city_suggestions(query):
         suggestions = response.json().get('suggestions', [])
 
         return [format_suggestion(s) for s in suggestions]
-    except (requests.exceptions.RequestException, Exception) as e:
-        print(f"Ошибка при запросе к Dadata: {e}")
-        return None 
+
+    except requests.exceptions.RequestException:
+        logger.error(f"Сеть или API DaData вернули ошибку для запроса: {query}")
+        return None
+    except Exception:
+        logger.exception("Критическая авария при обработке подсказок городов")
+        return None

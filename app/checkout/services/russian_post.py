@@ -14,12 +14,29 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         "X-User-Authorization": f"Basic {api_key}"
     }
 
+    logger.debug(f"Получение информации о доставке Почты России для города: {city_data.get('value')}")
+
+    return {
+        "status": "success",
+        "error_code": None,
+        "name": "Почта России",
+        "service": "russian_post",
+        "points": [
+            { "id": "15", "address":"350005 Персиковая 3"},
+            { "id": "26", "address":"450002 Яблочная 5"}
+        ],
+        "delivery_days": "3-4 дня",
+        "price": 700, 
+        "delivery_token": generate_jwt_delivery_token("russian_post", 700)
+    }
+
     try:
         total_weight = order_dimensions['total_weight']
         GLOBAL_WEIGHT_LIMIT = post_cfg.get('GLOBAL_WEIGHT_LIMIT')
         ORDER_WEIGHT_LIMIT = post_cfg.get('ORDER_WEIGHT_LIMIT')
 
         if total_weight > GLOBAL_WEIGHT_LIMIT or order_dimensions['max_item_weight'] > ORDER_WEIGHT_LIMIT:
+            logger.warning(f"Почта России: Заказ слишком тяжелый или объемный для доставки")
             return {
                 "status": "business_error",
                 "error_code": "OVERSIZE_OR_OVERWEIGHT",
@@ -36,6 +53,7 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         
 
         if not filtered_points:
+            logger.warning(f"Почта России: В данном городе нет подходящих отделений Почты России")
             return {
                 "status": "business_error",
                 "error_code": "NO_POINTS_IN_REGION",
@@ -43,11 +61,11 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
             }
         
         # 2 - get delivery details
-        index_to = city_data.get('postal_code')
+        index_to = city_data.get('postal_code') or filtered_points[0].get('id') or ''
         details = await _get_delivery_details(index_from, index_to, order_dimensions, order_price, client, auth_headers, post_cfg)
 
         if not details:
-            logger.warning(f"Почта России: Не удалось рассчитать цену для региона {city_data.get('value')}")
+            logger.warning(f"Почта России: Не удалось рассчитать цену для города {city_data.get('value')}")
             return {
                 "status": "tech_error",
                 "error_code": "PRICE_CALCULATION_FAILED",
@@ -69,7 +87,6 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
             }
         
         token = generate_jwt_delivery_token("yandex", clean_price_with_margin)
-        print("Post token:", token)
 
         return {
             "status": "success",
@@ -83,12 +100,11 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
         }
     
     except Exception as e:
-        logger.error(f"Критическая ошибка во время интеграции с Почтой России: {e}", exc_info=True)
+        logger.exception(f"Критическая ошибка во время интеграции с Почтой России")
         return {
             "status": "tech_error",
             "error_code": "POST_API_DOWN",
-            "message": "Сервер службы доставки Почты России временно недоступен.",
-            "points": []
+            "message": "Сервер службы доставки Почты России временно недоступен."
         }
     
 async def _get_pickup_points(latitude, longitude, search_radius, client, headers, post_cfg: dict):

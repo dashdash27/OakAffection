@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             errorBox.classList.remove("hidden");
         }
         else {
-            console.log("Ошибка соединения");
+            console.log("Ошибка сервера");
             errorBox.classList.remove("hidden");
         }
     }

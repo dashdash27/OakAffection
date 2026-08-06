@@ -1,9 +1,8 @@
 from flask import Blueprint, request, jsonify
-from sqlalchemy.orm import joinedload
-import json
 
 from app import csrf
 from app.extensions import db
+from app.logger import logger
 from app.models import Order, PaymentStatus, OrderStatus
 from app.payments.utils import generate_ozon_pay_notification_sign
 from app.services.email import send_order_confirmation_email
@@ -13,19 +12,22 @@ payments_bp = Blueprint('payments', __name__, url_prefix='/payments')
 @payments_bp.route('/api/ozon-pay-webhook', methods=['POST'], strict_slashes=False)
 @csrf.exempt
 def ozon_pay_webhook():
-    print("==== Получен Webhook от Ozon Pay ====)")
-    data = request.get_json(silent=True)
+    try:
+        raw_bytes = request.get_data()
+        logger.debug(f"=== Получен сырой Webhook от Ozon Pay ===. Тело: {raw_bytes.decode('utf-8')}")
+    except Exception:
+        logger.exception("Не удалось прочитать сырые байты входящего вебхука")
 
+    # Парсим json
+    data = request.get_json(silent=True)
     if not data:
-        print("Получен пустой вебхук или данные не в формате JSON")
+        logger.warning("Вебхук отклонен: пустые данные или невалидный формат JSON")
         return "Invalid JSON", 400
     
-    pretty_json = json.dumps(data, indent=4, ensure_ascii=False)
-    print(f"{pretty_json}")
 
     # 1. Отсев самостоятельных попыток оплаты. Если нет orderID - самостоятельная оплата
     if "orderID" not in data or not data["orderID"]:
-        print("Это самостоятельная оплата")
+        logger.info(f"Игнорируем самостоятельную оплату внутри Ozon. ExtOrderID: {data.get('extOrderID', 'Нет данных')}")
         return "Ignored independent payment", 200
     
     # 2. Проверка подписи
@@ -33,40 +35,44 @@ def ozon_pay_webhook():
     request_sign = data.get("requestSign")
 
     if computed_signature != request_sign:
-        print(f"-> [ОШИБКА]: Подпись не совпала! Ожидалось: {computed_signature}, пришло: {request_sign}")
+        logger.error(f"Контроль подписи провален! Ожидалось: {computed_signature}, пришло: {request_sign}. JSON: {data}")
         return "Invalid signature", 400
     
-    print(f"Подпись совпала: {computed_signature}")
+    logger.debug(f"Криптографическая подпись Ozon Pay успешно подтверждена: {computed_signature}")
 
     # 3. Ищем заказ по my_order_id в БД и его платеж
     my_order_id_raw = data.get("extOrderID")
     try:
         my_order_id = int(my_order_id_raw.split('-', 1)[1])
     except (ValueError, IndexError, AttributeError):
-        print(f"-> [ОШИБКА]: Некорректный формат extOrderID: {my_order_id_raw}")
+        logger.error(f"Не удалось распарсить локальный ID заказа из extOrderID. Получено: '{my_order_id_raw}'")
         return "Missing extOrderID", 400
 
-    order = Order.query.filter(Order.id == my_order_id).first()
+    try:
+        order = Order.query.filter(Order.id == my_order_id).first()
+    except Exception:
+        logger.exception(f"Системный сбой БД при поиске заказа №{my_order_id} во время вебхука")
+        return "Database error", 500
 
     if not order:
-        print(f"Заказ #{my_order_id} отсутствует в нашей БД!")
+        logger.error(f"Вебхук отклонен: Заказ №{my_order_id} физически отсутствует в нашей базе данных!")
         return "Order not found", 400
     
     # Получаем уже существующую платежку, привязанную к заказу
     payment = order.payment  
     if not payment:
-        print(f"-> [ОШИБКА]: К заказу #{my_order_id} не привязана платежка в БД!")
+        logger.error(f"Вебхук отклонен: К существующему заказу №{my_order_id} в БД не привязана таблица платежа!")
         return "Payment record not found for this order", 400
 
     # 4. Обработка статуса
     status_ozon = data.get("status")
-    print(f"Статус заказа в Ozon Pay: {status_ozon}")
-
     tx_id_raw = data.get("transactionID")
     tx_uid_raw = data.get("transactionUid") or data.get("transactionUID")
 
+    logger.debug(f"Начало обработки статуса Ozon Pay. Заказ №{order.id}, Статус шлюза: {status_ozon}, TxID: {tx_id_raw}")
+
     if status_ozon == "Completed":
-        print(f"Переводим заказ #{my_order_id} и платеж в статус 'paid'/'completed'...")
+        logger.info(f"Получен вебхук успеха от Ozon Pay. Переводим заказ №{order.id} в статус PAID, а платеж в статус COMPLETED.")
         
         try:
             order.status = OrderStatus.PAID
@@ -77,18 +83,20 @@ def ozon_pay_webhook():
 
             db.session.commit()
 
+            logger.info(f"Заказ №{order.id} успешно подтвержден оплатой в БД.")
+
             # Отправляем письмо-подтверждение клиенту
             send_order_confirmation_email(order.customer_email, order.id)
         except Exception as e:
             db.session.rollback()
-            print(f"Ошибка при сохранении успешного платежа в БД: {e}")
-            return jsonify({"success": False, "error": str(e)}), 500
+            logger.exception(f"Критическая ошибка фиксации успешной оплаты в БД для заказа №{order.id}")
+            return jsonify({"success": False, "error": "DATABASE_ERROR"}), 500
     
     elif status_ozon == "Rejected":
-        print(f"-> Переводим платежку заказа #{my_order_id} в статус 'rejected'...")
-
         try:
             if  not (payment.status == PaymentStatus.COMPLETED and order.status == OrderStatus.PAID):
+                logger.info(f"Получен вебхук отказа от Ozon Pay. Переводим платеж заказа №{order.id} в статус REJECTED.")
+
                 order.status = OrderStatus.PENDING
                 payment.status = PaymentStatus.REJECTED
                 
@@ -97,16 +105,16 @@ def ozon_pay_webhook():
                 
                 db.session.commit()
             else:
-                print("-> Платежка уже завершена, ничего не делаем")
+                logger.warning(f"Ozon прислал статус Rejected на уже ОПЛАЧЕННЫЙ заказ №{order.id}. Действие проигнорировано.")
             
         except Exception as e:
             db.session.rollback()
-            print(f"Ошибка при сохранении отклоненного платежа в БД: {e}")
-            return jsonify({"success": False, "error": str(e)}), 500
+            logger.exception(f"Критическая ошибка при сохранении отклоненного платежа в БД для заказа №{order.id}")
+            return jsonify({"success": False, "error": "DATABASE_ERROR"}), 500
 
     else:
-        print(f"-> Получен необрабатываемый статус: {status_ozon}")
-        return {"status": "unhandled_status"}, 200
+        logger.warning(f"Получен необрабатываемый статус от Ozon Pay: '{status_ozon}' для заказа №{order.id}")
+        return jsonify({"status": "unhandled_status"}), 200
     
-    print("==== Вебхук успешно обработан и записан в БД ====")
-    return {"status": "success"}, 200
+    logger.info(f"==== Вебхук Ozon Pay для заказа №{order.id} успешно обработан и закрыт ====")
+    return jsonify({"status": "success"}), 200

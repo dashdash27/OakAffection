@@ -33,9 +33,11 @@ def checkout():
 def sync_cart():
     data = request.get_json()
     if not data or 'product_ids' not in data:
-        return jsonify({"success": False, "error": "No data"}), 400
+        logger.warning(f"Некорректный запрос синхронизации корзины. Тело запроса: {data}")
+        return jsonify({"success": False, "error": "BAD_REQUEST"}), 400
     
     raw_ids = data.get('product_ids', [])
+    logger.debug(f"Фронтенд передал {len(raw_ids)} ID товаров для проверки")
 
     clean_ids = []
     for pid in raw_ids:
@@ -69,6 +71,8 @@ def sync_cart():
             "value": step.get("discount_percent") / 100,
             "label": f"{step.get('discount_percent')}%"
         })
+
+    logger.debug(f"Успешная синхронизация корзины: найдено в БД {len(result)} товаров")
     
     return jsonify({
         "products": result,
@@ -87,8 +91,10 @@ def suggest_cities():
     city_suggestions = get_city_suggestions(query)
 
     if city_suggestions is None:
-        return jsonify({"success": False, "error": "External service error"}), 502
-    
+        logger.warning(f"Не удалось получить подсказки городов для запроса: {query}")
+        return jsonify({"success": False, "error": "EXTERNAL_SERVICE_ERROR"}), 502
+
+    logger.debug(f"Успешно получено {len(city_suggestions)} подсказок для города: {query}")
     return jsonify(city_suggestions), 200
 
 @checkout_bp.route('/api/delivery/options', methods=['POST'])
@@ -97,14 +103,14 @@ async def get_delivery_options():
     req_data = request.get_json()
 
     if not req_data or 'city_data' not in req_data or 'cart' not in req_data:
-        logger.warning("get_delivery_options: Ошибка запроса. Отсутствуют city_data или cart")
-        return jsonify({"success": False, "error": "Missing city data"}), 400
+        logger.warning(f"Некорректный запрос вариантов доставки. Тело запроса: {req_data}")
+        return jsonify({"success": False, "error": "BAD_REQUEST"}), 400
     
     city_data = req_data.get('city_data')
     cart = req_data.get('cart')
     
     city_name = city_data.get('value', 'Неизвестный город')
-    logger.info(f"Начало расчета вариантов доставки для города: {city_name}")
+    logger.debug(f"Начало расчета вариантов доставки для города: {city_name}")
     
     order_items = process_cart(cart)
     order_dimensions = calculate_order_dimensions(order_items)
@@ -125,27 +131,26 @@ async def get_delivery_options():
     russian_post_result = results[1]
     
     if isinstance(yandex_result, Exception):
-        logger.error(f"Глобальный сбой asyncio для Яндекса (city: {city_name}): {yandex_result}", exc_info=True)
+        logger.exception(f"Глобальный сбой asyncio для Яндекса (city: {city_name}): {yandex_result}")
         yandex_delivery_info = {
             "status": "tech_error",
             "error_code": "YANDEX_API_DOWN",
-            "message": "Служба доставки Яндекса временно недоступна.",
-            "points": []
+            "message": "Служба доставки Яндекса временно недоступна."
         }
     else:
         yandex_delivery_info = yandex_result
 
     if isinstance(russian_post_result, Exception):
-        logger.error(f"Глобальный сбой asyncio для Почты России (city: {city_name}): {russian_post_result}", exc_info=True)
+        logger.exception(f"Глобальный сбой asyncio для Почты России (city: {city_name}): {russian_post_result}")
         russian_post_delivery_info = {
             "status": "tech_error",
             "error_code": "RUSSIAN_POST_API_DOWN",
-            "message": "Служба доставки Почты России временно недоступна.",
-            "points": []
+            "message": "Служба доставки Почты России временно недоступна."
         }
     else:
         russian_post_delivery_info = russian_post_result
 
+    logger.debug(f"Закончен расчет вариантов доставки для города: {city_name}")
     return jsonify({
         "status": "success",
         "cart_metrics": {
@@ -164,20 +169,18 @@ def create_order():
     if not raw_data:
         return jsonify({"success": False, "error": "Недостаточно данных для создания заказа"}), 422
     
-    print("Прилетели данные для заказа:", raw_data)
+    logger.debug(f"Получен запрос на создание заказа: {raw_data}")
 
     # 1. Validation
     try:
         validated_order = OrderCreateSchema(**raw_data)
     except ValidationError as e:
-        print("Ошибки при валидации:", [f"Поле {err['loc']}: {err['msg']}" for err in e.errors()])
-        return jsonify({
-            "success": False, 
-            "error": "Некоторые данные заполнены некорректно. Пожалуйста, проверьте форму."
-        }), 422
+        logger.warning(f"Ошибка валидации Pydantic. Ошибки: {e.errors()}. JSON: {raw_data}")
+        return jsonify({"success": False, "error": "VALIDATION_ERROR"}), 422
     
     try:
         # 2. Checking JWT Token
+        logger.debug("Проверка JWT токена доставки")
         trusted_delivery_price = verify_and_get_delivery_price(validated_order.delivery.delivery_token)
         
         # 3. Calculate total_amount and compare
@@ -187,7 +190,8 @@ def create_order():
             client_total_amount=validated_order.client_total_amount
         )
         if not totals_match:
-            return jsonify({"success": False, "error": "Ошибка расчета стоимости заказа. Пожалуйста, обновите корзину или выберите ПВЗ заново."}), 422
+            logger.warning(f"Рассинхронизация сумм корзины у пользователя. Client Total Amount: {validated_order.client_total_amount}")
+            return jsonify({"success": False, "error": "PRICE_MISMATCH"}), 422
         
         # 4. Распределяем скидку на товары
         items_base_total = items_discounted_total + discount_amount
@@ -206,52 +210,57 @@ def create_order():
         })
         
         order = create_new_order_transaction(final_order_to_save)
-        print("Order in DB created:", order.id)
+        logger.info(f"Заказ успешно создан локально в БД. ID Заказа: {order.id}, Сумма: {server_total_amount} руб.")
 
         # 6. Create order in ozon pay
         ozon_pay_cfg = current_app.config.get("OZON_PAY", {})
-        print(ozon_pay_cfg)
+
         pay_link, ext_order_id = request_ozon_pay_link(order, ozon_pay_cfg)
 
-        print(pay_link, ext_order_id)
-
-        if pay_link is not None and ext_order_id is not None:
-            # 7. Save ext_db for order in DB
+        if pay_link is None or ext_order_id is None:
             try:
-                order.ext_id = ext_order_id  
+                order.payment.status = PaymentStatus.CREATION_FAILED
                 db.session.commit()
             except Exception as e:
+                logger.exception(f"Не удалось перевести платеж заказа №{order.id} в статус CREATION_FAILED при ошибке шлюза")
                 db.session.rollback()
-
-                try:
-                    order.payment.status = PaymentStatus.CREATION_FAILED
-                    db.session.commit()
-                except Exception:
-                    db.session.rollback()
-  
-                return jsonify({"success": False, "error": "Ошибка сервера при сохранения данных оплаты"}), 500
+                return jsonify({"success": False, "error": "DATABASE_ERROR"}), 500
             
-            return jsonify({
-                "success": True, 
-                "order_id": order.id, 
-                "pay_link": pay_link,
-                "token": generate_order_hash(order.id)
-            }), 200
+            logger.warning(f"Заказ №{order.id} сохранен со статусом CREATION_FAILED (Ozon Pay не вернул ссылку или внешний id).")
+            return jsonify({"success": False, "error": "PAYMENT_GATEWAY_ERROR"}), 502
 
         try:
-            order.payment.status = PaymentStatus.CREATION_FAILED
+            order.ext_id = ext_order_id  
             db.session.commit()
         except Exception as e:
+            logger.exception(f"Ошибка сохранения ext_id={ext_order_id} для заказа №{order.id}. Откат транзакции.")
             db.session.rollback()
-            return jsonify({"success": False, "error": "Ошибка сервера при сохранения данных оплаты"}), 500
-        
-        return jsonify({"success": False, "error": "Ошибка платежного шлюза"}), 502
+
+            try:
+                order.payment.status = PaymentStatus.CREATION_FAILED
+                db.session.commit()
+            except Exception:
+                logger.warning(f"Ошибка перевода статуса оплаты в CREATION_FAILED для заказа №{order.id}. Откат транзакции.")
+                db.session.rollback()
+
+            return jsonify({"success": False, "error": "DATABASE_ERROR"}), 500
+
+        logger.info(f"Платежная ссылка успешно привязана к заказу №{order.id}. Клиент перенаправляется на оплату.")
+        return jsonify({
+            "success": True, 
+            "order_id": order.id, 
+            "pay_link": pay_link,
+            "token": generate_order_hash(order.id)
+        }), 200
 
     except ValueError as val_err:
-        return jsonify({"success": False, "error": str(val_err)}), 422
+        logger.warning(f"Ошибка при проверки токена доставки")
+        return jsonify({"success": False, "error": "DELIVERY_ERROR"}), 422
+    
     except Exception as e:
-        print(f"[FATAL ERROR] Критическая ошибка при оформлении: {e}")
-        return jsonify({"success": False, "error": "Ошибка сервера при формировании заказа."}), 500
+        logger.exception("Критическая непредвиденная ошибка на этапе оформления заказа")
+        return jsonify({"success": False, "error": "INTERNAL_SERVER_ERROR"}), 500
+
     
 @checkout_bp.route('/success', methods=['GET'])
 def success_page():
@@ -270,11 +279,20 @@ def get_single_order_status(order_id):
     client_token = request.args.get('token')
 
     if not verify_order_hash(order_id, client_token):
-        return jsonify({"success": False, "error": "Forbidden"}), 403
+        logger.warning(f"Отказ в доступе (403): Невалидный токен '{client_token}' для заказа №{order_id}")
+        return jsonify({"success": False, "error": "FORBIDDEN"}), 403
+
+    try:
+        order = Order.query.get(order_id)
+    except Exception:
+        logger.exception(f"Системный сбой БД при опросе статуса заказа №{order_id}")
+        return jsonify({"success": False, "error": "DATABASE_ERROR"}), 500
     
-    order = Order.query.get(order_id)
     if not order:
-        return jsonify({"success": False, "error": "Not Found"}), 404
+        logger.warning(f"Заказ №{order_id} не найден в БД при опросе статуса, хотя токен валиден")
+        return jsonify({"success": False, "error": "NOT_FOUND"}), 404
+
+    logger.debug(f"Опрос статуса заказа №{order.id}. Текущий статус в БД: {order.status.value}")
     
     order_details = None
     if order.status == OrderStatus.PAID:

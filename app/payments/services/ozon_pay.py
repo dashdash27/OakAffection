@@ -1,10 +1,9 @@
 from app.models import Order 
 from app.payments.utils import generate_ozon_pay_sign, generate_ozon_expires_at
 from app.checkout.core.utils import generate_order_hash
+from app.logger import logger
 
 import requests
-import json
-from datetime import timedelta
 
 ozon_pay_session = requests.Session()
 
@@ -31,8 +30,9 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
     failure_url = f"{base_failure_url}?order_id={order.id}&token={token}"
 
     if not url or not access_key:
+        logger.warning("Ошибка Ozon Pay: не настроены URL или ACCESS_KEY в конфигурации.")
         print("[OZON PAY ERROR] Не настроены URL_CREATE_ORDER или ACCESS_KEY в конфигурации.")
-        return None
+        return None, None
 
     # Add Order Items
     ozon_items = []
@@ -90,7 +90,8 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
     }
     # generate sign
     payload["requestSign"] = generate_ozon_pay_sign(payload)
-    print(json.dumps(payload, indent=4, ensure_ascii=False))
+
+    logger.debug(f"Отправка запроса в Ozon Pay для заказа №{order.id}. Payload: {payload}")
 
     try:
         session = get_ozon_pay_session()
@@ -98,6 +99,8 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
         response.raise_for_status() 
 
         response_data = response.json() or {}
+        logger.debug(f"Сырой ответ Ozon Pay для заказа №{order.id}: {response_data}")
+
         order_data = response_data.get('order') or {}
 
         ext_order_id = order_data.get('id')
@@ -105,9 +108,15 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
         
         return pay_link, ext_order_id
 
-    except requests.exceptions.RequestException as req_err:
-        print(f"[OZON PAY HTTP ERROR] Сбой API для заказа {order.id}: {req_err}")
+    except requests.exceptions.Timeout:
+        logger.error(f"Превышено время ожидания (Timeout) ответа Ozon Pay для заказа {order.id}")
         return None, None
-    except Exception as e:
-        print(f"[OZON PAY ERROR] Непредвиденная ошибка парсинга ответа: {e}")
+    except requests.exceptions.RequestException as req_err:
+        logger.error(
+            f"Сбой API Ozon Pay для заказа {order.id}. "
+            f"Системная ошибка: {req_err}."
+        )
+        return None, None
+    except Exception:
+        logger.exception(f"Непредвиденная авария парсинга ответа Ozon Pay для заказа {order.id}")
         return None, None

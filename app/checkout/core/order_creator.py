@@ -1,7 +1,7 @@
 from app.extensions import db
 from app.models.order_model import Order, OrderItem, OrderStatus, DeliveryService
 from app.models.payment_model import Payment, PaymentStatus, PaymentGateway
-from app.models.product_model import Product
+from app.logger import logger
 from app.checkout.schemas import OrderCreateSchema
 
 
@@ -14,6 +14,8 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
     
     Гарантирует Rollback при любой ошибке.
     """
+    logger.debug(f"Старт транзакции БД для создания заказа пользователя {validated_order.client_contacts.email}")
+
     try:
         # 1. Create Order (Order.status = PENDING) - переводим цены в копейки
         new_order = Order(
@@ -62,5 +64,5 @@ def create_new_order_transaction(validated_order: OrderCreateSchema) -> Order:
 
     except Exception as e:
         db.session.rollback()
-        print(f"[CORE ERROR] Ошибка создания транзакции заказа: {e}")
+        logger.error(f"Ошибка при создании заказа в Ozon Pay.")
         raise e
