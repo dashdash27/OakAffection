@@ -11,7 +11,7 @@
             "client_total_amount": checkoutState.totalPrice,
             "client_contacts": {
                 "name": checkoutState.contacts.name,
-                "phone": `+${checkoutState.contacts.phone}`,
+                "phone": `${checkoutState.contacts.phone}`,
                 "email": checkoutState.contacts.email   
             },
             "delivery": {

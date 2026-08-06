@@ -20,7 +20,7 @@ class ClientContactsSchema(BaseModel):
         max_length=150,
         pattern=r"^\s*[a-zA-Zа-яА-ЯёЁ]+(?:\s+[a-zA-Zа-яА-ЯёЁ]+)+\s*$"
     )
-    phone: str = Field(..., min_length=12, max_length=12, pattern=r"^\+7\d{10}$", strip_whitespace=True)
+    phone: str = Field(..., min_length=11, max_length=11, pattern=r"^7\d{10}$", strip_whitespace=True)
     email: EmailStr
 
 class SettlementSchema(BaseModel):
