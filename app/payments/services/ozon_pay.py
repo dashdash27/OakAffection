@@ -95,7 +95,7 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
 
     try:
         session = get_ozon_pay_session()
-        response = session.post(url, json=payload, timeout=5)
+        response = session.post(url, json=payload, timeout=12)
         response.raise_for_status() 
 
         response_data = response.json() or {}
