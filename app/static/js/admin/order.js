@@ -52,35 +52,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const trackInput = document.querySelector('.track-input');
     const trackBtn = document.querySelector('.track-btn');
 
-    trackBtn.addEventListener('click', async (e) => {
-        if (trackInput.disabled) {
-            trackInput.disabled = false; // Разблокируем поле для ввода
-            trackInput.focus();          // Ставим курсор внутрь
-            trackBtn.innerText = "Сохранить и отправить клиенту";
-            trackBtn.style.background = "var(--accent-color)";
-            trackBtn.style.color = "#ffffff";
-            trackBtn.style.borderColor = "#b7eb8f";
-            return;
-        }
+    if (trackBtn) {
+        trackBtn.addEventListener('click', async (e) => {
+            if (trackInput.disabled) {
+                trackInput.disabled = false; // Разблокируем поле для ввода
+                trackInput.focus();          // Ставим курсор внутрь
+                trackBtn.innerText = "Сохранить и отправить клиенту";
+                trackBtn.style.background = "var(--accent-color)";
+                trackBtn.style.color = "#ffffff";
+                trackBtn.style.borderColor = "#b7eb8f";
+                return;
+            }
 
-        const deliveryTrack = trackInput.value.trim();
-        if (!deliveryTrack) {
-            alert("Введите трек-номер!");
-            return;
-        }
+            const deliveryTrack = trackInput.value.trim();
+            if (!deliveryTrack) {
+                alert("Введите трек-номер!");
+                return;
+            }
 
-        // Вызываем fetch
-        const result = await fetchSaveOrderTrack(orderId, deliveryTrack);
+            // Вызываем fetch
+            const result = await fetchSaveOrderTrack(orderId, deliveryTrack);
 
-        if (result.success) {
-            showToastAfterReload("Трек номер успешно сохранен и отправлен клиенту", "success");
-            location.reload();
-        } else {
-            showToast("Не удалось сохранить и отправить трек-номер. Попробуйте еще раз", "error");
-        }
+            if (result.success) {
+                showToastAfterReload("Трек номер успешно сохранен и отправлен клиенту", "success");
+                location.reload();
+            } else {
+                showToast("Не удалось сохранить и отправить трек-номер. Попробуйте еще раз", "error");
+            }
 
-    });
+        });
 
+    }
+    
     async function fetchSaveOrderTrack(orderId, deliveryTrack) {
         try {
             const response = await fetch(`/admin/orders/${orderId}/track`, {

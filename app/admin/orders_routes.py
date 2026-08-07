@@ -2,6 +2,7 @@ from app.admin.routes import admin_bp
 from app.models import Order, OrderStatus, PaymentStatus
 from app.extensions import db
 from app.services.email import send_delivery_track_email
+from app.logger import logger
 
 
 from flask import render_template, request, jsonify, request
@@ -27,7 +28,7 @@ def orders():
 
     return render_template('admin/orders/home.html', orders=orders, current_status=status_filter)
 
-@admin_bp.route('/orders/<int:order_id>', methods=['GET', 'POST'])
+@admin_bp.route('/orders/<int:order_id>', methods=['GET'])
 def order_detail(order_id):
     order = Order.query.get_or_404(order_id)
     payment = order.payment
@@ -65,20 +66,29 @@ def order_detail(order_id):
 
 @admin_bp.route('/orders/<int:order_id>/action', methods=['POST'])
 def change_order_status(order_id):
-    order = Order.query.get_or_404(order_id)
+    order = Order.query.get(order_id)
+    if not order:
+        logger.warning(f"-> [Админка]: Заказ #{order_id} не найден при попытке изменения статуса заказа.")
+        return jsonify({"success": False, "error": "ORDER_NOT_FOUND"}), 404
+
     payment = order.payment
-    
+    if not payment:
+        logger.warning(f"-> [Админка]: Платеж к заказу #{order_id} не найден при попытке изменения статуса заказа.")
+        return jsonify({"success": False, "error": "PAYMENT_NOT_FOUND"}), 404
 
     req_data = request.get_json(silent=True)
     if not req_data:
-        return jsonify({"success": False, "error": "invalid_json"}), 400
+        logger.warning(f"-> [Админка]: Попытка изменения статуса заказа #{order_id} без JSON")
+        return jsonify({"success": False, "error": "INVALID_JSON"}), 400
     
     action = req_data.get('action')
     if not action:
-        return jsonify({"success": False, "error": "missing_action"}), 400
+        logger.warning(f"-> [Админка]: Попытка изменения статуса заказа #{order_id}: отсутствует действие.")
+        return jsonify({"success": False, "error": "MISSING_ACTION"}), 400
     
     if not payment or payment.status != PaymentStatus.COMPLETED:
-        return jsonify({"success": False, "error": "order_not_paid"}), 400
+        logger.warning(f"-> [Админка]: Попытка изменения статуса заказа #{order_id}: заказ не оплачен.")
+        return jsonify({"success": False, "error": "ORDER_NOT_PAID"}), 400
     
     try:
         # Действие: Отправить заказ (PAID -> SENT)
@@ -106,66 +116,78 @@ def change_order_status(order_id):
             order.status = OrderStatus.PAID
 
         else:
-            print(f"-> [Админка Ошибка]: Неизвестное действие {action} для заказа #{order_id}")
-            return jsonify({
-                "success": False, 
-                "error": f"invalid_status_action"
-            }), 400
+            logger.warning(f"-> [Админка]: Попытка изменения статуса заказа #{order_id}: неизвествное действие ({action}).")
+            return jsonify({"success": False, "error": "INVALID_STATUS_ACTION"}), 400
         
         db.session.commit()
-        print(f"-> [Админка Успех]: Статус заказа #{order_id} изменен на {order.status.value}")
+
+        logger.info(f"-> [Админка]: Статус заказа #{order_id} изменен на {order.status.value}")
         return jsonify({"success": True}), 200
     
     except Exception as e:
         db.session.rollback()
-        print(f"-> [Админка Ошибка]: Ошибка транзакции при действии {action} для заказа #{order_id}: {e}")
+        logger.exception(f"-> [Админка]: Ошибка при действии {action} для заказа #{order_id}: {e}")
         return jsonify({"success": False, "error": "database_error"}), 500
     
 
 @admin_bp.route('/orders/<int:order_id>/track', methods=['POST'])
 def save_order_track(order_id):
-    order = Order.query.get_or_404(order_id)
+    order = Order.query.get(order_id)
+    if not order:
+        logger.warning(f"-> [Админка]: Заказ #{order_id} не найден при попытке отправки трек-номера.")
+        return jsonify({"success": False, "error": "ORDER_NOT_FOUND"}), 404
     
     req_data = request.get_json(silent=True)
-    delivery_track = req_data.get('delivery_track', '').strip()
+    if not req_data:
+        logger.warning(f"-> [Админка]: Попытка отправки трек-номера для заказа #{order_id} без JSON.")
+        return jsonify({"success": False, "error": "INVALID_JSON"}), 400
 
+    delivery_track = req_data.get('delivery_track', '').strip()
     if not delivery_track:
-        return jsonify({"success": False, "error": "empty_delivery_track"}), 400
+        logger.warning(f"-> [Админка]: Попытка отправки трек номера для заказа #{order_id}: отсутствует трек-номер.")
+        return jsonify({"success": False, "error": "EMPTY_DELIVERY_TRACK"}), 400
 
     try:
         # 1. Сохраняем трек в модель заказа
         order.delivery_track = delivery_track
-        db.session.commit()
+        db.session.flush()
 
         # 2. Отправляем письмо с треком
         send_delivery_track_email(order.customer_email, order.id)
-        print(f"-> [Email]: Письмо с треком {delivery_track} отправлено для заказа #{order_id}")
+
+        db.session.commit()
+
+        logger.info(f"-> [Админка]: Фоновая задача на отправку письма с треком {delivery_track} для заказа #{order_id} поставлена в очередь. Трек-номер был сохранен в БД.")
 
         return jsonify({"success": True}), 200
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"success": False, "error": "database_error"}), 500
+        logger.exception(f"-> [Админка]: Ошибка при попытке сохранения и отправки трек-номера {delivery_track} для заказа #{order_id}.")
+        return jsonify({"success": False, "error": "DATABASE_ERROR"}), 500
     
 
 @admin_bp.route('/orders/<int:order_id>/comment', methods=['POST'])
 def save_order_comment(order_id):
-    order = Order.query.get_or_404(order_id)
+    order = Order.query.get(order_id)
+    if not order:
+        logger.warning(f"-> [Админка]: Заказ #{order_id} не найден при попытке обновления комментария.")
+        return jsonify({"success": False, "error": "ORDER_NOT_FOUND"}), 404
     
     req_data = request.get_json(silent=True)
     if not req_data:
-        return jsonify({"success": False, "error": "data_transfer_error"}), 400
+        logger.warning(f"-> [Админка]: Попытка обновления комментария для заказа #{order_id} без JSON")
+        return jsonify({"success": False, "error": "INVALID_JSON"}), 400
         
     comment_text = req_data.get('comment_text', '').strip()
-
     try:
         order.comment = comment_text if comment_text else ""
-        
-        print(f"-> [Админка]: Обновлен внутренний комментарий к заказу #{order_id}, {order.comment}")
         db.session.commit()
+
+        logger.info(f"-> [Админка]: Обновлен внутренний комментарий к заказу #{order_id}: {order.comment}")
         return jsonify({"success": True}), 200
 
     except Exception as e:
         db.session.rollback()
-        print(f"-> [Админка Ошибка]: Не удалось сохранить комментарий для заказа #{order_id}: {e}")
-        return jsonify({"success": False, "error": "database_error"}), 500
+        logger.exception(f"-> [Админка]: Не удалось обновить внутренний комментарий к заказу #{order_id}: {comment_text}")
+        return jsonify({"success": False, "error": "DATABASE_ERROR"}), 500

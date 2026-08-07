@@ -91,7 +91,7 @@ def send_delivery_track_email(to_email, order_id):
     Тип 2: Письмо с трек номером заказа.
     Принимает email клиента и id заказа.
     """
-    logger.debug(f"Инициализация фоновой отправки письма с текр-номером для заказа №{order_id}")
+    logger.debug(f"Инициализация фоновой отправки письма с трек-номером для заказа №{order_id}")
 
     app = current_app._get_current_object()
     def _prepare_and_send():
