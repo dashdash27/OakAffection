@@ -23,7 +23,7 @@ migrate = Migrate()
 limiter = Limiter(
     key_func=get_remote_address,
     storage_uri="memory://",
-    default_limits=["2 per second", "100 per minute", "5000 per day"]
+    default_limits=["5 per second", "100 per minute"]
 )
 
 def init_limiter(app):

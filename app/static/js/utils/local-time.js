@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-
     // Находим все элементы с нашими датами
     document.querySelectorAll('.js-local-time').forEach(function(element) {
         const utcStr = element.getAttribute('data-utc');
@@ -11,7 +10,6 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Проверяем, что дата распарсилась корректно
             if (!isNaN(localDate.getTime())) {
-                console.log(element.textContent);
                 // Форматируем дату под язык браузера пользователя (дд.мм.гггг, чч:мм)
                 element.textContent = localDate.toLocaleString(navigator.language, {
                     year: 'numeric',
@@ -20,8 +18,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     hour: '2-digit',
                     minute: '2-digit'
                 });
-
-                console.log(element.textContent);
             }
         }
     });

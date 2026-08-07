@@ -7,6 +7,7 @@ from app.utils.filters import to_iso_filter
 from flask_login import LoginManager
 from flask import Flask, g, request, render_template
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.middleware.proxy_fix import ProxyFix
 import uuid
 
 
@@ -15,6 +16,8 @@ csrf = CSRFProtect()
 def create_app():
 
     app = Flask(__name__)
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
     try:
         app.config.from_object('config.Config')

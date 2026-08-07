@@ -164,11 +164,9 @@ async def get_delivery_options():
     }), 200
 
 @checkout_bp.route('/api/orders', methods=['POST'])
+@limiter.limit("2 per minute; 10 per hour")
 def create_order():
     raw_data = request.get_json()
-
-    # TODO: Для теста
-    return jsonify({"success": False, "error": "DELIVERY_ERROR"}), 500
 
     if not raw_data:
         return jsonify({"success": False, "error": "BAD_REQUEST"}), 400
@@ -278,6 +276,7 @@ def failure_page():
 
 
 @checkout_bp.route('/api/orders/<int:order_id>/status', methods=['GET'])
+@limiter.limit("1 per second; 60 per minute")
 def get_single_order_status(order_id):
     """Проверка статуса одного заказа"""
     client_token = request.args.get('token')

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 
 from app import csrf
-from app.extensions import db
+from app.extensions import db, limiter
 from app.logger import logger
 from app.models import Order, PaymentStatus, OrderStatus
 from app.payments.utils import generate_ozon_pay_notification_sign
@@ -11,6 +11,7 @@ payments_bp = Blueprint('payments', __name__, url_prefix='/payments')
 
 @payments_bp.route('/api/ozon-pay-webhook', methods=['POST'], strict_slashes=False)
 @csrf.exempt
+@limiter.exempt
 def ozon_pay_webhook():
     try:
         raw_bytes = request.get_data()
@@ -24,7 +25,6 @@ def ozon_pay_webhook():
         logger.warning("Вебхук отклонен: пустые данные или невалидный формат JSON")
         return "Invalid JSON", 400
     
-
     # 1. Отсев самостоятельных попыток оплаты. Если нет orderID - самостоятельная оплата
     if "orderID" not in data or not data["orderID"]:
         logger.info(f"Игнорируем самостоятельную оплату внутри Ozon. ExtOrderID: {data.get('extOrderID', 'Нет данных')}")
