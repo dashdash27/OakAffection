@@ -13,11 +13,8 @@ def orders():
     status_filter = request.args.get('status')
 
     query = Order.query.order_by(Order.created_at.desc())
-
-    if status_filter == 'active':
-        query = query.filter(Order.status != OrderStatus.CANCELLED)
         
-    elif status_filter:
+    if status_filter:
         try:
             enum_status = OrderStatus(status_filter)
             query = query.filter(Order.status == enum_status)

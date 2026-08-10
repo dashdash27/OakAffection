@@ -167,12 +167,17 @@
     border-color: #91d5ff;
 }
 .filter-btn.status-sent.active {
+    background: #f9f0ff;
+    color: #531dab;
+    border-color: #d3adf7;
+}
+.filter-btn.status-delivered.active {
     background: #f6ffed;
     color: #389e0d;
     border-color: #b7eb8f;
 }
-.filter-btn.status-cancelled.active {
-    background: #fff1f0;
-    color: #cf1322;
-    border-color: #ffa39e;
+.filter-btn.status-returned.active {
+    background: #fff0f6;
+    color: #c41d7f;
+    border-color: #ffadd2;
 }
