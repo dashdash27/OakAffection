@@ -19,12 +19,9 @@ def setup_logger():
 
     logger = logging.getLogger('myapp')
 
-    is_debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1')
-
-    if is_debug_mode:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.INFO)
+    log_level_name = os.getenv('LOG_LEVEL', 'INFO').upper()
+    log_level = getattr(logging, log_level_name, logging.INFO)
+    logger.setLevel(log_level)
 
     logger.propagate = False  # предотвращаем дублирование
 
