@@ -2,6 +2,7 @@ from app.models import Order
 from app.logger import logger
 
 import smtplib
+import os
 from concurrent.futures import ThreadPoolExecutor
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -24,9 +25,12 @@ def _sync_send_smtp(to_email, subject, html_body):
         logger.warning("[ФОН] Ошибка отправки почты: Не настроены MAIL_USERNAME или MAIL_PASSWORD в config.")
         return
 
+    # Префикс
+    email_prefix = current_app.config.get("EMAIL_PREFIX", "")
+
     # Формируем структуру письма (поддерживает HTML и кириллицу)
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
+    msg["Subject"] = f"{email_prefix}{subject}"
     msg["From"] = sender_email
     msg["To"] = to_email
 
