@@ -45,11 +45,13 @@
     const modal = document.querySelector('.order-modal');
     const submitBtn = document.querySelector('.checkout__submit-btn');
 
+    let currentOrderText;
+
     submitBtn.addEventListener('click', (e) => {
         if (checkoutState.step == "ready") {
             e.preventDefault();
 
-            let currentOrderText = generateOrderText();
+            currentOrderText = generateOrderText();
             const orderReciept = document.querySelector('.order-modal__receipt');
             if (orderReciept) orderReciept.innerText = currentOrderText;
             
