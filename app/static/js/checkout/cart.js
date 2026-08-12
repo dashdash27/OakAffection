@@ -93,7 +93,6 @@ function cleanProductIdsInLS() {
 
     if (isDirty) {
         localStorage.setItem('cart', JSON.stringify(cleanCart));
-        console.log("Корзина была очищена от некорректных данных");
     }
 
     return cleanCart

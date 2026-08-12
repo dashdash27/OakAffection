@@ -13,21 +13,6 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
 
     logger.debug(f"Получение информации о доставке Яндекс для города: {city_data.get('value')}")
 
-    # Mockup
-    return {
-        "status": "success",
-        "error_code": None,
-        "name": "Яндекс Доставка",
-        "service": "yandex",
-        "points": [
-            { "id": "321", "address":"Ромашковая 3"},
-            { "id": "22", "address":"Атарбекова 36"}
-        ],
-        "delivery_days": "3-4 дня",
-        "price": 500, 
-        "delivery_token": generate_jwt_delivery_token("yandex", 500)
-    }
-
     try:
         geo_id = await _detect_geo_id(city_data, client, auth_headers, yandex_cfg)
         

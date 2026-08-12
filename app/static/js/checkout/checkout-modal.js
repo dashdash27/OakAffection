@@ -38,7 +38,6 @@
             addressLine
         ].join('\n');
 
-        console.log(fullText);
         return fullText;
     }
 

@@ -17,24 +17,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    console.log(orderId, token);
-
     // Отправляем фетч запрос на сервер
     const result = await fetchOrderStatus(orderId, token);
-    console.log(result.data);
 
     loader.classList.add('hidden');
 
     if (result.success) {
-        console.log("Токен валидный");
 
         if (result.data.paid) {
-            console.log("Заказ оплачен");
-
             // 1. Очищаем current и черновик, если нужно
             const currentCheckoutId = localStorage.getItem('current_checkout_order_id');
             if (currentCheckoutId && String(currentCheckoutId) === String(orderId)) {
-                console.log(`Текущий ID совпадает с #${orderId}. Очищаем черновик сессии.`);
                 localStorage.removeItem('current_checkout_order_id');
                 localStorage.removeItem('cart_draft'); 
             }
@@ -43,14 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             let myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
             const orderIndex = myOrders.findIndex(order => String(order.id) === String(orderId));
             if (orderIndex !== -1) {
-                console.log(`Заказ #${orderId} найден в истории. Меняем статус на paid.`);
                 myOrders[orderIndex].status = 'paid';
                 localStorage.setItem('my_orders', JSON.stringify(myOrders));
                 
                 renderOrderDetails(result.data.details);
             } else {
-                console.log(`Предупреждение: Заказ #${orderId} не найден в локальной истории my_orders.`);
-
                 document.querySelector('.receipt').classList.add('hidden');
 
                 const subMessage = document.querySelector('.sub-message');
@@ -62,16 +52,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             successBox.classList.remove("hidden");
         }
         else {
-            console.log("Заказ не оплачен");
             pendingBox.classList.remove("hidden");
         }
     } else {
         if (result.isInvalidToken) {
-            console.log("Токен не валидный");
             errorBox.classList.remove("hidden");
         }
         else {
-            console.log("Ошибка сервера");
             errorBox.classList.remove("hidden");
         }
     }

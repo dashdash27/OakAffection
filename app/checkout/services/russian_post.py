@@ -16,20 +16,6 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
 
     logger.debug(f"Получение информации о доставке Почты России для города: {city_data.get('value')}")
 
-    return {
-        "status": "success",
-        "error_code": None,
-        "name": "Почта России",
-        "service": "russian_post",
-        "points": [
-            { "id": "15", "address":"350005 Персиковая 3"},
-            { "id": "26", "address":"450002 Яблочная 5"}
-        ],
-        "delivery_days": "3-4 дня",
-        "price": 700, 
-        "delivery_token": generate_jwt_delivery_token("russian_post", 700)
-    }
-
     try:
         total_weight = order_dimensions['total_weight']
         GLOBAL_WEIGHT_LIMIT = post_cfg.get('GLOBAL_WEIGHT_LIMIT')

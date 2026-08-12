@@ -29,7 +29,6 @@
             },
             "cart": checkoutState.cart
         }
-        console.log("Попытка создания заказа:", orderData);
 
         // Блокируем paymentBtn
         paymentBtn.disabled = true;
@@ -45,15 +44,12 @@
         resetButton(paymentBtn);
 
         if (result.success) {
-            console.log(`Заказ #${result.data.order_id} успешно создан, переход к оплате`);
-            console.log(result.data)
 
             saveOrderToLS(result.data.order_id, result.data.token);
 
             window.location.href = result.data.pay_link;
             return;
         } else {
-            // TODO: красиво пишет ошибку
             errorBox.classList.remove("hidden");
             errorText.textContent = result.message;
             
@@ -122,7 +118,7 @@
                 };
             }
             return { 
-            success: false, 
+                success: false, 
                 message: "Не удалось оформить заказ. Пожалуйста, повторите попытку." 
             };
         } catch (error) {
@@ -136,8 +132,6 @@
     }
 
     function saveOrderToLS(orderId, token) {
-        console.log(`Сохраняем заказ #${orderId} в LS`);
-        
         // 1. Сохраняем текущую рабочую корзину в черновик, а оригинал очищаем
         const currentCart = localStorage.getItem('cart');
         localStorage.setItem('cart_draft', currentCart);

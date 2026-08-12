@@ -205,7 +205,6 @@
             renderDeliveryOptions(result.data["deliveries"]);
         } else {
             renderDeliveryOptions({});
-            console.log(`Не удалось получить список доступных доставок.`)
         }
     }
 
@@ -288,7 +287,6 @@
                 renderCitySuggestions(result.data);
             } else {
                 checkoutState.currentCitySuggestions = [];
-                console.log(`Не удалось получить список доступных городов: ${result.message}`)
             }
         }, 300);
     });
@@ -581,7 +579,6 @@
         const cart = cleanProductIdsInLS();
         
         // Редирект, если корзина пустая
-        console.log(cart);
         if (!cart || Object.keys(cart).length === 0) {
             window.location.href = '/checkout/cart';
         }
@@ -598,9 +595,7 @@
             const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)));
             initCheckoutState(productsCache, currentCart)
             renderSummary(productsCache, currentCart);
-        } else {
-            console.log(`Не удалось получить данные о товарах в корзине ${result.message}`)
-        }
+        } 
     }
 
     initCheckout();

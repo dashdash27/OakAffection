@@ -296,9 +296,11 @@ def get_single_order_status(order_id):
         return jsonify({"success": False, "error": "NOT_FOUND"}), 404
 
     logger.debug(f"Опрос статуса заказа №{order.id}. Текущий статус в БД: {order.status.value}")
+
+    is_paid = order.status != OrderStatus.PENDING
     
     order_details = None
-    if order.status == OrderStatus.PAID:
+    if is_paid:
         order_details = {
             "total_amount": order.total_amount / 100,
             "items": [
@@ -321,7 +323,7 @@ def get_single_order_status(order_id):
 
     return jsonify({
         "success": True, 
-        "paid": order.status == OrderStatus.PAID, 
+        "paid": is_paid, 
         "order_id": order.id,
         "details": order_details
     }), 200

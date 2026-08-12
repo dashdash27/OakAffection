@@ -221,7 +221,7 @@
                         <h3>Изменить статус заказа</h3>
                         <div class="actions-btns">
                             {% if buttons.ship %}
-                                <button class="action-btn action-ship" data-order-id="{{ order.id }}" data-action="ship">Отправить заказ</button>
+                                <button class="action-btn action-ship" data-order-id="{{ order.id }}" data-action="ship">Отметить «Отправлен»</button>
                             {% endif %}
 
                             {% if buttons.deliver %}
@@ -237,7 +237,7 @@
                             {% endif %}
 
                             {% if buttons.refund_mark %}
-                                <button class="action-btn action-refund-mark" data-order-id="{{ order.id }}" data-action="refund_mark">Отметить возврат</button>
+                                <button class="action-btn action-refund-mark" data-order-id="{{ order.id }}" data-action="refund_mark">Отметить «Возвращен»</button>
                             {% endif %}
 
                             {% if buttons.refund_cancel %}

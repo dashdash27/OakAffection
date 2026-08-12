@@ -9,7 +9,7 @@
 .order-status__inner {
     width: 100%;
     max-width: 500px;
-    padding: 30px 20px;
+    padding: 20px 10px;
     border-radius: 16px;
     background-color: var(--checkout-card-bg);
     border: 1px solid var(--bg-sub-color);
@@ -72,9 +72,9 @@ h1 {
 /* Receipt */
 .receipt {
     margin-top: 20px;
-    border: 1px solid var(--bg-sub-color);
+    border: none;
     border-radius: 18px;
-    padding: 35px 40px;
+    padding: 30px 15px;
     text-align: left;
 }
 .receipt__section {
@@ -130,7 +130,7 @@ h1 {
 .receipt__item-name {
     flex: 1;
     line-height: 1.4;
-    font-size: 14px;
+    font-size: 12px;
 }
 .receipt__item-qty {
     color: var(--text-sub-color);
@@ -191,4 +191,17 @@ h1 {
 }
 .order-status .button:hover {
     filter: brightness(0.9);
+}
+
+@media (min-width: 500px) {
+    .order-status__inner {
+        padding: 30px 20px;
+    }
+    .receipt {
+        padding: 35px 40px;
+        border: 1px solid var(--bg-sub-color);
+    }
+    .receipt__item-name {
+        font-size: 14px;
+    }
 }

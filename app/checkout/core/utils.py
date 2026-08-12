@@ -55,6 +55,7 @@ def allocate_items_discount(order_items: list, items_base_total: int, items_disc
         allocated_sum += item_discounted_price * item["quantity"]
 
     rubles_difference = items_discounted_total - allocated_sum
+    logger.debug(f"Рублевая погрешность: {rubles_difference}")
     if rubles_difference != 0 and len(order_items) > 0:
         corrected = False
 
@@ -63,6 +64,7 @@ def allocate_items_discount(order_items: list, items_base_total: int, items_disc
             if item["quantity"] == 1:
                 item["price_with_discount"] += rubles_difference
                 corrected = True
+                logger.debug(f"Корректировка рублевой погрешности у товара в количестве 1: {rubles_difference}, {item["name"]}")
                 break
 
          # Сценарий Б: Оптовый случай — разбиваем первую строку
@@ -75,6 +77,7 @@ def allocate_items_discount(order_items: list, items_base_total: int, items_disc
             adjusted_item["price_with_discount"] += rubles_difference
             
             order_items.insert(0, adjusted_item)
+            logger.debug(f"Корректировка рублевой погрешности (разбиение в теке): {rubles_difference}, {first_item['name']}")
 
     return order_items
 
