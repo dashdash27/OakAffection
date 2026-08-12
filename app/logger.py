@@ -1,5 +1,5 @@
 import logging
-from logging.handlers import RotatingFileHandler
+from concurrent_log_handler import ConcurrentRotatingFileHandler
 from flask import g, has_request_context
 import os
 
@@ -25,7 +25,7 @@ def setup_logger():
 
     logger.propagate = False  # предотвращаем дублирование
 
-    formatter = logging.Formatter('%(asctime)s %(levelname)-8s [%(request_id)s] %(message)s')
+    formatter = logging.Formatter('%(asctime)s %(levelname)-8s [%(process)d] [%(request_id)s] %(message)s')
 
     log_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'logs')
     if not os.path.exists(log_dir):
@@ -36,7 +36,7 @@ def setup_logger():
         logger.handlers.clear()
 
     # --- ОБРАБОТЧИК 1: ЗАПИСЬ В ФАЙЛ ---
-    file_handler = RotatingFileHandler(
+    file_handler = ConcurrentRotatingFileHandler(
         os.path.join(log_dir, 'app.log'), 
         maxBytes=10*1024*1024, 
         backupCount=5, 
