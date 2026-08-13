@@ -1,6 +1,8 @@
 from config.delivery import DeliveryConfig
 from config.geo import GeoConfig
 from config.business import BusinessConfig
+from config.payments import PaymentsConfig
+from config.email import EmailConfig
 
 from pathlib import Path
 import os
@@ -11,7 +13,7 @@ from datetime import timedelta
 env_path = Path(__file__).parent / '.env'
 load_dotenv()
 
-class Config(DeliveryConfig, GeoConfig, BusinessConfig):
+class Config(DeliveryConfig, GeoConfig, BusinessConfig, PaymentsConfig, EmailConfig):
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1')
     WTF_CSRF_ENABLED = True
 

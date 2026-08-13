@@ -38,8 +38,8 @@ from werkzeug.datastructures import CombinedMultiDict
 from sqlalchemy import or_
 
 
-admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
-login_bp = Blueprint('adminlogin', __name__, url_prefix='/adminlogin')
+from app.admin import admin_bp
+from app.admin import login_bp
 
 @admin_bp.before_request
 def protect_admin():
@@ -385,3 +385,5 @@ def publish_changes():
         flash("Не удалось подтвердить изменения")
     
     return redirect(url_for("admin.index"))
+
+from app.admin import orders_routes

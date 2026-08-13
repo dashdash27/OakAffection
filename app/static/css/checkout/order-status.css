@@ -1,0 +1,207 @@
+.order-status {
+    padding-top: 120px;
+    min-height: calc(100vh - 160px);
+    padding-bottom: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.order-status__inner {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px 10px;
+    border-radius: 16px;
+    background-color: var(--checkout-card-bg);
+    border: 1px solid var(--bg-sub-color);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+.hidden { 
+    display: none !important; 
+}
+
+/* Loader */
+.loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 0;
+}
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 3.5px solid var(--bg-sub-color);
+    border-top-color: var(--text-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 20px;
+}
+
+/* Icon */
+.icon {
+    margin: 0 auto;
+    font-size: 32px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.icon.success polyline {color: rgb(12, 164, 12)}
+.icon.pending polyline, .icon.pending circle {color: rgb(224, 147, 3)}
+.icon.error line {color: rgb(194, 64, 13)}
+.icon.success { background-color: #ecfdf5; }
+.order-status__inner .icon.pending { background-color: #ffefd3; }
+.order-status__inner .icon.error { background-color: #fcdede; color: rgb(210, 70, 52);}
+
+h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-top: 25px;
+}
+
+.sub-message {
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 10px auto 0 auto;
+    width: 90%;
+}
+
+/* Receipt */
+.receipt {
+    margin-top: 20px;
+    border: none;
+    border-radius: 18px;
+    padding: 30px 15px;
+    text-align: left;
+}
+.receipt__section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.receipt__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    gap: 16px;
+}
+.receipt__label {
+    color: var(--text-sub-color);
+}
+.receipt__value {
+    font-weight: 600;
+    text-align: right;
+}
+.receipt__value--bold {
+    font-weight: 600;
+}
+.badge {
+    border: 1px solid var(--bg-sub-color) ;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    letter-spacing: 0.5px;
+}
+
+/* Receipt Items */
+.receipt__items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.receipt__items-list .receipt__row {
+    gap: 30px;
+    position: relative;
+    padding-left: 10px;
+    align-items: flex-start;
+}
+.receipt__items-list .receipt__row::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.receipt__item-name {
+    flex: 1;
+    line-height: 1.4;
+    font-size: 12px;
+}
+.receipt__item-qty {
+    color: var(--text-sub-color);
+    font-size: 13px;
+    white-space: nowrap;
+    padding-top: 1px;
+}
+
+.receipt__item-price {
+    font-weight: 600;
+    white-space: nowrap;
+    text-align: right;
+    padding-top: 1px;
+}
+
+.receipt__divider {
+    position: relative;
+    height: 1px;
+    border-top: 1px dashed var(--bg-sub-color);
+    margin: 20px 0;
+}
+
+/* Delivery */ 
+.russian-post {
+    color: rgb(97, 100, 245);
+}
+.yandex {
+    color: rgb(227, 174, 2);
+}
+
+/* Total */
+.receipt__row--total {
+    margin-top: 4px;
+    font-weight: 600;
+}
+.receipt__row--total .receipt__label {
+    font-size: 20px;
+    color: var(--text-color);
+}
+.receipt__value--total {
+  font-size: 22px;
+}
+
+.order-status .button {
+    display: block;
+    margin-top: 20px;
+    width: 100%;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    text-decoration: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+.order-status .button:hover {
+    filter: brightness(0.9);
+}
+
+@media (min-width: 500px) {
+    .order-status__inner {
+        padding: 30px 20px;
+    }
+    .receipt {
+        padding: 35px 40px;
+        border: 1px solid var(--bg-sub-color);
+    }
+    .receipt__item-name {
+        font-size: 14px;
+    }
+}

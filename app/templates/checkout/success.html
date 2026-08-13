@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Статус заказа{% endblock %}
+{% block description %}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout/order-status.css') }}">
+{% endblock %}
+
+{% block js %}
+    
+{% endblock %}
+
+{% block content %}
+    <section class="order-status" aria-label="Результат оплаты заказа">
+        <div class="container">
+
+            <div class="order-status__inner">
+
+                <!-- Экран: Проверка статуса (Лоадер) -->
+                <div class="loader">
+                    <div class="spinner"></div>
+                    <div class="loader-message">Проверяем статус заказа...</div>
+                </div>
+
+                <!-- Экран: Заказ успешно оплачен -->
+                <div class="success-box hidden">
+                    <div class="icon success">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <h1>Заказ успешно оплачен!</h1>
+                    <p class="sub-message">Все детали отправлены на ваш email.</p>
+
+                    <!-- Чек -->
+                    <div class="receipt">
+
+                        <!-- Секция 1: Мета-данные -->
+                        <div class="receipt__section">
+                            <div class="receipt__row">
+                                <span class="receipt__label">Номер заказа:</span>
+                                <span class="badge order-id">#0000</span>
+                            </div>
+                            <div class="receipt__row">
+                                <span class="receipt__label">Дата и время:</span>
+                                <span class="receipt__value order-date">—</span>
+                            </div>
+                        </div>
+
+                        <div class="receipt__divider"></div>
+
+                        <div class="receipt__section">
+                            <div class="receipt__items-list">
+                                <!-- Сюда JS вставит товары -->
+                            </div>
+                        </div>
+
+                        <div class="receipt__divider"></div>
+
+                        <div class="receipt__section">
+                            <div class="receipt__row">
+                                <span class="receipt__label order-delivery-name">
+                                    Доставка (<span class="order-delivery-service">—</span>)
+                                </span>
+                                <span class="receipt__value order-delivery-price">—</span>
+                            </div>
+                            <div class="receipt__row">
+                                <span class="receipt__label">Получатель:</span>
+                                <span class="receipt__value order-customer">—</span>
+                            </div>
+                        </div>
+
+                        <div class="receipt__divider"></div>
+
+                        <!-- Секция 4: Итог и Оплата -->
+                        <div class="receipt__section">
+                            <div class="receipt__row receipt__row--total">
+                                <span class="receipt__label">Итого:</span>
+                                <span class="receipt__value receipt__value--total order-total">0 ₽</span>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <a href="/" class="button">На главную</a>
+
+                </div>
+
+                <!-- Экран: Ожидаем подтверждение банка -->
+                <div class="pending-box hidden">
+                    <div class="icon pending">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h1>Ожидаем подтверждение</h1>
+                    <p class="sub-message">Ожидаем подтверждение от банка, попробуйте обновить страницу позже.</p>
+                </div>
+
+                <div class="error-box hidden">
+                    <div class="icon error">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                    <h1>Ссылка недействительна</h1>
+                    <p class="sub-message">Пожалуйста, обратитесь в техническую поддержку.</p>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+    <script src="{{ url_for('static', filename='js/checkout/checkout-success.js') }}"></script>
+{% endblock %}

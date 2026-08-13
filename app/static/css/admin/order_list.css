@@ -1,0 +1,183 @@
+.orders-table {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.orders-table__header, 
+.orders-table__row {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    border-radius: 8px;
+}
+.orders-table__header {
+    background-color: #ffffff;
+    font-weight: 600;
+    color: #718096;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid #e2e8f0;
+}
+.orders-table__row {
+    background-color: #ffffff;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-size: 15px;
+    color: black;
+}
+.orders-table__row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: #cbd5e0;
+}
+
+.col-id      { flex: 0 0 10%; min-width: 80px; }
+.col-date    { flex: 0 0 15%; min-width: 120px; }
+.col-customer  { flex: 0 0 20%; min-width: 160px; }
+.col-delivery{ flex: 0 0 20%; min-width: 160px; }
+.col-amount  { flex: 0 0 10%; min-width: 90px; }
+.col-payment { flex: 0 0 12%; min-width: 110px; }
+.col-status  { flex: 0 0 13%; min-width: 110px; }
+
+/* Customer */
+.col-customer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.customer-phone {
+    font-size: 13px;
+    color: rgb(53, 63, 77);;
+}
+
+/* Delivery */
+.col-delivery {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.delivery-service {
+    font-weight: 600; 
+    text-transform: uppercase; 
+    font-size: 12px; 
+    color: #4a5568;
+}
+.delivery-sub-text {
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    max-width: 180px;
+}
+.delivery-service-yandex {
+    color: rgb(211, 151, 0);
+}
+.delivery-service-russian_post {
+    color: rgb(37, 37, 216);
+}
+
+/* Amount */
+.col-amount {
+    font-weight: 600;
+}
+
+/* Status */
+.badge-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+}
+.order-status-pending { 
+    background: #fff7e6;
+    color: #d46b08;
+    border: 1px solid #ffd591; 
+}
+.order-status-paid { 
+    background: #e6f7ff;
+    color: #0050b3;
+    border: 1px solid #91d5ff;
+ }
+.order-status-sent    { 
+    background: #f9f0ff;
+    color: #531dab;
+    border: 1px solid #d3adf7;
+}
+.order-status-delivered {
+    background: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+.order-status-returned {
+    background: #fff0f6;
+    color: #c41d7f;
+    border: 1px solid #ffadd2;
+}
+
+
+/* Filters */
+.orders-filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+    width: max-content;
+}
+.filter-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    color: #595959;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: all 0.15s ease-in-out;
+}
+.filter-btn:hover {
+    color: #1f1f1f;
+    background: #f0f0f0;
+}
+.filter-btn.active {
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+}
+.filter-btn:not([class*="status-"]).active {
+    background: #262626;
+    color: #ffffff;
+}
+.filter-btn.status-pending.active {
+    background: #fff7e6;
+    color: #d46b08;
+    border-color: #ffd591;
+}
+.filter-btn.status-paid.active {
+    background: #e6f7ff;
+    color: #0050b3;
+    border-color: #91d5ff;
+}
+.filter-btn.status-sent.active {
+    background: #f9f0ff;
+    color: #531dab;
+    border-color: #d3adf7;
+}
+.filter-btn.status-delivered.active {
+    background: #f6ffed;
+    color: #389e0d;
+    border-color: #b7eb8f;
+}
+.filter-btn.status-returned.active {
+    background: #fff0f6;
+    color: #c41d7f;
+    border-color: #ffadd2;
+}

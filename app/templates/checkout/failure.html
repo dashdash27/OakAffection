@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Статус заказа{% endblock %}
+{% block description %}{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout/order-status.css') }}">
+{% endblock %}
+
+{% block js %}
+    
+{% endblock %}
+
+{% block content %}
+    <section class="order-status" aria-label="Результат оплаты заказа">
+        <div class="container">
+
+            <div class="order-status__inner">
+
+                <!-- Экран: Проверка статуса (Лоадер) -->
+                <div class="loader">
+                    <div class="spinner"></div>
+                    <div class="loader-message">Проверяем статус заказа...</div>
+                </div>
+
+                <div class="payment-error-box hidden">
+                    <div class="icon error">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                    <h1>Что-то пошло не так</h1>
+                    <p class="sub-message">Платеж был отклонен банком. Деньги не списаны. Вы можете вернуться в корзину и попробовать еще раз.</p>
+                    <a href="{{ url_for('checkout.cart') }}" class="button">В корзину</a>
+                </div>
+
+                <div class="error-box hidden">
+                    <div class="icon error">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                    <h1>Ссылка недействительна</h1>
+                    <p class="sub-message">Пожалуйста, обратитесь в техническую поддержку.</p>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+    <script src="{{ url_for('static', filename='js/checkout/checkout-failure.js') }}"></script>
+{% endblock %}
