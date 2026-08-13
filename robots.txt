@@ -3,4 +3,5 @@ Disallow: /admin/
 Disallow: /adminlogin/
 Disallow: /logout
 Disallow: /checkout/cart
+Disallow: /checkout/details
 Sitemap: https://oakaffection.ru/sitemap.xml
