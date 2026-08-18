@@ -2,7 +2,7 @@ import json
 import math
 
 from app.logger import logger
-from ..utils import format_delivery_days, normalize_and_ceil_price
+from ..utils import format_delivery_days, normalize_and_ceil_price, generate_jwt_delivery_token
 from .yandex_delivery_utils import get_allowed_yandex_profiles, get_filtered_yandex_points
 
 
@@ -11,10 +11,13 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
     source_point_id = yandex_cfg.get('SOURCE_PVZ_ID')
     auth_headers = {"Authorization": f"Bearer {api_token}"}
 
+    logger.debug(f"Получение информации о доставке Яндекс для города: {city_data.get('value')}")
+
     try:
         geo_id = await _detect_geo_id(city_data, client, auth_headers, yandex_cfg)
         
         if not geo_id:
+            logger.warning(f"Яндекс Доставка: Не удалось определить geo_id для города: {city_data.get('value')}")
             return {
                 "status": "business_error",
                 "error_code": "NO_REGION_ID",
@@ -24,6 +27,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
         
         points = await  _get_pickup_points(geo_id, client, auth_headers, yandex_cfg)
         if not points:
+            logger.warning(f"Яндекс Доставка: Не удалось получить ПВЗ Яндекса для города: {city_data.get('value')}")
             return {
                 "status": "business_error",
                 "error_code": "NO_POINTS_IN_REGION",
@@ -38,6 +42,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
         filtered_points.sort(key=lambda x: x.get("_matched_profile") == "five_post_postamat")
         
         if not filtered_points:
+            logger.warning(f"Яндекс Доставка: Заказ слишком тяжелый или объемный для ПВЗ в этом городе: {city_data.get('value')}")
             return {
                 "status": "business_error",
                 "error_code": "OVERSIZE_OR_OVERWEIGHT",
@@ -62,7 +67,7 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
                 continue
 
         if not details or not details.get('price'):
-            logger.warning(f"Яндекс: Не удалось рассчитать цену для региона {city_data.get('value')}")
+            logger.warning(f"Яндекс Доставка: Не удалось рассчитать цену для города {city_data.get('value')}")
             return {
                 "status": "tech_error",
                 "error_code": "PRICE_CALCULATION_FAILED",
@@ -79,26 +84,28 @@ async def get_yandex_delivery_info(city_data, order_dimensions, client, yandex_c
             return {
                 "status": "tech_error",
                 "error_code": "PRICE_PARSING_FAILED",
-                "message": "Не удалось рассчитать стоимость доставки у Яндекса.",
-                "points": []
+                "message": "Не удалось рассчитать стоимость доставки у Яндекса."
             }
+        
+        token = generate_jwt_delivery_token("yandex", clean_price_with_margin)
         
         return {
             "status": "success",
             "error_code": None,
             "name": "Яндекс Доставка",
+            "service": "yandex",
             "points": filtered_points,
             "delivery_days": delivery_days,
-            "price": clean_price_with_margin
+            "price": clean_price_with_margin, 
+            "delivery_token": token
         }
     
     except Exception as e:
-        logger.error(f"Критическая ошибка во время интеграции с Яндекс Доставкой: {e}", exc_info=True)
+        logger.exception(f"Критическая ошибка во время интеграции с Яндекс Доставкой")
         return {
             "status": "tech_error",
             "error_code": "YANDEX_API_DOWN",
-            "message": "Сервер службы доставки Яндекса временно недоступен.",
-            "points": []
+            "message": "Сервер службы доставки Яндекса временно недоступен."
         }
 
 async def _detect_geo_id(city_data, client, headers, yandex_cfg: dict):

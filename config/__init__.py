@@ -1,6 +1,8 @@
 from config.delivery import DeliveryConfig
 from config.geo import GeoConfig
 from config.business import BusinessConfig
+from config.payments import PaymentsConfig
+from config.email import EmailConfig
 
 from pathlib import Path
 import os
@@ -11,7 +13,7 @@ from datetime import timedelta
 env_path = Path(__file__).parent / '.env'
 load_dotenv()
 
-class Config(DeliveryConfig, GeoConfig, BusinessConfig):
+class Config(DeliveryConfig, GeoConfig, BusinessConfig, PaymentsConfig, EmailConfig):
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() in ('true', '1')
     WTF_CSRF_ENABLED = True
 
@@ -32,6 +34,7 @@ class Config(DeliveryConfig, GeoConfig, BusinessConfig):
     # Security and sessions settings
     SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False').lower() in ('true', '1') # local - False, prod - True
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax') # local - Lax, prod - Strict
+    SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax') # Local and Prod - Lax
+    SESSION_COOKIE_NAME = 'site_session'
     WTF_CSRF_SSL_STRICT = os.getenv('WTF_CSRF_SSL_STRICT', 'False').lower() in ('true', '1') # local - False, prod - True
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)

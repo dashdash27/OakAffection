@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject }}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #fafafa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+
+    <!-- Центровщик на весь экран -->
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #fafafa; padding: 40px 16px;">
+        <tr>
+            <td align="center">
+                
+                <!-- Карточка письма -->
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 540px; background-color: #ffffff; border: 1px solid #eef0f2; border-radius: 12px; overflow: hidden;">
+                    
+                    <!-- Шапка с названием магазина -->
+                    <tr>
+                        <td style="padding: 32px 32px 16px 32px;">
+                            <div style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #111111;">
+                                OAK AFFECTION
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- ТИП 1: ПОДТВЕРЖДЕНИЕ ОПЛАТЫ -->
+                    {% if type == 'paid' %}
+                        <tr>
+                            <td style="padding: 16px 32px 24px 32px;">
+                                
+                                <!-- 🟢 Иконка галочки -->
+                                <table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 20px;">
+                                    <tr>
+                                        <td align="center" valign="middle" width="48" height="48" style="background-color: #e6f7ed; border-radius: 50%; color: #00b341; font-size: 22px; font-weight: bold; font-family: Arial, sans-serif;">
+                                            ✓
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <h2 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 600; color: #111111; letter-spacing: -0.5px;">Заказ №{{ order.id }} оплачен</h2>
+                                <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.5;">Спасибо за заказ! Мы уже собираем его. Как только отправим — пришлем трек-номер для отслеживания.</p>
+                            </td>
+                        </tr>
+
+                        <!-- Мини-чек (Состав заказа + Доставка + Итог) -->
+                        <tr>
+                            <td style="padding: 0 32px;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-size: 14px; color: #111111; border-top: 1px solid #f0f2f5; border-bottom: 1px solid #f0f2f5; padding: 16px 0;">
+                                    <!-- Перебор товаров -->
+                                    {% for item in order.items %}
+                                    <tr>
+                                        <td style="padding: 6px 0; color: #444444;">
+                                            {{ item.product_name }} <span style="color: #999999; font-size: 12px; margin-left: 4px;">× {{ item.quantity }}</span>
+                                        </td>
+                                        <td align="right" style="padding: 6px 0; font-weight: 500;">
+                                            {{ item.price_with_discount * item.quantity // 100 }} ₽
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+
+                                    <!-- Стоимость доставки в чеке -->
+                                    <tr>
+                                        <td style="padding: 6px 0; color: #444444; border-top: 1px dashed #f0f2f5; margin-top: 4px;">
+                                            Доставка 
+                                        </td>
+                                        <td align="right" style="padding: 6px 0; font-weight: 500; border-top: 1px dashed #f0f2f5; margin-top: 4px;">
+                                            {% if order.delivery_price and order.delivery_price > 0 %}
+                                                {{ order.delivery_price // 100}} ₽
+                                            {% else %}
+                                                Бесплатно
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+
+                                    <!-- Общий итог -->
+                                    <tr>
+                                        <td style="padding: 16px 0 0 0; font-weight: 600; font-size: 15px;">Итого</td>
+                                        <td align="right" style="padding: 16px 0 0 0; font-weight: 700; font-size: 16px;">
+                                            {{ order.total_amount // 100}} ₽
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                        <!-- Подробный блок доставки и получателя -->
+                        <tr>
+                            <td style="padding: 24px 32px 32px 32px; font-size: 13px; color: #666666; line-height: 1.6;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td valign="top" width="50%" style="padding-right: 12px;">
+                                            <strong style="color: #111111; display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600;">Получатель</strong>
+                                            <span style="color: #111111; font-weight: 500;">{{ order.customer_name }}</span><br>
+                                            +{{ order.customer_phone }}<br>
+                                            {{ order.customer_email }}
+                                        </td>
+                                        <td valign="top" width="50%" style="padding-left: 12px; border-left: 1px solid #f0f2f5;">
+                                            <strong style="color: #111111; display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600;">Доставка</strong>
+                                            Сервис: {{ order.delivery_service.value }}<br>
+                                            Город / Населенный пункт: {{ order.delivery_settlement }}<br>
+                                            Адрес ПВЗ: {{order.delivery_point_address}}<br>
+                                            <span style="color: #111111;">{{ order.delivery_address }}</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    <!-- ТИП 2: ТРЕК-НОМЕР -->
+                    {% if type == 'track' %}
+                        <tr>
+                            <td style="padding: 16px 32px 24px 32px;">
+                                
+                                <!-- 🔵 Иконка посылки, сверстанная на таблице (100% отображение везде) -->
+                                <table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 20px;">
+                                    <tr>
+                                        <td align="center" valign="middle" width="48" height="48" style="background-color: #e6f0ff; border-radius: 50%; color: #0066ff; font-size: 20px; font-family: Arial, sans-serif;">
+                                            📦
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <h2 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 600; color: #111111; letter-spacing: -0.5px;">Заказ №{{ order.id }} отправлен</h2>
+                                <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.5;">Ваша посылка передана в службу доставки <b>{{ order.delivery_service.value }}</b>. Вы можете отследить ее по трек-номеру.</p>
+                            </td>
+                        </tr>
+
+                        <!-- Акцентная рамка с треком -->
+                        <tr>
+                            <td style="padding: 0 32px 50px 32px;">
+                                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f7f8fa; border-radius: 8px; padding: 16px;">
+                                    <tr>
+                                        <td>
+                                            <span style="font-size: 11px; color: #888888; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">Трек-номер</span>
+                                            <strong style="font-size: 18px; color: #111111; font-family: monospace; letter-spacing: 0.5px;">{{ order.delivery_track }}</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                    
+                    {% endif %}
+
+                    <!-- Подвал (одинаковый) -->
+                    <tr>
+                        <td style="padding: 24px 32px; background-color: #fafafa; border-top: 1px solid #eef0f2; font-size: 12px; color: #888888; line-height: 1.4;">
+                            Если у вас возникли вопросы, просто ответьте на это письмо или напишите нам на <a href="mailto:shop@oakaffection.ru" style="color: #111111; text-decoration: none; font-weight: 500;">shop@oakaffection.ru</a>
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

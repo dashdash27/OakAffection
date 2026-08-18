@@ -1,0 +1,292 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Заказ #{{order.id}}
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/order_detail.css') }}">
+{% endblock %}
+
+{% block content %}
+
+   <meta name="csrf-token" content="{{ csrf_token() }}">
+
+   <div class="container">
+        
+        <div class="order-detail" data-order-id="{{order.id}}">
+
+            <div class="order__header">
+                <h1>Заказ #{{ order.id }}</h1>
+                
+                <div class="order-meta detail-card">
+                    <div class="order-date">
+                        <strong>Дата создания:</strong>
+                        <span class="order-date js-local-time" data-utc="{{ order.created_at | to_iso }}">
+                            {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}
+                        </span>
+                    </div>
+                    <div class="order-status">
+                        <strong>Статус заказа:</strong>
+                        <span class="badge-status order-status-{{ order.status.value }}">
+                            {% if order.status.value == 'pending' %}
+                                В ожидании
+                            {% elif order.status.value == 'paid' %}
+                                Оплачен
+                            {% elif order.status.value == 'sent' %}
+                                Отправлен
+                            {% elif order.status.value == 'delivered' %}
+                                Доставлен
+                            {% elif order.status.value == 'returned' %}
+                                Возвращен
+                            {% elif order.status.value == 'cancelled' %}
+                                Отменен
+                            {% else %}
+                                {{ order.status.value }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="order-detail-grid">
+                <div class="order-detail-grid__main">
+            
+                    <!-- 1 Reciept -->
+                    <div class="detail-card">
+                        <h2 class="detail-card__title">Состав заказа</h2>
+                        
+                        <div class="receipt-list">
+                            {% for item in order.items %}
+                                <div class="receipt-item">
+                                    <div class="product-name">
+                                        {{ item.product.name }}
+                                    </div>
+                                    <div style="text-align: right; min-width: 150px;">
+                                        <div class="product__qty">
+                                            {{ item.quantity }} шт. × 
+                                            
+                                            {% if item.price_at_purchase != item.price_with_discount %}
+                                                <!-- Есть скидка: зачеркиваем оригинал, показываем финальную -->
+                                                <span class="product-item__old-price">{{ item.price_at_purchase // 100 }} ₽</span>
+                                                <span class="product-item__new-price">{{ item.price_with_discount // 100 }} ₽</span>
+                                            {% else %}
+                                                <!-- Скидки нет: обычная цена -->
+                                                <span class="product-item__price">{{ item.price_at_purchase // 100 }} ₽</span>
+                                            {% endif %}
+                                        </div>
+                                        <!-- Итоговая стоимость строки (Всегда по цене со скидкой, чтобы сходился Итог) -->
+                                        <div class="product__price">
+                                            {{ (item.quantity * item.price_with_discount) // 100 }} ₽
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Receipt Footer -->
+                        <div class="receipt-footer">
+                            
+                            {% set ns = namespace(items_raw_total=0) %}
+                            {% for item in order.items %}
+                                {% set ns.items_raw_total = ns.items_raw_total + (item.quantity * item.price_at_purchase) %}
+                            {% endfor %}
+
+                            <div class="receipt-footer__item">
+                                <div>Стоимость товаров (без скидки):</div>
+                                <div>
+                                    {{ ns.items_raw_total // 100}} ₽
+                                </div>
+                            </div>
+                            {% if order.discount_amount > 0 %}
+                                <div class="receipt-discount receipt-footer__item">
+                                    <div>Скидка на товары:</div>
+                                    <div>-{{ order.discount_amount // 100 }} ₽</div>
+                                </div>
+                            {% endif %}
+
+                            <div class="receipt-delivery receipt-footer__item">
+                                <div>Стоимость доставки:</div>
+                                <div>{{ order.delivery_price // 100 }} ₽</div>
+                            </div>
+
+                            <div class="receipt-total receipt-footer__item">
+                                <div>Итого к оплате:</div>
+                                <div>{{ order.total_amount // 100 }} ₽</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Customer and Delivery -->
+                    <div class="detail-card">
+                        
+                        <h2 class="detail-card__title">Доставка и контакты клиента</h2>
+                        
+                        <div class="customer-and-delivery">
+                            
+                            <!-- Customer -->
+                            <div class="customer-block">
+                                <h3>Покупатель</h3>
+                                <p>
+                                    <strong>ФИО:</strong> {{ order.customer_name }}
+                                </p>
+                                <p>
+                                    <strong>Телефон:</strong> 
+                                    <a href="tel:{{ order.customer_phone }}" style="color: #1677ff; text-decoration: none;">+{{ order.customer_phone }}</a>
+                                </p>
+                                <p>
+                                    <strong>Email:</strong> {{ order.customer_email }}
+                                </p>
+                                
+                            </div>
+                            
+                            <!-- Delivery and Point -->
+                            <div>
+                                <h3>Пункт выдачи (<span class="delivery-service-{{order.delivery_service.value}}">{{order.delivery_service.value}}</span>)</h3>
+                                <p><strong>Город/Населенный пункт:</strong> {{ order.delivery_settlement }}</p>
+                                <p><strong>Идентификатор точки:</strong> <code>{{ order.delivery_point_id }}</code></p>
+                                <p><strong>Адрес выдачи:</strong> {{ order.delivery_point_address }}</p>
+                            </div>
+                            
+                        </div>
+
+                        <div class="order-comment">
+
+                            <h3>Комментарий к заказу</h3>
+
+                            <textarea class="order-comment-input" placeholder="Добавьте важную заметку к заказу (изменение данных, пожелания клиента)..." rows="1">{{ order.comment or '' }}</textarea>
+
+                            <button class="save-comment-btn" data-order-id="{{ order.id }}">
+                                Сохранить заметку
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Finance and Management -->
+                <div class="order-detail-grid__sidebar">
+                    
+                    <!-- Payment System -->
+                    <div class="detail-card payment">
+                        <h2 class="detail-card__title">Оплата заказа</h2>
+                        {% if order.payment %}
+                            <div class="payment-item">
+                                <strong>Сумма транзакции:</strong> {{ order.payment.amount // 100 }} ₽
+                            </div>
+                            <div class="payment-item">
+                                <strong>Платежный шлюз:</strong> {{ order.payment.gateway.value }}
+                            </div>
+                            <div class="payment-item">
+                                <strong>ID платежа:</strong> 
+                                <code class="transaction-id">{{ order.payment.id }}</code>
+                            </div>
+                            <div class="payment-item">
+                                <strong>ID транзакции банка:</strong> 
+                                <code class="transaction-id">{{ order.payment.external_id or 'Ожидает генерации сессии' }}</code>
+                            </div>
+                            <div class="payment-item">
+                                <strong>Обновлен статус:</strong> <span class="js-local-time" data-utc="{{ order.payment.updated_at | to_iso }}">{{order.payment.updated_at.strftime('%d.%m.%Y %H:%M')}}</span>
+                            </div>
+                            <div class="payment-status">
+                                <strong>Текущий статус:</strong> 
+
+                                <div class="badge-status payment-status-{{order.payment.status.value}}">
+                                    {% if order.payment.status.value == 'pending' %}
+                                        В ожидании
+                                    {% elif order.payment.status.value == 'completed' %}
+                                        Выполнено
+                                    {% elif order.payment.status.value == 'rejected' %}
+                                        Отклонено
+                                    {% elif order.payment.status.value == 'failed' %}
+                                        Не сгенерирована ссылка
+                                    {% else %}
+                                        {{ order.payment.status.value }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div style="color: #a0aec0; font-size: 13px; font-style: italic;">Платежная сессия для Озона не была сформирована на чекауте.</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Manager Actions -->
+                    <div class="detail-card">
+                        <h2 class="detail-card__title">Действия менеджера</h2>
+
+                        <h3>Изменить статус заказа</h3>
+                        <div class="actions-btns">
+                            {% if buttons.ship %}
+                                <button class="action-btn action-ship" data-order-id="{{ order.id }}" data-action="ship">Отметить «Отправлен»</button>
+                            {% endif %}
+
+                            {% if buttons.deliver %}
+                                <button class="action-btn action-deliver" data-order-id="{{ order.id }}" data-action="deliver">Отметить «Доставлен»</button>
+                            {% endif %}
+
+                            {% if buttons.rollback_paid %}
+                                <button class="action-btn action-rollback" data-order-id="{{ order.id }}" data-action="rollback_paid">Вернуть в «Оплачен»</button>
+                            {% endif %}
+
+                            {% if buttons.rollback_sent %}
+                                <button class="action-btn action-rollback" data-order-id="{{ order.id }}" data-action="rollback_sent">Вернуть в «Отправлен»</button>
+                            {% endif %}
+
+                            {% if buttons.refund_mark %}
+                                <button class="action-btn action-refund-mark" data-order-id="{{ order.id }}" data-action="refund_mark">Отметить «Возвращен»</button>
+                            {% endif %}
+
+                            {% if buttons.refund_cancel %}
+                                <button class="action-btn action-refund-cancel" data-order-id="{{ order.id }}" data-action="refund_cancel">Отменить возврат</button>
+                            {% endif %}
+                        </div>
+
+                        <h3>Трек-номер</h3>
+                        {% if order.status.value in ['paid', 'sent', 'delivered', 'returned', 'cancelled'] %}
+                            <div class="track-wrapper">
+                                <!-- Если трек уже есть в БД, поле заблокировано (disabled) -->
+                                <input class="track-input" type="text" id="trackInput" placeholder="Введите трек-номер" 
+                                    value="{{ order.delivery_track or '' }}"
+                                    {% if order.delivery_track %}disabled{% endif %}
+                                    >
+                                
+                                <!-- Если трека нет — показываем фиолетовую кнопку отправки -->
+                                <button class="track-btn" id="trackBtn" class="btn-action" data-order-id="{{order.id}}">
+                                    {% if order.delivery_track %}Редактировать{% else %}Отправить клиенту{% endif %}
+                                </button>
+
+                                {% if order.delivery_track %}
+                                    <div class="comment">
+                                        Трек-номер уже был отправлен клиенту на указанный email. Но вы можете сделать это повторно.
+                                    </div>
+                                {% else %}
+                                    <div class="comment">Трек-номер еще не был отправлен клиенту на email.</div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="comment">
+                                Трек-номер отправить пока нельзя, так как заказ еще не оплачен.
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+            </div>
+            
+        </div>
+
+            
+
+    </div>
+
+    <div class="toast-container">
+    </div>
+
+    <script src="{{ url_for('static', filename='js/utils/local-time.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin/order.js') }}"></script>
+{% endblock %}

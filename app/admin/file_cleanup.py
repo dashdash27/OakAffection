@@ -31,41 +31,12 @@ def after_rollback(session):
 
 @db.event.listens_for(db.session, 'after_commit')
 def after_commit(session):
-    
-    logger.info(f">>> Работа с ФС после коммита началась")
-
-    if photos_to_delete != []:
-        logger.info(f"Список фото для удаления:")
-        for photo in photos_to_delete:
-            logger.info(f"-- '{photo}'")
-    else:
-        logger.info(f"Фото для удаления нет")
-
-    if videos_to_delete != []:
-        logger.info(f"Список видео для удаления:")
-        for video in videos_to_delete:
-            logger.info(f"-- '{video}'")
-    else:
-        logger.info(f"Видео для удаления нет")
-
-    if icons_to_delete != []:
-        logger.info(f"Список иконок для удаления:")
-        for icon in icons_to_delete:
-            logger.info(f"-- '{icon}'")
-    else:
-        logger.info(f"Иконок для удаления: иконок нет")
-
-
     error_count = 0
     for photo_url in photos_to_delete:
         try:
             delete_photo_by_path(photo_url)
         except Exception as e:
             error_count += 1
-    if error_count > 0:
-        logger.warning(f"Удаление фотографий завершилось с {error_count} ошибками")
-    else:
-        logger.info(f"Удаление фотографий завершилось успешно")
 
     error_count = 0
     for video_url in videos_to_delete:
@@ -73,10 +44,6 @@ def after_commit(session):
             delete_video_by_path(video_url)
         except Exception as e:
             error_count += 1
-    if error_count > 0:
-        logger.warning(f"Удаление видео завершилось с {error_count} ошибками")
-    else:
-        logger.info(f"Удаление видео завершилось успешно")
 
     error_count = 0
     for icon_url in icons_to_delete:
@@ -84,32 +51,7 @@ def after_commit(session):
             delete_color_icon_by_path(icon_url)
         except Exception as e:
             error_count += 1
-    if error_count > 0:
-        logger.warning(f"Удаление иконок завершилось с {error_count} ошибками")
-    else:
-        logger.info(f"Удаление иконок завершилось успешно")
 
-
-    if added_photos != []:
-        logger.info(f"Список добавленных фото:")
-        for photo in added_photos:
-            logger.info(f"-- '{photo}'")
-    else:
-        logger.info(f"Добавленных фото нет")
-
-    if added_videos != []:
-        logger.info(f"Список добавленных видео:")
-        for video in added_videos:
-            logger.info(f"-- '{video}'")
-    else:
-        logger.info(f"Добавленных видео нет")
-
-    if added_icons != []:
-        logger.info(f"Список добавленных иконок:")
-        for icon in added_icons:
-            logger.info(f"-- '{icon}'")
-    else:
-        logger.info(f"Добавленных иконок нет")
     
     photos_to_delete.clear()
     added_photos.clear()
@@ -119,5 +61,3 @@ def after_commit(session):
 
     icons_to_delete.clear()
     added_icons.clear()
-
-    logger.info("<<< Работа с файлами после коммита завершена")

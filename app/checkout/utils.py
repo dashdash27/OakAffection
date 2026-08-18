@@ -3,6 +3,19 @@ from app.models import Product
 import math
 import re
 from flask import current_app
+from datetime import datetime, timedelta, timezone
+from typing import Dict, List, Any
+import jwt
+import os
+
+def generate_jwt_delivery_token(delivery_service: str, price: int) -> str:
+    secret_key = os.getenv("SECRET_KEY") 
+    payload = {
+        "delivery_service": delivery_service,
+        "price": price,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=20)
+    }
+    return jwt.encode(payload, secret_key, algorithm="HS256")
 
 def pluralize(number, titles):
     cases = [2, 0, 1, 1, 1, 2]
@@ -59,6 +72,23 @@ def process_cart(cart):
 
     return order_items
 
+def normalize_and_ceil_price(raw_price) -> int:
+    if raw_price is None:
+        return None
+    
+    try:
+        price_str = str(raw_price)
+        
+        clean_str = re.sub(r'[^\d.,]', '', price_str)
+        clean_str = clean_str.replace(',', '.')
+        
+        if not clean_str:
+            return None
+            
+        return math.ceil(float(clean_str))
+        
+    except (ValueError, TypeError):
+        return None
     
 def calculate_order_dimensions(cart_items):
     """Approximately order params"""
@@ -96,40 +126,36 @@ def calculate_order_dimensions(cart_items):
             "max_item_weight": max_item_weight
         }
 
-def calculate_discounted_price(total_price) -> int:
+def calculate_cart_base_total(cart_items: List[Dict[str, Any]]) -> int:
+    """Вычисляет чистую базовую стоимость товаров в корзине БЕЗ скидок."""
+    base_total = 0
+    for item in cart_items:
+        base_total += item['price'] * item['quantity']
+    return base_total
+
+def apply_threshold_discount(base_total: int) -> int:
+    """Вычисляет стоимость товаров ПОСЛЕ применения пороговой скидки."""
     thresholds = current_app.config.get("DISCOUNT_THRESHOLDS", [])
     
     for step in thresholds:
         threshold = step.get("min_amount_rub", 0)
         discount_percent = step.get("discount_percent", 0)
         
-        if total_price >= threshold:
-            discount_amount = (total_price * discount_percent) / 100
-            return math.ceil(total_price - discount_amount)
+        if base_total >= threshold:
+            discount_amount = (base_total * discount_percent) / 100
+            return math.ceil(base_total - discount_amount)
             
-    return math.ceil(total_price)
+    return math.ceil(base_total)
 
-def calculate_order_price(cart_items):
-    total_price = 0
-    for item in cart_items:
-        total_price += item['price'] * item['quantity']
-
-    return calculate_discounted_price(total_price)
-
-def normalize_and_ceil_price(raw_price) -> int:
-    if raw_price is None:
-        return None
+def calculate_order_total(
+    cart: Dict[str, int], 
+    delivery_price: int
+) -> int:
+    """Основная точка входа для проверки финальной стоимости на бэкенде.
+    Считает товары со скидкой и прибавляет доставку.
+    """
+    order_items = process_cart(cart)
+    base_total = calculate_cart_base_total(order_items)
+    items_price_with_discount = apply_threshold_discount(base_total)
     
-    try:
-        price_str = str(raw_price)
-        
-        clean_str = re.sub(r'[^\d.,]', '', price_str)
-        clean_str = clean_str.replace(',', '.')
-        
-        if not clean_str:
-            return None
-            
-        return math.ceil(float(clean_str))
-        
-    except (ValueError, TypeError):
-        return None
+    return items_price_with_discount + delivery_price
