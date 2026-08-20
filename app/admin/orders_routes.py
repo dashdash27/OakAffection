@@ -147,12 +147,10 @@ def save_order_track(order_id):
     try:
         # 1. Сохраняем трек в модель заказа
         order.delivery_track = delivery_track
-        db.session.flush()
+        db.session.commit()
 
         # 2. Отправляем письмо с треком
         send_delivery_track_email(order.customer_email, order.id)
-
-        db.session.commit()
 
         logger.info(f"-> [Админка]: Фоновая задача на отправку письма с треком {delivery_track} для заказа #{order_id} поставлена в очередь. Трек-номер был сохранен в БД.")
 
