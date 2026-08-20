@@ -1,0 +1,401 @@
+/* Order Header */
+.order__header {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.order-meta.detail-card {
+    margin: 0;
+    color: #4a5568;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.order-date span {
+    font-size: 14px;
+    color: var(--accent-color);
+}
+/* Titles and comments */
+h1 {
+    font-size: 27px; 
+    font-weight: 600; 
+    color: #4b5262;
+    text-transform: uppercase;
+}
+h2.detail-card__title {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #edf2f7;
+    color: #1a202c;
+}
+h3 {
+    font-size: 13px; 
+    text-transform: uppercase; 
+    color: #a0aec0; 
+    margin-bottom: 12px; 
+    letter-spacing: 0.5px;
+}
+.comment {
+    color: #8b98aa; 
+    font-size: 14px; 
+    line-height: 20px;
+    font-style: italic;
+    margin-top: 20px;
+}
+
+/* Status Badge*/
+.badge-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* Order Status Colors */
+.order-status-pending { 
+    background: #fff7e6;
+    color: #d46b08;
+    border: 1px solid #ffd591; 
+}
+.order-status-paid { 
+    background: #e6f7ff;
+    color: #0050b3;
+    border: 1px solid #91d5ff;
+ }
+.order-status-sent { 
+    background: #f9f0ff;
+    color: #531dab;
+    border: 1px solid #d3adf7;
+}
+.order-status-delivered {
+    background: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+.order-status-returned {
+    background: #fff0f6;
+    color: #c41d7f;
+    border: 1px solid #ffadd2;
+}
+
+/* Payment Status Colors */
+.payment-status-completed {
+    background: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+.payment-status-rejected {
+    background: #fff1f0;
+    color: #cf1322;
+    border: 1px solid #ffa39e;
+}
+.payment-status-pending {
+    background: #fff7e6;
+    color: #d46b08;
+    border: 1px solid #ffd591; 
+}
+
+/* Order Detail Grid */
+.order-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* Detail Card */
+.detail-card {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    margin-bottom: 24px;
+}
+
+
+/* Receipt */
+.receipt-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #f7fafc;
+}
+.receipt-item:last-child {
+    border-bottom: none;
+}
+.product-name {
+    font-weight: 600; 
+    font-size: 15px;
+}
+.product__qty {
+    font-size: 15px; 
+    color: #595959;
+}
+.product-item__old-price {
+    text-decoration: line-through; 
+    color: #9c9b9b; 
+    font-size: 14px; 
+    margin-right: 4px;
+}
+.product-item__new-price {
+    color: #cf1322; 
+    font-weight: 600;
+}
+.product__price {
+    font-size: 16px; 
+    font-weight: 700; 
+    color: #262626; 
+    margin-top: 7px;
+}
+.receipt-footer {
+    margin-top: 24px; 
+    padding-top: 20px; 
+    border-top: 2px dashed #e2e8f0; 
+    font-size: 15px; 
+    color: #4a5568;
+}
+.receipt-footer__item {
+    display: flex; 
+    justify-content: space-between; 
+    margin-bottom: 10px;
+}
+.receipt-discount {
+    color: #e53e3e;
+}
+.receipt-total {
+    display: flex; 
+    justify-content: space-between; 
+    margin-top: 16px; 
+    font-size: 20px; 
+    font-weight: 700; 
+    color: #1a202c;
+}
+
+/* Customer and Delivery */
+.customer-and-delivery {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 32px; 
+    font-size: 14px; 
+    line-height: 1.6;
+}
+.delivery-service-yandex {
+    color: rgb(237, 169, 12);
+}
+.delivery-service-russian_post {
+    color: rgb(6, 54, 176);
+}
+.comment-block {
+    margin-top: 12px; 
+    padding: 10px; 
+    background: #f7fafc; 
+    border-left: 3px solid #cbd5e0; 
+    border-radius: 0 4px 4px 0;
+}
+.order-comment-input {
+    width: 100%; 
+    padding: 10px 14px; 
+    border: 1px solid #d1d1d6; 
+    border-radius: 12px; 
+    font-size: 13px;
+    resize: vertical; 
+    box-sizing: border-box; 
+    background: #ffffff; 
+    color: #1c1c1e;
+}
+.save-comment-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+
+    background: #f6f8fa;
+    color: #515154;
+    border: 1px solid #e5e5ea;
+    
+    transition: all 0.2s ease-in-out;
+
+    margin-top: 10px;
+}
+
+/* Payment */
+.payment-item {
+    font-size: 14px; 
+    margin-bottom: 15px; 
+    color: #4a5568;
+}
+.transaction-id {
+    font-size: 11px; 
+    background: #fff; 
+    padding: 2px 4px; 
+    border: 1px solid #e2e8f0; 
+    border-radius: 4px;
+}
+.payment-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px; 
+    padding-top: 12px; 
+    border-top: 1px solid #e2e8f0; 
+    font-size: 14px;
+}
+
+/* Actions */
+.actions-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+
+    background: #f6f8fa;
+    color: #515154;
+    border: 1px solid #e5e5ea;
+    
+    transition: all 0.2s ease-in-out;
+}
+
+/* Action Btns Colors */
+.action-ship:hover, .action-deliver:hover {
+    background: #f6ffed;
+    color: #389e0d;
+    border-color: #d9f7be;
+}
+.action-rollback:hover {
+    background: #fff7e6; 
+    color: #d46b08;
+    border-color: #ffd591;
+}
+.action-refund-mark:hover {
+    background: #fff1f0;
+    color: #cf1322;
+    border-color: #ffccc7;
+}
+.action-refund-cancel:hover {
+    background: #e6f7ff;
+    color: #0050b3;
+    border-color: #bae7ff;
+}
+
+/* Delivery Track */
+.track-wrapper input {
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 7px;
+    border: 1px solid rgb(201, 201, 201);
+}
+.track-wrapper input:disabled {
+    cursor: not-allowed;
+}
+.track-wrapper button {
+    margin-top: 15px;
+    width: 100%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    
+    background: #f6f8fa;
+    color: #515154;
+    border: 1px solid #e5e5ea;
+    
+    transition: all 0.2s ease-in-out;
+}
+.track-wrapper button:hover {
+    transition: all 0.2s ease-in-out;
+    background: var(--accent-color);
+    color: white;
+}
+
+/* Toast */
+.toast-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.toast-item {
+    min-width: 280px;
+    max-width: 400px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    
+    /* Анимация появления */
+    animation: toastSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    transition: all 0.3s ease;
+}
+
+/* Плашка плавного исчезновения */
+.toast-item.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+/* Цвета для успешных операций (в цвет статуса COMPLETED) */
+.toast-success {
+    background: #f6ffed;
+    color: #389e0d;
+    border: 1px solid #b7eb8f;
+}
+
+/* Цвета для ошибок (в цвет статуса REJECTED) */
+.toast-error {
+    background: #fff1f0;
+    color: #cf1322;
+    border: 1px solid #ffa39e;
+}
+
+
+/* Анимация вылета справа налево */
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

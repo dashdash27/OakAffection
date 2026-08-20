@@ -2,6 +2,7 @@ venv/
 .env
 __pycache__/
 *.log
+*.lock
 instance/
 app/static/img/uploads/*
 !app/static/img/uploads/.gitkeep

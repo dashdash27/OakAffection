@@ -1,0 +1,99 @@
+{% extends "admin/mybase.html" %}
+
+{% block title %}
+    Заказы
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/order_list.css') }}">
+{% endblock %}
+
+{% block content %}
+   <div class="container">
+        <h1>Заказы</h1>
+
+        <div class="orders-filter-bar">
+            <a href="{{ url_for('admin.orders') }}" class="filter-btn {% if not current_status %}active{% endif %}">
+                Все заказы
+            </a>
+            <a href="{{ url_for('admin.orders', status='pending') }}" class="filter-btn status-pending {% if current_status == 'pending' %}active{% endif %}">
+                Ожидает
+            </a>
+            <a href="{{ url_for('admin.orders', status='paid') }}" class="filter-btn status-paid {% if current_status == 'paid' %}active{% endif %}">
+                Оплачен
+            </a>
+            <a href="{{ url_for('admin.orders', status='sent') }}" class="filter-btn status-sent {% if current_status == 'sent' %}active{% endif %}">
+                Отправлен
+            </a>
+            <a href="{{ url_for('admin.orders', status='delivered') }}" class="filter-btn status-delivered {% if current_status == 'delivered' %}active{% endif %}">
+                Доставлен
+            </a>
+            <a href="{{ url_for('admin.orders', status='returned') }}" class="filter-btn status-returned {% if current_status == 'returned' %}active{% endif %}">
+                Возвращен
+            </a>
+        </div>
+    
+        <div class="orders-table">
+            <div class="orders-table__header">
+                <div class="col-id">№ Заказа</div>
+                <div class="col-date">Дата</div>
+                <div class="col-customer">Покупатель</div>
+                <div class="col-delivery">Доставка</div>
+                <div class="col-amount">Сумма</div>
+                <div class="col-status">Статус</div>
+            </div>
+
+            {% for order in orders %}
+                <a href="{{ url_for('admin.order_detail', order_id=order.id) }}" class="orders-table__row">
+                    
+                    <div class="col-id">{{order.id}}</div>
+
+                    <div class="col-date js-local-time" data-utc="{{ order.created_at | to_iso }}">
+                        {{order.created_at.strftime('%d.%m.%Y %H:%M')}}
+                    </div>
+
+                    <div class="col-customer">
+                        <div class="customer-name">{{order.customer_name}}</div>
+                        <div class="customer-phone">+{{order.customer_phone}}</div>
+                    </div>
+
+                    <div class="col-delivery">
+                        <div class="delivery-service delivery-service-{{order.delivery_service.value}}">
+                            {{ order.delivery_service.value }}
+                        </div>
+                        <div class="delivery-sub-text">
+                            {{ order.delivery_settlement }}, {{ order.delivery_point_address }}
+                        </div>
+                    </div>
+
+                    <div class="col-amount">{{order.total_amount // 100}} ₽</div>
+
+                    <div class="col-status">
+                        <span class="badge-status order-status-{{ order.status.value }}">
+                            {% if order.status.value == 'pending' %}
+                                В ожидании
+                            {% elif order.status.value == 'paid' %}
+                                Оплачен
+                            {% elif order.status.value == 'sent' %}
+                                Отправлен
+                            {% elif order.status.value == 'delivered' %}
+                                Доставлен
+                            {% elif order.status.value == 'returned' %}
+                                Возвращен
+                            {% elif order.status.value == 'cancelled' %}
+                                Отменен
+                            {% else %}
+                                {{ order.status.value }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                </a>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/utils/local-time.js') }}"></script>
+{% endblock %}

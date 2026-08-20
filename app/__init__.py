@@ -2,10 +2,12 @@ from app.extensions import db, migrate
 from app.logger import logger
 from app.models import AdminUser
 from app.extensions import init_limiter 
+from app.utils.filters import to_iso_filter
 
 from flask_login import LoginManager
 from flask import Flask, g, request, render_template
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.middleware.proxy_fix import ProxyFix
 import uuid
 
 
@@ -14,6 +16,8 @@ csrf = CSRFProtect()
 def create_app():
 
     app = Flask(__name__)
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
     try:
         app.config.from_object('config.Config')
@@ -40,18 +44,20 @@ def create_app():
 
         from app import models  # импорт моделей
 
+        # фильтры
+        app.jinja_env.filters['to_iso'] = to_iso_filter
 
+        # блюпринты
         from app.routes import main_bp
-        from app.admin.routes import admin_bp, login_bp
+        from app.admin import admin_bp, login_bp
         from app.checkout.routes import checkout_bp
+        from app.payments.routes import payments_bp
+
         app.register_blueprint(login_bp)
         app.register_blueprint(main_bp)
         app.register_blueprint(admin_bp)
         app.register_blueprint(checkout_bp)
-
-
-        with app.app_context():
-            db.create_all()
+        app.register_blueprint(payments_bp)
 
         @app.before_request
         def assign_request_id():

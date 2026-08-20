@@ -22,6 +22,7 @@
     const summaryTotalComment = document.querySelector('.summary__total-comment');
 
     const submitBtn = document.querySelector('.checkout__submit-btn');
+    const paymentBtn = document.querySelector('.checkout__payment-btn');
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
@@ -204,7 +205,6 @@
             renderDeliveryOptions(result.data["deliveries"]);
         } else {
             renderDeliveryOptions({});
-            console.log(`Не удалось получить список доступных доставок: ${result.message}`)
         }
     }
 
@@ -287,7 +287,6 @@
                 renderCitySuggestions(result.data);
             } else {
                 checkoutState.currentCitySuggestions = [];
-                console.log(`Не удалось получить список доступных городов: ${result.message}`)
             }
         }, 300);
     });
@@ -544,6 +543,7 @@
         const isValid = error === "";
         if (submitBtn) {
             submitBtn.disabled = !isValid;
+            paymentBtn.disabled = !isValid;
         }
     }
 
@@ -577,7 +577,11 @@
 
     async function initCheckout() {
         const cart = cleanProductIdsInLS();
-        // TODO: редирект если корзина пустая
+        
+        // Редирект, если корзина пустая
+        if (!cart || Object.keys(cart).length === 0) {
+            window.location.href = '/checkout/cart';
+        }
         
         const ids = Object.keys(cart);
         const result = await syncCartWithServer(ids);
@@ -591,9 +595,7 @@
             const currentCart = syncLSWithServerIds(productsCache.map(p => String(p.id)));
             initCheckoutState(productsCache, currentCart)
             renderSummary(productsCache, currentCart);
-        } else {
-            console.log(`Не удалось получить данные о товарах в корзине ${result.message}`)
-        }
+        } 
     }
 
     initCheckout();

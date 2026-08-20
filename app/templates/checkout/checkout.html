@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="checkout__summary">
-                    <div class="chekout__card">
+                    <div class="checkout__card">
                         <div class="card-title">Ваш заказ</div>
                         <div class="card-content">
                             <div class="summary__items"></div>
@@ -111,11 +111,19 @@
                     </div>
 
                     <div class="checkout__validation-msg"></div>
+                    <div class="checkout__error-box card-content hidden">
+                        <div class="checkout__error-text">
+                            Ошибка сервера
+                        </div>
+                    </div>
+                    <button class="checkout__payment-btn" disabled>
+                        Перейти к оплате
+                    </button>
                     <button class="checkout__submit-btn" disabled>
-                        Оформить заказ
+                        Оформить заказ через мессенджер
                     </button>
                     <div class="checkout__agreement">
-                        Нажимая кнопку, вы соглашаетесь с условиями 
+                        Оформляя заказ, вы соглашаетесь с условиями 
                         <a href="{{ url_for('main.terms') }}">Публичной оферты</a> и 
                         <a href="{{ url_for('main.privacy') }}">Политики конфиденциальности</a>
                     </div>
@@ -148,8 +156,8 @@
                 </p>
 
                 <div class="order-modal__actions">
-                    <a href="https://t.me/+79604870478" class="order-btn order-btn--tg" target="_blank">Telegram</a>
-                    <a href="mailto:oakaffection@gmail.com" class="order-btn order-btn--email">Email</a>
+                    <a href="https://max.ru/u/f9LHodD0cOJ6RtHIf-Iy4RtoEpUdDZqc-p6TPvJXLD5_XO22-JsAyMhHv3g" class="order-btn order-btn--max" target="_blank">Max</a>
+                    <a href="mailto:shop@oakaffection.ru" class="order-btn order-btn--email">Email</a>
                 </div>
 
                 <button class="order-modal__close" aria-label="Закрыть">
@@ -166,5 +174,6 @@
     <script src="https://unpkg.com/imask"></script>
     <script src="{{ url_for('static', filename='js/checkout/checkout.js') }}"></script>
     <script src="{{ url_for('static', filename='js/checkout/checkout-modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/checkout/checkout-payment.js') }}"></script>
 
 {% endblock %}
