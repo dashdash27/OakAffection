@@ -34,6 +34,7 @@ class Config(DeliveryConfig, GeoConfig, BusinessConfig, PaymentsConfig, EmailCon
     # Security and sessions settings
     SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False').lower() in ('true', '1') # local - False, prod - True
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax') # local - Lax, prod - Strict
+    SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax') # Local and Prod - Lax
+    SESSION_COOKIE_NAME = 'site_session'
     WTF_CSRF_SSL_STRICT = os.getenv('WTF_CSRF_SSL_STRICT', 'False').lower() in ('true', '1') # local - False, prod - True
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)

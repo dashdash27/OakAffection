@@ -32,7 +32,7 @@ from app.admin.forms import (
     edit_product_draft_handler
 )
 
-from flask import Blueprint, flash, request, render_template, url_for, redirect
+from flask import Blueprint, flash, request, render_template, url_for, redirect, session
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.datastructures import CombinedMultiDict
 from sqlalchemy import or_
@@ -60,6 +60,9 @@ def login():
         if user and user.check_password(password):
             logout_user()
             login_user(user, remember=False)
+
+            session.permanent = True
+            
             return redirect(url_for('admin.index'))
         else:
             flash('Неверный логин или пароль', "error")
