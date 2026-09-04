@@ -137,7 +137,6 @@ async def _get_delivery_details(ozon_point_id_to, order_dimensions, order_price,
             {
             "request_id": int(time.time()),
             "shipment_method_id": shipment_method_id,
-            "cutoff_at": "2026-09-16T12:00:00Z",
             "declared_value": {
                 "amount": str(order_price),
                 "currency_code": "RUB"
