@@ -24,6 +24,7 @@ def format_suggestion(s):
         "unrestricted_value": s.get('unrestricted_value'),
         "region_fias_id": data.get('region_fias_id'),
         "fias_level": data.get('fias_level'),
+        "fias_id": data.get("settlement_fias_id") or data.get("city_fias_id"),
         "latitude": data.get('geo_lat'),
         "longitude": data.get('geo_lon'),
         "postal_code": data.get('postal_code') or "",

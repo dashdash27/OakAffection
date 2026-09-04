@@ -84,14 +84,14 @@ def get_valid_access_token_sync(ozon_delivery_cfg: dict) -> str:
 
 async def get_valid_access_token_async(client: httpx.AsyncClient, ozon_delivery_cfg: dict) -> str:
     """Асинхронная функция для Flask чекаута. Работает внутри asyncio.gather."""
-    current_time = int(time.time())
     db_path = ozon_delivery_cfg.get("DB_PATH")
 
-    cached_token = get_cached_token_or_none(db_path, current_time)
+    cached_token = get_cached_token_or_none(db_path)
     if cached_token:
+        logger.info("[Ozon Delivery]: Токен взят из хэша и действителен.")
         return cached_token
 
-    logger.info("Ozon Delivery API [Flask]: Токен устарел. Запрашиваем новый...")
+    logger.info("[Ozon Delivery]: Токен устарел. Запрашиваем новый...")
     
     payload = {
         "client_id": ozon_delivery_cfg.get("API_CLIENT_ID"),
@@ -108,5 +108,9 @@ async def get_valid_access_token_async(client: httpx.AsyncClient, ozon_delivery_
     new_token = data.get("access_token")
     expires_at = int(data.get("expires_in"))
 
-    save_token_to_cache(db_path, new_token, expires_at)
+    try:
+        save_token_to_cache(db_path, new_token, expires_at)
+    except Exception as e:
+        logger.warning(f"[Ozon Delivery]: Ошибка при сохранении токена в БД: {e}")
+
     return new_token

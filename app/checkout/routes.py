@@ -11,6 +11,7 @@ from app.checkout.core.utils import validate_order_totals, allocate_items_discou
 from .services.dadata import get_city_suggestions
 from .services.yandex import get_yandex_delivery_info
 from .services.russian_post import get_russian_post_delivery_info
+from .services.ozon_delivery.ozon_delivery import get_ozon_delivery_info
 
 import asyncio
 import httpx
@@ -118,17 +119,20 @@ async def get_delivery_options():
 
     yandex_config = current_app.config.get("YANDEX_DELIVERY", {})
     russian_post_config = current_app.config.get("RUSSIAN_POST", {})
+    ozon_delivery_config = current_app.config.get("OZON_DELIVERY", {})
 
     # Create 1 client for all requests of this user
     async with httpx.AsyncClient(http2=True, timeout=10.0) as client:
         tasks = [
             get_yandex_delivery_info(city_data, order_dimensions, client, yandex_config),
-            get_russian_post_delivery_info(city_data, order_dimensions, order_price, client, russian_post_config)
+            get_russian_post_delivery_info(city_data, order_dimensions, order_price, client, russian_post_config),
+            get_ozon_delivery_info(city_data, order_dimensions, order_price, client, ozon_delivery_config)
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
     yandex_result = results[0]
     russian_post_result = results[1]
+    ozon_delivery_result = results[2]
     
     if isinstance(yandex_result, Exception):
         logger.exception(f"Глобальный сбой asyncio для Яндекса (city: {city_name}): {yandex_result}")
@@ -150,6 +154,16 @@ async def get_delivery_options():
     else:
         russian_post_delivery_info = russian_post_result
 
+    if isinstance(ozon_delivery_result, Exception):
+            logger.exception(f"Глобальный сбой asyncio для Ozon Delivery (city: {city_name}): {ozon_delivery_result}")
+            russian_post_delivery_info = {
+                "status": "tech_error",
+                "error_code": "OZON_DELIVERY_API_DOWN",
+                "message": "Служба доставки Ozon Delivery временно недоступна."
+            }
+    else:
+        ozon_delivery_info = ozon_delivery_result
+
     logger.debug(f"Закончен расчет вариантов доставки для города: {city_name}")
     return jsonify({
         "status": "success",
@@ -159,7 +173,8 @@ async def get_delivery_options():
         },
         "deliveries": {
             "yandex": yandex_delivery_info,
-            "post": russian_post_delivery_info
+            "post": russian_post_delivery_info,
+            "ozon": ozon_delivery_info
         }
     }), 200
 
