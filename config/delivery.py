@@ -80,7 +80,9 @@ class DeliveryConfig:
         "URL_PRICING_CALCULATOR": "https://api-delivery.ozon.ru/v1/order/checkout",
 
         "DB_PATH": str(Path(__file__).resolve().parent.parent / "instance" /"ozon_delivery.db"),
-        
+
         "REGULAR_SHIPMENT_METHOD_ID": os.getenv("OZON_DELIVERY_REGULAR_SHIPMENT_METHOD_ID"),
         "KGT_SHIPMENT_METHOD_ID": os.getenv("OZON_DELIVERY_KGT_SHIPMENT_METHOD_ID"),
+
+        "DEFAULT_PHONE": os.getenv("OZON_DELIVERY_DEFAULT_PHONE"),
     }

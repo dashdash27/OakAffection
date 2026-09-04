@@ -113,6 +113,8 @@ def _get_pickup_points(fias_id, shipment_method_id, ozon_delivery_cfg: dict):
 async def _get_delivery_details(ozon_point_id_to, order_dimensions, order_price, shipment_method_id, client, headers, ozon_delivery_cfg: dict):
     url = ozon_delivery_cfg.get('URL_PRICING_CALCULATOR')
 
+    default_phone = ozon_delivery_cfg.get('DEFAULT_PHONE')
+
     weight = order_dimensions.get('total_weight')
     cubic_sum_of_sides = order_dimensions["cubic_sum_of_sides"]
     max_item_side = order_dimensions["max_item_side"]
@@ -129,7 +131,7 @@ async def _get_delivery_details(ozon_point_id_to, order_dimensions, order_price,
 
     payload = {
         "recipient": {
-            "phone_number": "+79991234567"
+            "phone_number": default_phone
         },
         "postings": [
             {
