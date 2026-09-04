@@ -1,4 +1,44 @@
+from app.logger import logger
+
 import re
+
+def determine_shipment_method_id(order_dimensions: dict, ozon_delivery_cfg: dict) -> int:
+    """Расчет в граммах и см"""
+    logger.debug(f"Order dimensions: {order_dimensions}")
+
+    weight = order_dimensions["total_weight"]
+    cubic_sum_of_sides = order_dimensions["cubic_sum_of_sides"]
+    max_item_side = order_dimensions["max_item_side"]
+
+    # 1. Распределяем общую кубическую сумма сторон на 3 измерения
+    base_side = cubic_sum_of_sides / 3
+
+    length = max(base_side, max_item_side)
+    width = base_side
+    height = base_side
+
+    # 2. Вычисляем объем в литрах
+    volume_liters = (length * width * height) / 1000
+
+    # 3. Проверка на длины сторон и вес - если не проходит, доставка недоступна
+    sorted_sides = sorted([length, width, height])
+    if (weight > 125000 or 
+        sorted_sides[0] > 120 or   # Самая маленькая сторона коробки > 120 см
+        sorted_sides[1] > 220 or   # Средняя сторона коробки > 220 см
+        sorted_sides[2] > 240):    # Самая большая сторона коробки > 240 см
+        logger.debug("Доставка Ozon недоступна")
+        return None
+
+    # 4. Проверка на крупногабарит
+    if (weight >= 35000 or 
+        length >= 200 or width >= 200 or height >= 200 or 
+        volume_liters >= 500):
+        logger.debug("Крупногабаритная доставка")
+        return ozon_delivery_cfg.get('KGT_SHIPMENT_METHOD_ID')
+
+    logger.debug("Обычная доставка")
+    return ozon_delivery_cfg.get('REGULAR_SHIPMENT_METHOD_ID')
+
 
 def extract_city_context(raw_address: str) -> str:
     """

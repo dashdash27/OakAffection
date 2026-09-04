@@ -78,5 +78,9 @@ class DeliveryConfig:
         "URL_POINTS_LIST": "https://api-delivery.ozon.ru/v1/delivery-point/list",
         "URL_POINTS_INFO": "https://api-delivery.ozon.ru/v1/delivery-point/info",
         "URL_PRICING_CALCULATOR": "https://api-delivery.ozon.ru/v1/order/checkout",
-        "DB_PATH": str(Path(__file__).resolve().parent.parent / "instance" /"ozon_delivery.db")
+
+        "DB_PATH": str(Path(__file__).resolve().parent.parent / "instance" /"ozon_delivery.db"),
+        
+        "REGULAR_SHIPMENT_METHOD_ID": os.getenv("OZON_DELIVERY_REGULAR_SHIPMENT_METHOD_ID"),
+        "KGT_SHIPMENT_METHOD_ID": os.getenv("OZON_DELIVERY_KGT_SHIPMENT_METHOD_ID"),
     }
