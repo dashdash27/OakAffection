@@ -5,6 +5,7 @@ from app.checkout.utils import format_delivery_days, normalize_and_ceil_price, g
 
 import sqlite3
 import math
+import time
 
 async def get_ozon_delivery_info(city_data, order_dimensions, order_price, client, ozon_delivery_cfg: dict):
     logger.debug(f"Получение информации о доставке Ozon Delivery для города: {city_data.get('value')}")
@@ -132,7 +133,7 @@ async def _get_delivery_details(ozon_point_id_to, order_dimensions, order_price,
         },
         "postings": [
             {
-            "request_id": 105,
+            "request_id": int(time.time()),
             "shipment_method_id": shipment_method_id,
             "cutoff_at": "2026-09-16T12:00:00Z",
             "declared_value": {
