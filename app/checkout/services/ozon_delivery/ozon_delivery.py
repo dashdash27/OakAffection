@@ -159,7 +159,10 @@ async def _get_delivery_details(ozon_point_id_to, order_dimensions, order_price,
     data = response.json()
 
     delivery_days = data.get('results')[0].get('posting').get('estimated_delivery_days')
-    price = data.get('results')[0].get('posting').get('estimated_delivery_cost').get('amount')
+    delivery_cost = float(data.get('results')[0].get('posting').get('estimated_delivery_cost').get('amount'))
+    insurance_cost = float(data.get('results')[0].get('posting').get('estimated_insurance_cost').get('amount'))
+
+    price = math.ceil(delivery_cost + insurance_cost)
 
     return {
         "delivery_days": delivery_days,
