@@ -11,7 +11,7 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
     logger.debug(f"Получение информации о доставке Ozon Delivery для города: {city_data.get('value')}")
 
     try:
-        # TODO 1. Определяем shipment_method_id
+        # TODO 1. Определяем shipment_method_id (пока доступен только обычный метод доставки)
         shipment_method_id = determine_shipment_method_id(order_dimensions, ozon_delivery_cfg)
         if not shipment_method_id:
             logger.warning(f"Ozon Delivery: Не удалось определить shipment_method_id для города: {city_data.get('value')}")
