@@ -17,7 +17,7 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
             logger.warning(f"Ozon Delivery: Не удалось определить shipment_method_id для города: {city_data.get('value')}")
             return {
                 "status": "business_error",
-                "error_code": "NO_SHIPMENT_METHOD_ID",
+                "error_code": "OVERSIZE_OR_OVERWEIGHT",
                 "message": "Не удалось определить shipment_method_id для города"
             }
 
@@ -51,6 +51,9 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
 
         delivery_days = format_delivery_days(details.get('delivery_days'))
         clean_price = normalize_and_ceil_price(details.get('price'))
+        clean_price_with_margin = clean_price
+
+        token = generate_jwt_delivery_token("ozon", clean_price_with_margin)
 
         return {
                 "status": "success",
@@ -60,7 +63,7 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
                 "points": points,
                 "delivery_days": delivery_days,
                 "price": clean_price, 
-                "delivery_token": "ddd"
+                "delivery_token": token
             }
         
         

@@ -428,7 +428,7 @@
                             ${style.label}
                         </div>
                         <div class="delivery-card__title" style="color: #777;">
-                            ${{ yandex: 'Яндекс Доставка', russian_post: 'Почта России', ozon: 'Ozon' }[key] || 'Доставка'}
+                            ${{ yandex: 'Яндекс Доставка', russian_post: 'Почта России', ozon: 'Ozon Доставка' }[key] || 'Доставка'}
                         </div>
                         <div class="delivery-card__additional">
                             <span class="delivery-card__error-text" style="color: #ff9800; font-size: 13px;">${errorText}</span>
