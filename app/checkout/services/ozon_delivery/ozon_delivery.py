@@ -51,20 +51,21 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
 
         delivery_days = format_delivery_days(details.get('delivery_days'))
         clean_price = normalize_and_ceil_price(details.get('price'))
-        clean_price_with_margin = clean_price
+        multiplier = ozon_delivery_cfg.get('MARGIN_MULTIPLIER', 1.1)
+        clean_price_with_margin = math.ceil(multiplier * clean_price)
 
         token = generate_jwt_delivery_token("ozon", clean_price_with_margin)
 
         return {
-                "status": "success",
-                "error_code": None,
-                "name": "Ozon",
-                "service": "ozon",
-                "points": points,
-                "delivery_days": delivery_days,
-                "price": clean_price, 
-                "delivery_token": token
-            }
+            "status": "success",
+            "error_code": None,
+            "name": "Ozon Доставка",
+            "service": "ozon",
+            "points": points,
+            "delivery_days": delivery_days,
+            "price": clean_price_with_margin, 
+            "delivery_token": token
+        }
         
         
     except Exception as e:

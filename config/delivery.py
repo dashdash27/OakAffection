@@ -93,5 +93,7 @@ class DeliveryConfig:
 
         "KGT_THRESHOLD_WEIGHT_LIMIT": 35000,
         "KGT_THRESHOLD_SIDE_LIMIT": 200,
-        "KGT_THRESHOLD_VOLUME_LIMIT": 500
+        "KGT_THRESHOLD_VOLUME_LIMIT": 500,
+
+        "MARGIN_MULTIPLIER": 1.1
     }
