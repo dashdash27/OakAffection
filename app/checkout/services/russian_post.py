@@ -72,7 +72,7 @@ async def get_russian_post_delivery_info(city_data, order_dimensions, order_pric
                 "points": []
             }
         
-        token = generate_jwt_delivery_token("yandex", clean_price_with_margin)
+        token = generate_jwt_delivery_token("russian_post", clean_price_with_margin)
 
         return {
             "status": "success",

@@ -160,6 +160,9 @@ h1 {
 .yandex {
     color: rgb(227, 174, 2);
 }
+.ozon {
+    color: #005BFF;
+}
 
 /* Total */
 .receipt__row--total {
