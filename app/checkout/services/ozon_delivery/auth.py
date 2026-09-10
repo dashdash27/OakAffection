@@ -4,9 +4,9 @@ import time
 import requests
 import httpx 
 
-def get_cached_token_or_none(db_path: str) -> str | None:
+def get_cached_token_or_none(db_path: str, db_timeout: float = 5.0) -> str | None:
     """Читает токен из хэша и проверяет его дату истечения."""
-    conn = sqlite3.connect(db_path, timeout=3.0)
+    conn = sqlite3.connect(db_path, timeout=db_timeout)
     try:
         conn.execute("PRAGMA journal_mode=WAL;")
         cursor = conn.cursor()
@@ -29,9 +29,9 @@ def get_cached_token_or_none(db_path: str) -> str | None:
     return None
 
 
-def save_token_to_cache(db_path: str, token: str, expires_at: int):
+def save_token_to_cache(db_path: str, token: str, expires_at: int, db_timeout: float = 5.0):
     """Записывает обновленный токен в кэш."""
-    conn = sqlite3.connect(db_path, timeout=3.0)
+    conn = sqlite3.connect(db_path, timeout=db_timeout)
     try:
         conn.execute("PRAGMA journal_mode=WAL;")
         cursor = conn.cursor()
@@ -42,7 +42,7 @@ def save_token_to_cache(db_path: str, token: str, expires_at: int):
         """, (token, expires_at))
         conn.commit()
     except Exception as e:
-        logger.error(f"[Ozon DeliveryAuth] Ошибка при сохранении токена в БД: {e}")
+        logger.error(f"[Ozon Delivery Auth] Ошибка при сохранении токена в БД: {e}")
         raise
     finally:
         conn.close()
@@ -52,12 +52,12 @@ def get_valid_access_token_sync(ozon_delivery_cfg: dict) -> str:
     db_path = ozon_delivery_cfg.get("DB_PATH")
 
     # Ищем токен в кэше
-    cached_token = get_cached_token_or_none(db_path)
+    cached_token = get_cached_token_or_none(db_path, db_timeout=30.0)
     if cached_token:
-        logger.info("[Cron Ozon Delivery]: Токен взят из хэша и действителен.")
+        logger.info("[Cron Ozon Delivery] Токен взят из кэша и действителен.")
         return cached_token
 
-    logger.info("[Cron Ozon Delivery]: Токен устарел. Запрашиваем новый...")
+    logger.info("[Cron Ozon Delivery] Токен устарел. Запрашиваем новый...")
 
     client_id = ozon_delivery_cfg.get("API_CLIENT_ID")
     client_secret = ozon_delivery_cfg.get("API_CLIENT_SECRET")
@@ -76,9 +76,9 @@ def get_valid_access_token_sync(ozon_delivery_cfg: dict) -> str:
     expires_at = int(data.get("expires_in"))
 
     try:
-        save_token_to_cache(db_path, new_token, expires_at)
+        save_token_to_cache(db_path, new_token, expires_at, db_timeout=30.0)
     except Exception as e:
-        logger.warning(f"[Cron Ozon Delivery]: Ошибка при сохранении токена в БД: {e}")
+        logger.warning(f"[Cron Ozon Delivery] Ошибка при сохранении токена в БД: {e}")
 
     return new_token
 
@@ -86,7 +86,7 @@ async def get_valid_access_token_async(client: httpx.AsyncClient, ozon_delivery_
     """Асинхронная функция для Flask чекаута. Работает внутри asyncio.gather."""
     db_path = ozon_delivery_cfg.get("DB_PATH")
 
-    cached_token = get_cached_token_or_none(db_path)
+    cached_token = get_cached_token_or_none(db_path, db_timeout=2.0)
     if cached_token:
         logger.info("[Ozon Delivery]: Токен взят из хэша и действителен.")
         return cached_token
@@ -109,7 +109,7 @@ async def get_valid_access_token_async(client: httpx.AsyncClient, ozon_delivery_
     expires_at = int(data.get("expires_in"))
 
     try:
-        save_token_to_cache(db_path, new_token, expires_at)
+        save_token_to_cache(db_path, new_token, expires_at, db_timeout=2.0)
     except Exception as e:
         logger.warning(f"[Ozon Delivery]: Ошибка при сохранении токена в БД: {e}")
 
