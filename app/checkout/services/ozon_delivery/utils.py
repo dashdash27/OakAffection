@@ -4,7 +4,6 @@ import re
 
 def determine_shipment_method_id(order_dimensions: dict, ozon_delivery_cfg: dict) -> int:
     """Расчет в граммах и см"""
-    logger.debug(f"Order dimensions: {order_dimensions}")
 
     weight = order_dimensions["total_weight"]
     cubic_sum_of_sides = order_dimensions["cubic_sum_of_sides"]
@@ -31,7 +30,6 @@ def determine_shipment_method_id(order_dimensions: dict, ozon_delivery_cfg: dict
         sorted_sides[0] > max_side_a or   # Самая маленькая сторона коробки > 120 см
         sorted_sides[1] > max_side_b or   # Средняя сторона коробки > 220 см
         sorted_sides[2] > max_side_c):    # Самая большая сторона коробки > 240 см
-        logger.debug("Доставка Ozon недоступна")
         return None
 
     # 4. Проверка на крупногабарит - пока делаем недоступной
@@ -42,10 +40,8 @@ def determine_shipment_method_id(order_dimensions: dict, ozon_delivery_cfg: dict
     if (weight >= kgt_weight or 
         length >= kgt_side or width >= kgt_side or height >= kgt_side or 
         volume_liters >= kgt_volume):
-        logger.debug("Крупногабаритная доставка")
         return None
 
-    logger.debug("Обычная доставка")
     return ozon_delivery_cfg.get('REGULAR_SHIPMENT_METHOD_ID')
 
 

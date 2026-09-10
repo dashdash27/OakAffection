@@ -66,10 +66,8 @@ def init_db(db_path: str):
         """)
         
         # Индексы для быстрого JOIN-поиска
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ozon_points_fias ON ozon_points(fias_id);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_methods_point_id ON ozon_point_shipment_methods(ozon_point_id);")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_methods_shipment_id ON ozon_point_shipment_methods(shipment_method_id);")
-
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_ozon_points_fias ON ozon_points(fias_id);") # по фиасу поиск
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_methods_point_and_shipment ON ozon_point_shipment_methods(ozon_point_id, shipment_method_id);")
         conn.commit()
 
 def fetch_all_ozon_point_ids(ozon_delivery_cfg: dict, access_token: str) -> list[dict]:

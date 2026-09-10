@@ -11,19 +11,18 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
     logger.debug(f"Получение информации о доставке Ozon Delivery для города: {city_data.get('value')}")
 
     try:
-        # TODO 1. Определяем shipment_method_id (пока доступен только обычный метод доставки)
+        # 1. Определяем shipment_method_id (пока доступен только обычный метод доставки)
         shipment_method_id = determine_shipment_method_id(order_dimensions, ozon_delivery_cfg)
         if not shipment_method_id:
             logger.warning(f"Ozon Delivery: Не удалось определить shipment_method_id для города: {city_data.get('value')}")
             return {
                 "status": "business_error",
                 "error_code": "OVERSIZE_OR_OVERWEIGHT",
-                "message": "Не удалось определить shipment_method_id для города"
+                "message": "Заказ слишком объемный для ПВЗ Ozon Delivery"
             }
 
-        fias_id = city_data.get('fias_id')
-
         # 1. Get Points by fias_id and shipment_method
+        fias_id = city_data.get('fias_id')
         points = _get_pickup_points(fias_id, shipment_method_id, ozon_delivery_cfg)
         if not points:
             logger.warning(f"Ozon Delivery: Не удалось получить ПВЗ для города: {city_data.get('value')}")
@@ -34,7 +33,6 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
             }
 
         # 2. Get delivery details
-        # TODO: try для получения токена
         access_token = await get_valid_access_token_async(client, ozon_delivery_cfg)
         auth_headers = {"Authorization": f"Bearer {access_token}"}
         details = None
@@ -67,7 +65,6 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
             "delivery_token": token
         }
         
-        
     except Exception as e:
         logger.exception(f"Критическая ошибка во время интеграции с Ozon Delivery")
         return {
@@ -80,9 +77,8 @@ async def get_ozon_delivery_info(city_data, order_dimensions, order_price, clien
 def _get_pickup_points(fias_id, shipment_method_id, ozon_delivery_cfg: dict):
 
     db_path = ozon_delivery_cfg.get('DB_PATH')
-    conn = sqlite3.connect(db_path, timeout=3.0)
 
-    try:
+    with sqlite3.connect(db_path, timeout=2.0) as conn:
         conn.execute("PRAGMA journal_mode=WAL;")
         
         conn.row_factory = sqlite3.Row 
@@ -106,13 +102,7 @@ def _get_pickup_points(fias_id, shipment_method_id, ozon_delivery_cfg: dict):
             })
             
         return pickup_points
-    
-    except Exception as e:
-        logger.error(f"[Ozon Delivery] Ошибка при чтении ПВЗ из SQLite: {e}")
-        return None
-    
-    finally:
-        conn.close()
+
 
 async def _get_delivery_details(ozon_point_id_to, order_dimensions, order_price, shipment_method_id, client, headers, ozon_delivery_cfg: dict):
     url = ozon_delivery_cfg.get('URL_PRICING_CALCULATOR')
@@ -160,7 +150,7 @@ async def _get_delivery_details(ozon_point_id_to, order_dimensions, order_price,
         }
     }
 
-    response = await client.post(url, json=payload, headers=headers, timeout=5, follow_redirects=True)
+    response = await client.post(url, json=payload, headers=headers, timeout=8, follow_redirects=True)
     response.raise_for_status()
     data = response.json()
 
