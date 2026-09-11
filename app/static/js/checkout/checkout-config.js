@@ -3,7 +3,8 @@ window.Checkout = window.Checkout || {};
 window.Checkout.config = {
     DELIVERY_STYLES: {
         yandex: { color: '#FFCC00', label: 'Я' },
-        post: { color: '#0055A5', label: 'П' }
+        post: { color: '#0055A5', label: 'П' },
+        ozon: { color: '#005BFF', label: 'O' }
     },
     QUANTITY_MAX: 30
 };

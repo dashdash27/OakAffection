@@ -102,6 +102,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             orderDelivery.textContent = 'Яндекс';
             orderDelivery.classList.add('yandex');
         }
+        else if (details.delivery_service == "ozon") {
+            orderDelivery.textContent = 'Ozon';
+            orderDelivery.classList.add('ozon');
+        }
 
         // 5. Customer
         if (details.customer) {

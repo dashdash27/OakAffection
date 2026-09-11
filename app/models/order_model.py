@@ -15,6 +15,7 @@ class OrderStatus(enum.Enum):
 class DeliveryService(enum.Enum):
     YANDEX = 'yandex'
     RUSSIAN_POST = 'russian_post'
+    OZON = 'ozon'
 
 
 class Order(db.Model):

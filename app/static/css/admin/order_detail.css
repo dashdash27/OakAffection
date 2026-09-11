@@ -195,6 +195,9 @@ h3 {
 .delivery-service-russian_post {
     color: rgb(6, 54, 176);
 }
+.delivery-service-ozon {
+    color: #005BFF;
+}
 .comment-block {
     margin-top: 12px; 
     padding: 10px; 
