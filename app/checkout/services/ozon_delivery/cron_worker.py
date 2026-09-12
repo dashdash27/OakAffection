@@ -97,40 +97,42 @@ def fetch_all_ozon_point_ids(ozon_delivery_cfg: dict, access_token: str) -> list
             }
         }
 
-        try:
-            logger.info(f"[Ozon Delivery API] Запрос страницы {page_counter} (cursor: {current_cursor})...")
+        success = False
+        for attempt in range(1, 6):
+            try:
+                logger.info(f"[Ozon Delivery API] Запрос страницы {page_counter} (Попытка {attempt}/5, cursor: {current_cursor})...")
 
-            response = requests.post(url, json=payload, headers=headers, timeout=10)
-            response.raise_for_status()
-            data = response.json()
+                response = requests.post(url, json=payload, headers=headers, timeout=30)
+                response.raise_for_status()
+                data = response.json()
 
-            points = data.get("delivery_points", [])
-            all_points.extend(points)
+                points = data.get("delivery_points", [])
+                all_points.extend(points)
 
-            logger.info(f"[Ozon Delivery API] Страница {page_counter} успешно обработана. Получено точек: {len(points)}.")
+                logger.info(f"[Ozon Delivery API] Страница {page_counter} успешно обработана. Получено точек: {len(points)}.")
 
-            next_cursor = data.get("next_cursor")
+                next_cursor = data.get("next_cursor")
 
-            if not next_cursor or next_cursor == current_cursor:
-                logger.info(f"[Ozon Delivery API] Курсор пуст или завершен. Всего найдено ПВЗ: {len(all_points)}")
+                success = True
                 break
 
-            current_cursor = next_cursor
-            page_counter += 1
+            except (requests.exceptions.ReadTimeout, requests.exceptions.RequestException) as e:
+                logger.warning(f"[Ozon Delivery API] Попытка {attempt}/5 на странице {page_counter} провалена: {e}")
+                if attempt < 5:
+                    time.sleep(attempt * 3)
 
-            time.sleep(0.2)
+        if not success:
+            logger.critical(f"[Ozon Delivery API] Страница {page_counter} не ответила после 5 попыток. Аварийный выход!")
+            return None
 
-        except requests.exceptions.RequestException as e:
-            # Если сеть моргнет на середине пути, крон не упадет
-            logger.error(f"[Ozon Delivery API] Сетевая ошибка на странице {page_counter}: {e}")
+        if not next_cursor or next_cursor == current_cursor:
+            logger.info(f"[Ozon Delivery API] Сбор завершен. Успешно собрано ПВЗ: {len(all_points)}")
+            break
+
+        current_cursor = next_cursor
+        page_counter += 1
+        time.sleep(0.2)
             
-            # Если мы уже успели выкачать часть данных, возвращаем их, чтобы конвейер продолжил работу
-            if all_points:
-                logger.warning(f"[Ozon Delivery API] Возвращаем частично собранные данные ({len(all_points)} ПВЗ) из-за ошибки.")
-                return all_points
-
-            return []
-
     return all_points
 
 
@@ -147,6 +149,9 @@ def fetch_point_details_chunk(ozon_delivery_cfg: dict, access_token: str, point_
     chunk_size = 100
     total_ids = len(point_ids)
 
+    failed_chunks_count = 0
+    max_allowed_failed_chunks = 5
+
     logger.info(f"[Ozon Delivery API] Начинаем сбор деталей для {total_ids} ПВЗ...")
 
     for i in range(0, total_ids, chunk_size):
@@ -158,12 +163,13 @@ def fetch_point_details_chunk(ozon_delivery_cfg: dict, access_token: str, point_
             "delivery_point_ids": chunk
         }
 
-        max_retries = 3
-        for retry in range(max_retries):
+        success = False
+
+        for retry in range(1, 6):
             try:
-                logger.info(f"[Ozon Delivery API]: Запрос чанка {chunk_number}/{total_chunks}...")
+                logger.info(f"[Ozon Delivery API]: Запрос чанка {chunk_number}/{total_chunks} (Попытка {retry}/5)...")
                 
-                response = requests.post(url, json=payload, headers=headers, timeout=15)
+                response = requests.post(url, json=payload, headers=headers, timeout=30)
                 response.raise_for_status()
                 data = response.json()
 
@@ -171,18 +177,25 @@ def fetch_point_details_chunk(ozon_delivery_cfg: dict, access_token: str, point_
                 points_chunk = data.get("delivery_points", [])
                 detailed_points.extend(points_chunk)
                 
+                success = True
                 break
 
-            except requests.exceptions.RequestException as e:
-                logger.warning(f"[Ozon Delivery API] Ошибка чанка {chunk_number} (Попытка {retry + 1}/{max_retries}): {e}")
+            except (requests.exceptions.ReadTimeout, requests.exceptions.RequestException) as e:
+                logger.warning(f"[Ozon Delivery API] Ошибка чанка {chunk_number} (Попытка {retry}/5): {e}")
                 
-                if retry < max_retries - 1:
-                    time.sleep(2)  # Ждем 2 секунды перед повторной попыткой
-                else:
-                    # Если все 3 попытки провалились — пропускаем этот чанк, чтобы не ронять весь Крон
-                    logger.warning(f"[Ozon Delivery API] Чанк {chunk_number} окончательно провален после {max_retries} попыток. Пропускаем.")
+                if retry < 5:
+                    time.sleep(retry * 3)
 
-        # Шаг 3: Обязательная микро-пауза между чанками для защиты от Rate Limit Ozon (ошибка 429)
+        if not success:
+            failed_chunks_count += 1
+            logger.warning(f"[Ozon Delivery API] Чанк {chunk_number} окончательно провален после 5 попыток.")
+            
+            # Проверяем критический лимит потерь для деталей
+            if failed_chunks_count > max_allowed_failed_chunks:
+                logger.critical(f"[Ozon Delivery API] Превышен лимит ошибок деталей ({failed_chunks_count} чанков). Конвейер полностью остановлен!")
+                return None
+
+        # Микро-пауза между чанками для защиты от Rate Limit Ozon (ошибка 429)
         time.sleep(0.3)
 
     logger.info(f"[Ozon Delivery API] Сбор деталей завершен. Успешно получено: {len(detailed_points)} из {total_ids} ПВЗ.")
