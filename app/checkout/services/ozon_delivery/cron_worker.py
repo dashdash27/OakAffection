@@ -8,6 +8,7 @@ import requests
 import os
 import time
 from flask import current_app
+import random
 
 
 session = requests.Session()
@@ -119,7 +120,7 @@ def fetch_all_ozon_point_ids(ozon_delivery_cfg: dict, access_token: str) -> list
             except (requests.exceptions.ReadTimeout, requests.exceptions.RequestException) as e:
                 logger.warning(f"[Ozon Delivery API] Попытка {attempt}/5 на странице {page_counter} провалена: {e}")
                 if attempt < 5:
-                    time.sleep(attempt * 3)
+                    time.sleep(attempt * 8)
 
         if not success:
             logger.critical(f"[Ozon Delivery API] Страница {page_counter} не ответила после 5 попыток. Аварийный выход!")
@@ -131,7 +132,7 @@ def fetch_all_ozon_point_ids(ozon_delivery_cfg: dict, access_token: str) -> list
 
         current_cursor = next_cursor
         page_counter += 1
-        time.sleep(0.2)
+        time.sleep(random.uniform(0.5, 1.0))
             
     return all_points
 
@@ -184,7 +185,7 @@ def fetch_point_details_chunk(ozon_delivery_cfg: dict, access_token: str, point_
                 logger.warning(f"[Ozon Delivery API] Ошибка чанка {chunk_number} (Попытка {retry}/5): {e}")
                 
                 if retry < 5:
-                    time.sleep(retry * 3)
+                    time.sleep(retry * 8)
 
         if not success:
             failed_chunks_count += 1
@@ -196,7 +197,7 @@ def fetch_point_details_chunk(ozon_delivery_cfg: dict, access_token: str, point_
                 return None
 
         # Микро-пауза между чанками для защиты от Rate Limit Ozon (ошибка 429)
-        time.sleep(0.3)
+        time.sleep(random.uniform(0.5, 1.0))
 
     logger.info(f"[Ozon Delivery API] Сбор деталей завершен. Успешно получено: {len(detailed_points)} из {total_ids} ПВЗ.")
     return detailed_points
@@ -360,4 +361,3 @@ def run_full_pickup_points_sync():
         
     except Exception as e:
         logger.exception(f"[Cron Ozon] КРИТИЧЕСКАЯ ОШИБКА в процессе работы конвейера Ozon ПВЗ: {e}")
-    
