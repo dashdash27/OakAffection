@@ -132,7 +132,7 @@ def fetch_all_ozon_point_ids(ozon_delivery_cfg: dict, access_token: str) -> list
 
         current_cursor = next_cursor
         page_counter += 1
-        time.sleep(random.uniform(0.5, 1.0))
+        time.sleep(random.uniform(1.2, 2.5))
             
     return all_points
 
@@ -197,7 +197,7 @@ def fetch_point_details_chunk(ozon_delivery_cfg: dict, access_token: str, point_
                 return None
 
         # Микро-пауза между чанками для защиты от Rate Limit Ozon (ошибка 429)
-        time.sleep(random.uniform(0.5, 1.0))
+        time.sleep(random.uniform(1.2, 2.5))
 
     logger.info(f"[Ozon Delivery API] Сбор деталей завершен. Успешно получено: {len(detailed_points)} из {total_ids} ПВЗ.")
     return detailed_points
