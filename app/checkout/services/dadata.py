@@ -70,7 +70,7 @@ def get_cities_fias(unique_cities: set[str], db_path: str) -> dict[str, str]:
         return {}
 
     city_to_fias = {}
-    logger.info("[DaData] Запрос в кэш БД SQLite для получения Fias_id...")
+    logger.info("[DaData] Запрос в кэш БД SQLite для получения FIAS...")
 
     # Пытаемся получить fias из локальной БД SQLite
     try:
@@ -81,7 +81,7 @@ def get_cities_fias(unique_cities: set[str], db_path: str) -> dict[str, str]:
             for context, fias in rows:
                 if fias:  # Сохраняем только валидные fias_id
                     city_to_fias[context] = fias
-        logger.info(f"[SQLite Cache] В локальной базе найдено {len(city_to_fias)} населенных пунков.")
+        logger.info(f"[SQLite Cache] В локальной базе найдено {len(city_to_fias)} FIAS населенных пунков.")
     except Exception as e:
         logger.error(f"[SQLite Cache] Ошибка при чтении кэша городов: {e}")
 
@@ -162,5 +162,5 @@ def get_cities_fias(unique_cities: set[str], db_path: str) -> dict[str, str]:
         except Exception as e:
             logger.error(f"[SQLite Cache] Ошибка при сохранении новых городов в кэш: {e}")
 
-    logger.info(f"[DaData] Финал. Общее количество доступных FIAS: {len(city_to_fias)} из {len(unique_cities)}.")
+    logger.info(f"[DaData] Финал. Добавлено новых FIAS: {len(new_cached_entries)}.")
     return city_to_fias
