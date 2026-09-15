@@ -9,6 +9,7 @@ import os
 import time
 from flask import current_app
 import random
+from requests.exceptions import HTTPError, RequestException
 
 
 session = requests.Session()
@@ -99,7 +100,9 @@ def fetch_all_ozon_point_ids(ozon_delivery_cfg: dict, access_token: str) -> list
         }
 
         success = False
-        for attempt in range(1, 6):
+        attempt = 1
+        max_attempts = 5
+        while attempt <= max_attempts:
             try:
                 logger.info(f"[Ozon Delivery API] Запрос страницы {page_counter} (Попытка {attempt}/5, cursor: {current_cursor})...")
 
@@ -117,10 +120,25 @@ def fetch_all_ozon_point_ids(ozon_delivery_cfg: dict, access_token: str) -> list
                 success = True
                 break
 
-            except (requests.exceptions.ReadTimeout, requests.exceptions.RequestException) as e:
-                logger.warning(f"[Ozon Delivery API] Попытка {attempt}/5 на странице {page_counter} провалена: {e}")
-                if attempt < 5:
+            except RequestException as e:
+                # Ошибка 401
+                if hasattr(e, 'response') and e.response is not None and e.response.status_code == 401:
+                    logger.warning(f"[Ozon Delivery API] Ошибка 401 (Токен протух). Обновляем токен и ПОВТОРЯЕМ попытку {attempt}...")
+                    
+                    access_token = get_valid_access_token_sync(ozon_delivery_cfg)
+                    headers["Authorization"] = f"Bearer {access_token}"
+                    
+                    logger.warning(f"[Ozon Delivery API] Токен успешно обновлен.")
+
+                    continue 
+
+                # Любая другая ошибка
+                logger.warning(f"[Ozon Delivery API] Попытка {attempt}/{max_attempts} провалена: {e}")
+                
+                if attempt < max_attempts:
                     time.sleep(attempt * 8)
+                    
+                attempt += 1
 
         if not success:
             logger.critical(f"[Ozon Delivery API] Страница {page_counter} не ответила после 5 попыток. Аварийный выход!")
@@ -165,10 +183,11 @@ def fetch_point_details_chunk(ozon_delivery_cfg: dict, access_token: str, point_
         }
 
         success = False
-
-        for retry in range(1, 6):
+        attempt = 1
+        max_attempts = 5
+        while attempt <= max_attempts:
             try:
-                logger.info(f"[Ozon Delivery API]: Запрос чанка {chunk_number}/{total_chunks} (Попытка {retry}/5)...")
+                logger.info(f"[Ozon Delivery API]: Запрос чанка {chunk_number}/{total_chunks} (Попытка {attempt}/5)...")
                 
                 response = requests.post(url, json=payload, headers=headers, timeout=30)
                 response.raise_for_status()
@@ -181,11 +200,25 @@ def fetch_point_details_chunk(ozon_delivery_cfg: dict, access_token: str, point_
                 success = True
                 break
 
-            except (requests.exceptions.ReadTimeout, requests.exceptions.RequestException) as e:
-                logger.warning(f"[Ozon Delivery API] Ошибка чанка {chunk_number} (Попытка {retry}/5): {e}")
+            except RequestException as e:
+                # Ошибка 401
+                if hasattr(e, 'response') and e.response is not None and e.response.status_code == 401:
+                    logger.warning(f"[Ozon Delivery API] Ошибка 401 (Токен протух). Обновляем токен и ПОВТОРЯЕМ попытку {attempt}...")
+                    
+                    access_token = get_valid_access_token_sync(ozon_delivery_cfg)
+                    headers["Authorization"] = f"Bearer {access_token}"
+                    
+                    logger.warning(f"[Ozon Delivery API] Токен успешно обновлен.")
+
+                    continue 
+
+                # Любая другая ошибка
+                logger.warning(f"[Ozon Delivery API] Ошибка чанка {chunk_number} (Попытка {attempt}/5): {e}")
                 
-                if retry < 5:
-                    time.sleep(retry * 8)
+                if attempt < max_attempts:
+                    time.sleep(attempt * 8)
+                    
+                attempt += 1
 
         if not success:
             failed_chunks_count += 1
@@ -318,7 +351,7 @@ def run_full_pickup_points_sync():
     try:
         # 1. Get access token
         access_token = get_valid_access_token_sync(ozon_delivery_cfg)
-        logger.info("[Cron Ozon Delivery] Токен Ozon API успешно верифицирован.")
+        logger.info("[Cron Ozon Delivery] Токен Ozon API успешно верифицирован перед запросом ID ПВЗ.")
 
         # 2. Get raw points
         raw_points = fetch_all_ozon_point_ids(ozon_delivery_cfg, access_token)
@@ -331,7 +364,10 @@ def run_full_pickup_points_sync():
         point_methods_map = {p["delivery_point_id"]: p.get("shipment_method_ids", []) for p in raw_points}
         point_ids = list(point_methods_map.keys())
 
-        # 4. Get detailed points
+        # 4. Get detailed points (and token before that)
+        access_token = get_valid_access_token_sync(ozon_delivery_cfg)
+        logger.info("[Cron Ozon Delivery] Токен Ozon API успешно верифицирован перед запросом деталей ПВЗ.")
+        
         detailed_points = fetch_point_details_chunk(ozon_delivery_cfg, access_token, point_ids)
         if not detailed_points:
             logger.warning("[Cron Ozon Delivery] Детализация ПВЗ пуста. Выходим.")

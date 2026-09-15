@@ -96,7 +96,7 @@ def get_cities_fias(unique_cities: set[str], db_path: str) -> dict[str, str]:
 
     new_cached_entries = []
     requested_count = 0
-    MAX_DAILY_LIMIT = 9500
+    MAX_DAILY_LIMIT = 9000
 
     try:
         session = get_dadata_session()
