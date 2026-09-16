@@ -52,7 +52,8 @@ def request_ozon_pay_link(order: Order, ozon_pay_cfg: dict) -> str | None:
     # Add Delivery
     DELIVERY_NAMES = {
         'yandex': 'Яндекс.Доставка',
-        'russian_post': 'Почта России'
+        'russian_post': 'Почта России',
+        'ozon': 'Ozon'
     }
     if order.delivery_price > 0:
         service_name = DELIVERY_NAMES.get(order.delivery_service.value, order.delivery_service.value)

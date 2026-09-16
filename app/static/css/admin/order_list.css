@@ -76,6 +76,9 @@
 .delivery-service-russian_post {
     color: rgb(37, 37, 216);
 }
+.delivery-service-ozon {
+    color: #005BFF;
+}
 
 /* Amount */
 .col-amount {

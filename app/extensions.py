@@ -7,6 +7,7 @@ from flask_limiter.util import get_remote_address
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / 'static'
+ROOT_DIR = BASE_DIR.parent
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
