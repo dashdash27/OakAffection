@@ -46,46 +46,55 @@ def determine_shipment_method_id(order_dimensions: dict, ozon_delivery_cfg: dict
 
 
 def extract_city_context(raw_address: str) -> str:
-    """
-    Отрезает адрес строго на уровне населенного пункта.
-    Игнорирует индексы, улицы, дома, корпуса, сохраняя только 
-    цепочку: Страна -> Регион -> Район -> Город.
-    """
     if not raw_address:
         return ""
 
-    # Убираем индексы
+    # 1. Убираем почтовый индекс (6 цифр)
     clean_address = re.sub(r'\b\d{6}\b', '', raw_address)
+    
+    # 2. Приводим к нижнему регистру и стираем точки (запятые пока ОСТАВЛЯЕМ на месте)
+    clean_address = clean_address.lower().replace('.', '')
 
-    # Разделяем адрес на элементы по запятым
-    parts = [p.strip() for p in clean_address.split(",") if p.strip()]
+    # 3. Маркеры улиц и дорог
+    stop_markers = [
+        r'\bулица\b', r'\bул\b', r'\bпроспект\b', r'\bпр-кт\b', r'\bпркт\b', r'\bпросп\b', 
+        r'\bбульвар\b', r'\bб-вар\b', r'\bпереулок\b', r'\bпер\b', r'\bшоссе\b', r'\bш\b',
+        r'\bтракт\b', r'\bнабережная\b', r'\bпроезд\b', r'\bаллея\b', r'\bквартал\b', r'\bлиния\b',
+        r'\bдом\b', r'\bд\b', r'\bстр\b', r'\bкорпус\b', r'\bкорп\b', r'\bстроение\b', r'\bмикрорайон\b', r'\bмкр\b',
+        r'\bплощадь\b',
 
-    # Если в части адреса есть такая часть - отсекаем ее
-    trash_markers = [
-        'улица', 'ул', 'проспект', 'пр-кт', 'пркт', 'бульвар', 'б-вар', 
-        'переулок', 'пер', 'шоссе', 'ш', 'дом', 'д ', 'д.', 'кв', 'офис', 
-        'строение', 'стр', 'корпус', 'корп', 'лит', 'литера', 'пвз'
+        r'\bк\d+',
+        r'\b\d+[a-яa-z]\b'
     ]
 
-    context_parts = []
+    # Находим, какой маркер встретился в строке самым первым
+    first_marker_pos = len(clean_address)
+    for marker in stop_markers:
+        match = re.search(marker, clean_address, flags=re.UNICODE)
+        if match and match.start() < first_marker_pos:
+            first_marker_pos = match.start()
 
-    for part in parts:
-        # Нижний регистр и стирание точек
-        part_clean = part.lower().replace('.', '').strip()
+    # 4. ЛОГИКА С ЗАПЯТОЙ: Если маркер найден, ищем запятую ПЕРЕД ним
+    if first_marker_pos < len(clean_address):
+        # Берем кусок строки ДО маркера улицы
+        string_before_marker = clean_address[:first_marker_pos]
+        
+        # Находим индекс ПОСЛЕДНЕЙ запятой в этом куске
+        last_comma_pos = string_before_marker.rfind(',')
+        
+        # Если запятая перед улицей найдена, режем строго по неё
+        if last_comma_pos != -1:
+            short_address = string_before_marker[:last_comma_pos].strip()
+        else:
+            # Если запятой вдруг не было (слова написаны слитно), режем по сам маркер
+            short_address = string_before_marker.strip()
+    else:
+        short_address = clean_address.strip()
 
-        if re.match(r'^\d+$', part_clean) or re.match(r'^\d+[\s\-/a-яА-Я\d]+', part_clean):
-            continue
+    # 5. Теперь, когда всё лишнее отрезано, заменяем оставшиеся внутренние запятые на пробелы
+    short_address = short_address.replace(',', ' ')
 
-        has_trash = any(re.search(r'\b' + re.escape(marker) + r'\b', part_clean) for marker in trash_markers)
+    # 6. Финальное удаление случайных двойных пробелов
+    short_address = re.sub(r'\s+', ' ', short_address)
 
-        if has_trash or re.search(r'\b[дш]\b', part_clean):
-            continue
-            
-        context_parts.append(part_clean)
-
-    str_context = " ".join(context_parts).strip()
-    
-    # Шаг 7: Удаление случайных двойных пробелов
-    str_context = re.sub(r'\s+', ' ', str_context)
-    
-    return str_context
+    return short_address

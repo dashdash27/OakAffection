@@ -57,6 +57,7 @@ def get_city_suggestions(query):
         logger.exception("Критическая авария при обработке подсказок городов")
         return None
 
+
 def get_cities_fias(unique_cities: set[str], db_path: str) -> dict[str, str]:
     """
         Собирает fias_id из списка уникальных населенных пунктов
@@ -111,6 +112,8 @@ def get_cities_fias(unique_cities: set[str], db_path: str) -> dict[str, str]:
                     f"Оставшиеся города переносятся на следующий запуск Крона."
                 )
                 break
+
+            fias_id = None
                 
             data = {
                 "query": city_str, 
@@ -121,6 +124,11 @@ def get_cities_fias(unique_cities: set[str], db_path: str) -> dict[str, str]:
             
             try:
                 response = session.post(url, json=data, timeout=5)
+
+                if response.status_code == 403:
+                    logger.critical("[DaData API]: Бесплатный дневной лимит DaData исчерпан!")
+                    break
+
                 response.raise_for_status() 
 
                 suggestions = response.json().get('suggestions', [])
@@ -128,10 +136,15 @@ def get_cities_fias(unique_cities: set[str], db_path: str) -> dict[str, str]:
                     match_data = suggestions[0].get("data", {})
                     
                     fias_id = match_data.get("settlement_fias_id") or match_data.get("city_fias_id")
+
                     if fias_id:
                         city_to_fias[city_str] = fias_id
+                        new_cached_entries.append((city_str, fias_id))
+                    else:
+                        logger.warning(f"[DaData] По запросу '{city_str}' нет settlement_fias_id или city_fias_id.")
 
-                new_cached_entries.append((city_str, fias_id))
+                else:
+                    logger.warning(f"[DaData] Поисковый движок вернул пустой ответ для: '{city_str}'")
 
                 requested_count += 1
                 if requested_count % 500 == 0:
