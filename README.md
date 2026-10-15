@@ -10,7 +10,7 @@ A production-ready, highly optimized online store featuring a custom CMS, lightn
 The core philosophy behind this platform is **pragmatic performance**: achieving sub-millisecond local latency, high security, and exceptional throughput using a lean, maintainable monolithic stack (`Flask` + `PostgreSQL` + `Nginx`) running bare-metal on a single Linux VPS.
 
 <div align="center">
-    <img width="60%" alt="scheme-git" src="https://github.com/user-attachments/assets/bdb1f497-4d00-4995-8af1-130d904e0a85" />
+    <img width="750px" style="max-width: 100%" alt="scheme-git" src="https://github.com/user-attachments/assets/bdb1f497-4d00-4995-8af1-130d904e0a85" />
 </div>
 
 
